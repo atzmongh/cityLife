@@ -158,6 +158,9 @@
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>cityLifeDB.Designer.cs</LastGenOutput>
     </EntityDeploy>
+    <Content Include="cityLifeDB.csv" />
+    <Content Include="cityLifeDB.xlsx" />
+    <Content Include="Views\Admin\Index.cshtml" />
     <None Include="Views\Home\Index.cshtml" />
     <Content Include="icons\arr-b.svg" />
     <Content Include="icons\arr-l.svg" />
@@ -209,6 +212,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>cityLifeDB.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
