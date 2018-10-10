@@ -1,0 +1,7 @@
+Apartments,id,number,nameKey,descriptionKey,addressKey,size,featuresKeys,
+,1,1,nice,very nice apartment,poltavski shlach,25,bathroom;shower;fan,
+,2,2,beautiful,very nice apartment,poltavski shlach,26,"bathroom,shower,fan",
+,3,3,very beautiful,amazing,poltavski shlach,30,"all kinds of things,more things",
+ApartmentPhotoes,id,filePath,type,orientation,width,height,sortOrder,apartment_Id
+,1,/images/app1main.jpg,0,1,100,300,1,1
+,2,/images/app2main.jpg,0,1,100,300,2,2

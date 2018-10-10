@@ -7,10 +7,10 @@
 -- --------------------------------------------------
 
 SET QUOTED_IDENTIFIER OFF;
-GO
+--GO
 
 IF SCHEMA_ID(N'dbo') IS NULL EXECUTE(N'CREATE SCHEMA [dbo]');
-GO
+--GO
 
 -- --------------------------------------------------
 -- Dropping existing FOREIGN KEY constraints
@@ -18,10 +18,10 @@ GO
 
 IF OBJECT_ID(N'[dbo].[FK_ApartmentApartmentPhoto]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[ApartmentPhotoes] DROP CONSTRAINT [FK_ApartmentApartmentPhoto];
-GO
+--GO
 IF OBJECT_ID(N'[dbo].[FK_ApartmentPricing]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[Pricings] DROP CONSTRAINT [FK_ApartmentPricing];
-GO
+--GO
 
 -- --------------------------------------------------
 -- Dropping existing tables
@@ -29,13 +29,13 @@ GO
 
 IF OBJECT_ID(N'[dbo].[Apartments]', 'U') IS NOT NULL
     DROP TABLE [dbo].[Apartments];
-GO
+--GO
 IF OBJECT_ID(N'[dbo].[ApartmentPhotoes]', 'U') IS NOT NULL
     DROP TABLE [dbo].[ApartmentPhotoes];
-GO
+--GO
 IF OBJECT_ID(N'[dbo].[Pricings]', 'U') IS NOT NULL
     DROP TABLE [dbo].[Pricings];
-GO
+--GO
 
 -- --------------------------------------------------
 -- Creating all tables
@@ -51,7 +51,7 @@ CREATE TABLE [dbo].[Apartments] (
     [size] smallint  NOT NULL,
     [featuresKeys] nvarchar(max)  NULL
 );
-GO
+--GO
 
 -- Creating table 'ApartmentPhotoes'
 CREATE TABLE [dbo].[ApartmentPhotoes] (
@@ -64,7 +64,7 @@ CREATE TABLE [dbo].[ApartmentPhotoes] (
     [sortOrder] smallint  NOT NULL,
     [Apartment_Id] int  NOT NULL
 );
-GO
+--GO
 
 -- Creating table 'Pricings'
 CREATE TABLE [dbo].[Pricings] (
@@ -75,7 +75,7 @@ CREATE TABLE [dbo].[Pricings] (
     [priceWeekEnd] int  NOT NULL,
     [Apartment_Id] int  NOT NULL
 );
-GO
+--GO
 
 -- --------------------------------------------------
 -- Creating all PRIMARY KEY constraints
@@ -85,19 +85,19 @@ GO
 ALTER TABLE [dbo].[Apartments]
 ADD CONSTRAINT [PK_Apartments]
     PRIMARY KEY CLUSTERED ([Id] ASC);
-GO
+--GO
 
 -- Creating primary key on [Id] in table 'ApartmentPhotoes'
 ALTER TABLE [dbo].[ApartmentPhotoes]
 ADD CONSTRAINT [PK_ApartmentPhotoes]
     PRIMARY KEY CLUSTERED ([Id] ASC);
-GO
+--GO
 
 -- Creating primary key on [Id] in table 'Pricings'
 ALTER TABLE [dbo].[Pricings]
 ADD CONSTRAINT [PK_Pricings]
     PRIMARY KEY CLUSTERED ([Id] ASC);
-GO
+--GO
 
 -- --------------------------------------------------
 -- Creating all FOREIGN KEY constraints
@@ -110,13 +110,13 @@ ADD CONSTRAINT [FK_ApartmentApartmentPhoto]
     REFERENCES [dbo].[Apartments]
         ([Id])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
-GO
+--GO
 
 -- Creating non-clustered index for FOREIGN KEY 'FK_ApartmentApartmentPhoto'
 CREATE INDEX [IX_FK_ApartmentApartmentPhoto]
 ON [dbo].[ApartmentPhotoes]
     ([Apartment_Id]);
-GO
+--GO
 
 -- Creating foreign key on [Apartment_Id] in table 'Pricings'
 ALTER TABLE [dbo].[Pricings]
@@ -125,13 +125,13 @@ ADD CONSTRAINT [FK_ApartmentPricing]
     REFERENCES [dbo].[Apartments]
         ([Id])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
-GO
+--GO
 
 -- Creating non-clustered index for FOREIGN KEY 'FK_ApartmentPricing'
 CREATE INDEX [IX_FK_ApartmentPricing]
 ON [dbo].[Pricings]
     ([Apartment_Id]);
-GO
+--GO
 
 -- --------------------------------------------------
 -- Script has ended

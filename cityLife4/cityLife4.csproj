@@ -56,6 +56,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.Web.DynamicData" />
@@ -158,6 +159,9 @@
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>cityLifeDB.Designer.cs</LastGenOutput>
     </EntityDeploy>
+    <Content Include="Views\Admin\Index.cshtml" />
+    <Content Include="cityLifeDB.csv" />
+    <Content Include="cityLifeDB.xlsx" />
     <None Include="Views\Home\Index.cshtml" />
     <Content Include="icons\arr-b.svg" />
     <Content Include="icons\arr-l.svg" />
@@ -209,6 +213,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>cityLifeDB.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
