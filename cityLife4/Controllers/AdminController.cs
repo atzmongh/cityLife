@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Mvc;
 using Microsoft.VisualBasic.FileIO;
 using System.Text;
+using System.Configuration;
 
 namespace cityLife4.Controllers
 {
@@ -25,16 +26,16 @@ namespace cityLife4.Controllers
             
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
             db.Database.ExecuteSqlCommand(createDBsql);
-            createSqlForPopulatingDB(db);
+            PopulateDB(db);
            
 
             return View();
         }
         /// <summary>
         /// The function reads the CSV file that contains the DB content and creates SQL statements to populate it
+        /// Then it executes this SQL and populates the DB
         /// </summary>
-        /// <returns>SQL statements</returns>
-        private string createSqlForPopulatingDB(cityLifeDBContainer1 db)
+        private void PopulateDB(cityLifeDBContainer1 db)
         {
             string CSVFilePath = Server.MapPath("/cityLifeDB.csv");
             using (TextFieldParser parser = new TextFieldParser(CSVFilePath))
@@ -111,7 +112,7 @@ namespace cityLife4.Controllers
                     }
                     lineFields = parser.ReadFields();
                 }
-                return "";
+                return;
             }
         }
     }

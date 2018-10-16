@@ -9,6 +9,9 @@
     <EntitySet Name="Apartments" EntityType="cityLifeDB.Store.Apartments" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="ApartmentPhotoes" EntityType="cityLifeDB.Store.ApartmentPhotoes" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="Pricings" EntityType="cityLifeDB.Store.Pricings" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Languages" EntityType="cityLifeDB.Store.Languages" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="TranslationKeys" EntityType="cityLifeDB.Store.TranslationKeys" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Translations" EntityType="cityLifeDB.Store.Translations" store:Type="Tables" Schema="dbo" />
     <AssociationSet Name="ApartmentApartmentPhoto" Association="cityLifeDB.Store.ApartmentApartmentPhoto">
       <End Role="Apartment" EntitySet="Apartments" />
       <End Role="ApartmentPhoto" EntitySet="ApartmentPhotoes" />
@@ -16,6 +19,14 @@
     <AssociationSet Name="ApartmentPricing" Association="cityLifeDB.Store.ApartmentPricing">
       <End Role="Apartment" EntitySet="Apartments" />
       <End Role="Pricing" EntitySet="Pricings" />
+    </AssociationSet>
+    <AssociationSet Name="TranslationKeyTranslatio" Association="cityLifeDB.Store.TranslationKeyTranslatio">
+      <End Role="TranslationKey" EntitySet="TranslationKeys" />
+      <End Role="Translatio" EntitySet="Translations" />
+    </AssociationSet>
+    <AssociationSet Name="LanguageTranslation" Association="cityLifeDB.Store.LanguageTranslation">
+      <End Role="Language" EntitySet="Languages" />
+      <End Role="Translation" EntitySet="Translations" />
     </AssociationSet>
   </EntityContainer>
   <EntityType Name="Apartments">
@@ -54,6 +65,31 @@
     <Property Name="priceWeekEnd" Type="int" Nullable="false" />
     <Property Name="Apartment_Id" Type="int" Nullable="false" />
   </EntityType>
+  <EntityType Name="Languages">
+    <Key>
+      <PropertyRef Name="languageCode" />
+    </Key>
+    <Property Name="languageCode" Type="nchar" Nullable="false" MaxLength="10" />
+    <Property Name="name" Type="nchar" Nullable="false" MaxLength="30" />
+    <Property Name="isDefault" Type="bit" Nullable="false" DefaultValue="false" />
+  </EntityType>
+  <EntityType Name="TranslationKeys">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="key" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="isUsed" Type="bit" Nullable="false" DefaultValue="false" />
+  </EntityType>
+  <EntityType Name="Translations">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="message" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="TranslationKey_id" Type="int" Nullable="false" />
+    <Property Name="Language_languageCode" Type="nchar" MaxLength="10" Nullable="false" />
+  </EntityType>
   <Association Name="ApartmentApartmentPhoto">
     <End Role="Apartment" Type="cityLifeDB.Store.Apartments" Multiplicity="1" />
     <End Role="ApartmentPhoto" Type="cityLifeDB.Store.ApartmentPhotoes" Multiplicity="*" />
@@ -78,6 +114,30 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
+  <Association Name="TranslationKeyTranslatio">
+    <End Role="TranslationKey" Type="cityLifeDB.Store.TranslationKeys" Multiplicity="1" />
+    <End Role="Translatio" Type="cityLifeDB.Store.Translations" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="TranslationKey">
+        <PropertyRef Name="id" />
+      </Principal>
+      <Dependent Role="Translatio">
+        <PropertyRef Name="TranslationKey_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="LanguageTranslation">
+    <End Role="Language" Type="cityLifeDB.Store.Languages" Multiplicity="1" />
+    <End Role="Translation" Type="cityLifeDB.Store.Translations" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Language">
+        <PropertyRef Name="languageCode" />
+      </Principal>
+      <Dependent Role="Translation">
+        <PropertyRef Name="Language_languageCode" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
 </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
@@ -93,6 +153,17 @@
           <AssociationSet Name="ApartmentPricing" Association="cityLifeDB.ApartmentPricing">
             <End Role="Apartment" EntitySet="Apartments" />
             <End Role="Pricing" EntitySet="Pricings" />
+          </AssociationSet>
+          <EntitySet Name="Languages" EntityType="cityLifeDB.Language" />
+          <EntitySet Name="TranslationKeys" EntityType="cityLifeDB.TranslationKey" />
+          <EntitySet Name="Translations" EntityType="cityLifeDB.Translation" />
+          <AssociationSet Name="TranslationKeyTranslatio" Association="cityLifeDB.TranslationKeyTranslatio">
+            <End Role="TranslationKey" EntitySet="TranslationKeys" />
+            <End Role="Translatio" EntitySet="Translations" />
+          </AssociationSet>
+          <AssociationSet Name="LanguageTranslation" Association="cityLifeDB.LanguageTranslation">
+            <End Role="Language" EntitySet="Languages" />
+            <End Role="Translation" EntitySet="Translations" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="Apartment">
@@ -150,6 +221,57 @@
           <End Type="cityLifeDB.Apartment" Role="Apartment" Multiplicity="1" />
           <End Type="cityLifeDB.Pricing" Role="Pricing" Multiplicity="*" />
         </Association>
+        <EntityType Name="Language">
+          <Key>
+            <PropertyRef Name="languageCode" />
+          </Key>
+          <Property Name="languageCode" Type="String" Nullable="false" FixedLength="true" MaxLength="10" Unicode="true" >
+            <Documentation>
+              <Summary>the standard 5 letter code of the language, such as en-US</Summary>
+            </Documentation>
+          </Property>
+          <Property Name="name" Type="String" Nullable="false" FixedLength="true" MaxLength="30" >
+            <Documentation>
+              <Summary>the language name in its own language.</Summary>
+            </Documentation>
+          </Property>
+          <Property Name="isDefault" Type="Boolean" Nullable="false" DefaultValue="false" >
+            <Documentation>
+              <Summary>Determines if that language is the default language. Only a single language can be set default</Summary>
+            </Documentation>
+          </Property>
+          <NavigationProperty Name="Translations" Relationship="cityLifeDB.LanguageTranslation" FromRole="Language" ToRole="Translation" />
+        </EntityType>
+        <EntityType Name="TranslationKey">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="key" Type="String" Nullable="false" />
+          <Property Name="isUsed" Type="Boolean" Nullable="false" DefaultValue="false" >
+            <Documentation>
+              <Summary>set to true if this translation key has ever been used. This can help us to remove garbage translation keys from the DB</Summary>
+            </Documentation>
+          </Property>
+          <NavigationProperty Name="Translatios" Relationship="cityLifeDB.TranslationKeyTranslatio" FromRole="TranslationKey" ToRole="Translatio" />
+        </EntityType>
+        <EntityType Name="Translation">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="message" Type="String" Nullable="false" />
+          <NavigationProperty Name="TranslationKey" Relationship="cityLifeDB.TranslationKeyTranslatio" FromRole="Translatio" ToRole="TranslationKey" />
+          <NavigationProperty Name="Language" Relationship="cityLifeDB.LanguageTranslation" FromRole="Translation" ToRole="Language" />
+        </EntityType>
+        <Association Name="TranslationKeyTranslatio">
+          <End Type="cityLifeDB.TranslationKey" Role="TranslationKey" Multiplicity="1" />
+          <End Type="cityLifeDB.Translation" Role="Translatio" Multiplicity="*" />
+        </Association>
+        <Association Name="LanguageTranslation">
+          <End Type="cityLifeDB.Language" Role="Language" Multiplicity="1" />
+          <End Type="cityLifeDB.Translation" Role="Translation" Multiplicity="*" />
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -193,6 +315,32 @@
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
+    <EntitySetMapping Name="Languages">
+      <EntityTypeMapping TypeName="IsTypeOf(cityLifeDB.Language)">
+        <MappingFragment StoreEntitySet="Languages">
+          <ScalarProperty Name="languageCode" ColumnName="languageCode" />
+          <ScalarProperty Name="name" ColumnName="name" />
+          <ScalarProperty Name="isDefault" ColumnName="isDefault" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="TranslationKeys">
+      <EntityTypeMapping TypeName="IsTypeOf(cityLifeDB.TranslationKey)">
+        <MappingFragment StoreEntitySet="TranslationKeys">
+          <ScalarProperty Name="id" ColumnName="id" />
+          <ScalarProperty Name="key" ColumnName="key" />
+          <ScalarProperty Name="isUsed" ColumnName="isUsed" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Translations">
+      <EntityTypeMapping TypeName="IsTypeOf(cityLifeDB.Translation)">
+        <MappingFragment StoreEntitySet="Translations">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="message" ColumnName="message" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
     <AssociationSetMapping Name="ApartmentApartmentPhoto" TypeName="cityLifeDB.ApartmentApartmentPhoto" StoreEntitySet="ApartmentPhotoes">
       <EndProperty Name="Apartment">
         <ScalarProperty Name="Id" ColumnName="Apartment_Id" />
@@ -206,6 +354,22 @@
         <ScalarProperty Name="Id" ColumnName="Apartment_Id" />
       </EndProperty>
       <EndProperty Name="Pricing">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="TranslationKeyTranslatio" TypeName="cityLifeDB.TranslationKeyTranslatio" StoreEntitySet="Translations">
+      <EndProperty Name="TranslationKey">
+        <ScalarProperty Name="id" ColumnName="TranslationKey_id" />
+      </EndProperty>
+      <EndProperty Name="Translatio">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="LanguageTranslation" TypeName="cityLifeDB.LanguageTranslation" StoreEntitySet="Translations">
+      <EndProperty Name="Language">
+        <ScalarProperty Name="languageCode" ColumnName="Language_languageCode" />
+      </EndProperty>
+      <EndProperty Name="Translation">
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
     </AssociationSetMapping>

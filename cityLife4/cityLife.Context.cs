@@ -28,5 +28,8 @@ namespace cityLife4
         public virtual DbSet<Apartment> Apartments { get; set; }
         public virtual DbSet<ApartmentPhoto> ApartmentPhotoes { get; set; }
         public virtual DbSet<Pricing> Pricings { get; set; }
+        public virtual DbSet<Language> Languages { get; set; }
+        public virtual DbSet<TranslationKey> TranslationKeys { get; set; }
+        public virtual DbSet<Translation> Translations { get; set; }
     }
 }

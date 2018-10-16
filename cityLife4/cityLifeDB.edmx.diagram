@@ -10,6 +10,11 @@
         <AssociationConnector Association="cityLifeDB.ApartmentApartmentPhoto" />
         <EntityTypeShape EntityType="cityLifeDB.Pricing" Width="1.5" PointX="0.5" PointY="0.75" />
         <AssociationConnector Association="cityLifeDB.ApartmentPricing" />
+        <EntityTypeShape EntityType="cityLifeDB.Language" Width="1.5" PointX="8.75" PointY="1" />
+        <EntityTypeShape EntityType="cityLifeDB.TranslationKey" Width="1.5" PointX="8.75" PointY="3.25" />
+        <EntityTypeShape EntityType="cityLifeDB.Translation" Width="1.5" PointX="6.375" PointY="2.25" />
+        <AssociationConnector Association="cityLifeDB.TranslationKeyTranslatio" />
+        <AssociationConnector Association="cityLifeDB.LanguageTranslation" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
