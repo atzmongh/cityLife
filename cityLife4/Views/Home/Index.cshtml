@@ -3,13 +3,16 @@
 <html lang="en">
 
 @{ IEnumerable<ApartmentMainPhoto> apartments = ViewBag.apartments;
+    TranslateBox tBox = ViewBag.tBox;
+    string home = tBox.translate("home");
+    string booking = tBox.translate("booking");
 }
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <link rel="stylesheet" type="text/css" href="~/css/libs.css" media="all">
     <link rel="stylesheet" type="text/css" href="~/css/styles.css" media="all">
-    <title>Home</title>
+    <title>@home</title>
 </head>
 <body>
 
@@ -49,14 +52,14 @@
                             </svg>
                         </a>
                         <ul class="main-menu">
-                            <li class="active"><a href="#">Home</a></li>
+                            <li class="active"><a href="#"></a></li>
                             <li><a href="#">Nice Apartments</a></li>
                             <li><a href="#">Our important rules</a></li>
                         </ul>
                     </header>
 
                     <div class="form">
-                        <h2>Booking</h2>
+                        <h2>@booking</h2>
                         <form method="post" action="~/home/index">
                             <div class="field-box datepicker-box">
                                 <input type="text" id="fromDate" name="fromDate">

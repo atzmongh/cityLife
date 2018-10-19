@@ -24,7 +24,13 @@ namespace cityLife.Controllers
                                 join mainPhoto in db.ApartmentPhotoes on apartment.Id equals mainPhoto.Apartment.Id
                                 where mainPhoto.type == PhotoType.Main
                                 select new ApartmentMainPhoto { apart = apartment, photo = mainPhoto });
-
+            if (Session["tBox"]== null)
+            {
+                //Create a new translateBox object and save in session
+                Session["tBox"] = new TranslateBox("ru", "en", "showAsterisks");
+            }
+            ViewBag.tBox = Session["tBox"];
+            
                  
             
             return View();

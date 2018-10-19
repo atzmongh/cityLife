@@ -7,6 +7,7 @@ using System.Web.Mvc;
 using Microsoft.VisualBasic.FileIO;
 using System.Text;
 using System.Configuration;
+using System.Data.SqlClient;
 
 namespace cityLife4.Controllers
 {
@@ -25,7 +26,8 @@ namespace cityLife4.Controllers
             string createDBsql = sqlReader.ReadToEnd();
             
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
-            db.Database.ExecuteSqlCommand(createDBsql);
+           
+            //db.Database.ExecuteSqlCommand(createDBsql);
             PopulateDB(db);
            
 
@@ -47,6 +49,7 @@ namespace cityLife4.Controllers
                 List<string> columnValues =  new List<string>();
 
                 string[] lineFields = parser.ReadFields();
+                int startAt = -1;
                 while (lineFields !=null)
                 {
                     if (lineFields[0] != "")
@@ -55,11 +58,21 @@ namespace cityLife4.Controllers
                         tableName = lineFields[0];
                         columnNames.Clear();
                         //Set current table to be ON, so we can insert id's explicitly
-                        db.Database.ExecuteSqlCommand("SET IDENTITY_INSERT " + tableName + " ON");
+                      //  db.Database.ExecuteSqlCommand("SET IDENTITY_INSERT " + tableName + " ON");
                         columnNames = new List<string>();
-                        
-                        //copy all column names to the columnNames list - jump over the first column name which is always "id"
-                        for (int i = 2; i < lineFields.Count(); i++)
+
+                        //copy all column names to the columnNames list - if the first column is "id" - skip it, because it has autoamtic sequencing
+                        if (lineFields[1] == "id")
+                        {
+                            //The first column is "id", which has an automatic sequencing - jump over it.
+                            startAt = 2;
+                        }
+                        else
+                        {
+                            startAt = 1;
+                        }
+
+                        for (int i = startAt; i < lineFields.Count(); i++)
                         {
                             if (lineFields[i] != "")
                             {
@@ -76,7 +89,8 @@ namespace cityLife4.Controllers
                         //this is a data line - create an insert command to insert it into the DB
                         //Copy all value names into the valueName list
                         columnValues.Clear();
-                        for (int i = 2; i < lineFields.Count(); i++)
+                       
+                        for (int i = startAt; i < lineFields.Count(); i++)
                         {
                             if (lineFields[i] != "")
                             {
@@ -100,11 +114,11 @@ namespace cityLife4.Controllers
                             insertCommand.Append(columnNames[i]);          //INSERT INTO apartment(id,name
                         }
                         insertCommand.Append(") VALUES (");                //INSERT INTO apartment(id,name,description) VALUES (
-                        insertCommand.Append("'"+columnValues[0]+"'");     //INSERT INTO apartment(id,name,description) VALUES ("123"
+                        insertCommand.Append("N'"+columnValues[0]+"'");     //INSERT INTO apartment(id,name,description) VALUES (N'123'
                         for (int i = 1; i < columnValues.Count(); i++)
                         {
-                            insertCommand.Append(",");                     //INSERT INTO apartment(id,name,description) VALUES ("123",
-                            insertCommand.Append("'"+columnValues[i]+"'"); //INSERT INTO apartment(id,name,description) VALUES ("123","nice"
+                            insertCommand.Append(",");                     //INSERT INTO apartment(id,name,description) VALUES (N'123',
+                            insertCommand.Append("N'"+columnValues[i]+"'"); //INSERT INTO apartment(id,name,description) VALUES (N'123',N'nice'
                         }
                         insertCommand.Append(")");
                         string insertCommandSt = insertCommand.ToString();

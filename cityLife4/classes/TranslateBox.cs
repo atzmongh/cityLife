@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace cityLife4.classes
+namespace cityLife4
 {
     /// <summary>
     /// this class translates messages into the desired language
@@ -37,17 +37,18 @@ namespace cityLife4.classes
 
         public string translate(string translationKey)
         {
-            TranslationKey theTranslationKey =  db.TranslationKeys.SingleOrDefault(record => record.key == translationKey);
+            TranslationKey theTranslationKey =  db.TranslationKeys.SingleOrDefault(record => record.transKey == translationKey);
             if (theTranslationKey==null)
             {
                 //the translation key does not exist. Add it to the translation key table
-                theTranslationKey = new TranslationKey() { key = translationKey, isUsed = true };
-                db.TranslationKeys.Add(theTranslationKey);
-                db.SaveChanges();
+                //theTranslationKey = new TranslationKey() { transKey = translationKey, isUsed = true };
+                //db.TranslationKeys.Add(theTranslationKey);
+                //db.SaveChanges();
                 if (_noTranslation == "showAsterisks")
                 {
                     //return the translation key surrounded by asterisks for QA
-                    return '*' + translationKey + '*';
+                    string translated = '*' + translationKey + '*';
+                    return translated;
                 }
                 else
                 {

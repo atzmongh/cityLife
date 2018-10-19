@@ -78,7 +78,7 @@
       <PropertyRef Name="id" />
     </Key>
     <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="key" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="transKey" Type="nvarchar(max)" Nullable="false" />
     <Property Name="isUsed" Type="bit" Nullable="false" DefaultValue="false" />
   </EntityType>
   <EntityType Name="Translations">
@@ -172,7 +172,7 @@
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="number" Type="Int16" Nullable="false" />
-          <Property Name="nameKey" Type="String" Nullable="false" />
+          <Property Name="nameKey" Type="String" Nullable="false" Unicode="true" />
           <Property Name="descriptionKey" Type="String" Nullable="false" />
           <Property Name="addressKey" Type="String" Nullable="false" />
           <Property Name="size" Type="Int16" Nullable="false" />
@@ -247,7 +247,7 @@
             <PropertyRef Name="id" />
           </Key>
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="key" Type="String" Nullable="false" />
+          <Property Name="transKey" Type="String" Nullable="false" />
           <Property Name="isUsed" Type="Boolean" Nullable="false" DefaultValue="false" >
             <Documentation>
               <Summary>set to true if this translation key has ever been used. This can help us to remove garbage translation keys from the DB</Summary>
@@ -260,7 +260,7 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="message" Type="String" Nullable="false" />
+          <Property Name="message" Type="String" Nullable="false" Unicode="true" />
           <NavigationProperty Name="TranslationKey" Relationship="cityLifeDB.TranslationKeyTranslatio" FromRole="Translatio" ToRole="TranslationKey" />
           <NavigationProperty Name="Language" Relationship="cityLifeDB.LanguageTranslation" FromRole="Translation" ToRole="Language" />
         </EntityType>
@@ -328,7 +328,7 @@
       <EntityTypeMapping TypeName="IsTypeOf(cityLifeDB.TranslationKey)">
         <MappingFragment StoreEntitySet="TranslationKeys">
           <ScalarProperty Name="id" ColumnName="id" />
-          <ScalarProperty Name="key" ColumnName="key" />
+          <ScalarProperty Name="transKey" ColumnName="transKey" />
           <ScalarProperty Name="isUsed" ColumnName="isUsed" />
         </MappingFragment>
       </EntityTypeMapping>

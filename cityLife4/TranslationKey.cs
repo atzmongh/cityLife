@@ -22,7 +22,7 @@ namespace cityLife4
         }
     
         public int id { get; set; }
-        public string key { get; set; }
+        public string transKey { get; set; }
         public bool isUsed { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
