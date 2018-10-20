@@ -162,7 +162,7 @@
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="cityLifeDB.csv" />
     <Content Include="cityLifeDB.xlsx" />
-    <None Include="Views\Home\Index.cshtml" />
+    <None Include="Views\Home\IndexOLD.cshtml" />
     <Content Include="icons\arr-b.svg" />
     <Content Include="icons\arr-l.svg" />
     <Content Include="icons\arr-r.svg" />
@@ -245,6 +245,7 @@
     <Content Include="Views\web.config" />
     <Content Include="packages.config" />
     <Content Include="Views\sharing\_cityLifeLayout.cshtml" />
+    <Content Include="Views\Home\index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

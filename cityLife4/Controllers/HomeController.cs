@@ -27,12 +27,17 @@ namespace cityLife.Controllers
             if (Session["tBox"]== null)
             {
                 //Create a new translateBox object and save in session
-                Session["tBox"] = new TranslateBox("ru", "en", "showAsterisks");
+                Session["tBox"] = new TranslateBox(targetLanguageCode:"en",
+                                                   defaultLanguageCode: "ru",
+                                                   noTranslation: "showAsterisks");
             }
             ViewBag.tBox = Session["tBox"];
-            
-                 
-            
+            ViewBag.languages = db.Languages;
+            ViewBag.pageURL = "home";
+           
+
+
+
             return View();
         }
 

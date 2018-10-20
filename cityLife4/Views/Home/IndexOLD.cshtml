@@ -1,21 +1,21 @@
-﻿
-@using System.Data.Entity;
-@{ 
-    TranslateBox tBox = ViewBag.tBox;
-    string booking = tBox.translate("booking");
-    DbSet<Language> languages = ViewBag.languages;
-}
+﻿@using cityLife.Controllers;
 <!DOCTYPE html>
+<html lang="en">
 
-<html>
+@{ IEnumerable<ApartmentMainPhoto> apartments = ViewBag.apartments;
+    TranslateBox tBox = ViewBag.tBox;
+    string home = tBox.translate("home");
+    string booking = tBox.translate("booking");
+}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <link rel="stylesheet" type="text/css" href="~/css/libs.css" media="all">
     <link rel="stylesheet" type="text/css" href="~/css/styles.css" media="all">
-    <title>@ViewBag.Title</title>
+    <title>@home</title>
 </head>
 <body>
+
     <main>
         <aside class="main-sidebar">
             <div class="holder">
@@ -52,9 +52,9 @@
                             </svg>
                         </a>
                         <ul class="main-menu">
-                            <li class="active"><a href="#">Home</a></li>
-                            <li><a href="#">Apartments</a></li>
-                            <li><a href="#">Our rules</a></li>
+                            <li class="active"><a href="#"></a></li>
+                            <li><a href="#">Nice Apartments</a></li>
+                            <li><a href="#">Our important rules</a></li>
                         </ul>
                     </header>
 
@@ -133,17 +133,24 @@
                             <span class="name">EN</span>
                         </div>
                         <ul class="dropdown">
-                            @{ 
-                                foreach(var language in languages)
-                                {
-                                    <li>
-                                        <a href="#/lang/EN">
-                                            <span class="name">@language.languageCode</span>
-                                            <span class="dscr">@language.name</span>
-                                        </a>
-                                    </li>
-                                }
-                            }
+                            <li>
+                                <a href="#">
+                                    <span class="name">EN</span>
+                                    <span class="dscr">english</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <span class="name">RU</span>
+                                    <span class="dscr">русский</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <span class="name">UA</span>
+                                    <span class="dscr">украiнська</span>
+                                </a>
+                            </li>
                         </ul>
                     </div>
                     <div class="currency">
@@ -174,7 +181,38 @@
         <div class="mobile-menu-toggle"><span></span></div>
 
         <div class="main-wrapper">
-            @RenderBody();
+            <div class="slider main-slider">
+
+                @foreach (var apartmentPhoto in apartments)
+                {
+                    <div>
+                        <div class="slide">
+                            <div class="image" style="background-image: url('@apartmentPhoto.photo.filePath');"></div>
+                            <div class="slide-dscr">
+                                <div class="col">
+                                    <h4 class="light">Apartment @apartmentPhoto.apart.number</h4>
+                                    <h2 class="light">@apartmentPhoto.apart.addressKey</h2>
+                                    <div class="btn">Book now</div>
+                                </div>
+                                <div class="col">
+                                    <h4 class="light">Price</h4>
+                                    <div class="price light">$150/night</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="main-description-wrap">
+                <div class="proverb">
+                    <p>To know the road ahead, ask those coming back.</p>
+                    <p class="align-right">— Chinese Proverb</p>
+                </div>
+                <div class="description main-description">
+                    <p>Our apartment house is in a sunny and quiet location with good connections to hiking paths and cross country skiing runs. There are 10 comfortable apartments from 25m<sup>2</sup> to 45m<sup>2</sup></p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. At deserunt ea et iusto, odit rerum soluta tempore vel! Ab accusantium error eum fuga magnam modi nam quasi ratione repellat veritatis?</p>
+                </div>
+            </div>
         </div>
 
         <footer class="visible-on-mobile">
@@ -196,7 +234,78 @@
                 <a href="mailto:ksenia.korovina@gmail.com" class="mail">ksenia.korovina@gmail.com</a>
             </div>
         </footer>
-</main>
+
+        <div class="popup">
+            <div class="popup-centered">
+                <div class="popup-box">
+                    <a href="#" class="close-btn"></a>
+                    <div class="title">
+                        <h2>Congratulations!</h2>
+                    </div>
+                    <div class="content">
+                        <p class="stylized">
+                            Your booking has been successfully accepted.
+                            Email has been sent to the following address:
+                        </p>
+                        <a href="#mailto:oliver.williams@gmail.com" class="link">oliver.williams@gmail.com</a>
+                        <ul class="booking-details">
+                            <li>
+                                <span>
+                                    Check in date
+                                </span>
+                                <span>
+                                    09-09-2018
+                                </span>
+                            </li>
+                            <li>
+                                <span>Check out date</span>
+                                <span>11-09-2018</span>
+                            </li>
+                            <li>
+                                <span>Check in time</span>
+                                <span>
+                                    12:00
+                                </span>
+                            </li>
+                            <li>
+                                <span>Check out time</span>
+                                <span>
+                                    14:00
+                                </span>
+                            </li>
+                            <li>
+                                <span>
+                                    Guests
+                                </span>
+                                <span>
+                                    2
+
+                                </span>
+                            </li>
+                            <li>
+                                <span>Children</span>
+                                <span>-</span>
+                            </li>
+                            <li>
+                                <span>
+                                    Price
+                                </span>
+                                <span>$600</span>
+                            </li>
+                            <li>
+                                <span>Booking number</span>
+                                <span> 512687</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="btn-wrap">
+                        <a href="#" class="btn">OK</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
     <script src="/js/libs.js"></script>
     <script src="/js/scripts.js"></script>
 </body>
