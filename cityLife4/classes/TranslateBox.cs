@@ -35,6 +35,10 @@ namespace cityLife4
             _noTranslation = noTranslation;
         }
 
+        public void setTargetLanguage(string languageCode)
+        {
+            _targetLanguageCode = languageCode;
+        }
         public string translate(string translationKey)
         {
             TranslationKey theTranslationKey =  db.TranslationKeys.SingleOrDefault(record => record.transKey == translationKey);

@@ -4,6 +4,7 @@
     TranslateBox tBox = ViewBag.tBox;
     string booking = tBox.translate("booking");
     DbSet<Language> languages = ViewBag.languages;
+    string pageURL = ViewBag.pageURL;
 }
 <!DOCTYPE html>
 
@@ -52,19 +53,19 @@
                             </svg>
                         </a>
                         <ul class="main-menu">
-                            <li class="active"><a href="#">Home</a></li>
-                            <li><a href="#">Apartments</a></li>
-                            <li><a href="#">Our rules</a></li>
+                            <li class="active"><a href="#">@tBox.translate("Home")</a></li>
+                            <li><a href="#">@tBox.translate("Apartments")</a></li>
+                            <li><a href="#">@tBox.translate("Our rules")</a></li>
                         </ul>
                     </header>
 
                     <div class="form">
-                        <h2>@booking</h2>
+                        <h2>@tBox.translate("booking")</h2>
                         <form method="post" action="~/home/index">
                             <div class="field-box datepicker-box">
                                 <input type="text" id="fromDate" name="fromDate">
                                 <label for="fromDate">
-                                    <span class="field-name">Check in date</span>
+                                    <span class="field-name">@tBox.translate("Check in date")</span>
                                     <span class="calendar-ico"></span>
                                 </label>
                                 <span class="field-error"></span>
@@ -72,7 +73,7 @@
                             <div class="field-box datepicker-box">
                                 <input type="text" id="toDate" name="toDate">
                                 <label for="toDate">
-                                    <span class="field-name">Check out date</span>
+                                    <span class="field-name">@tBox.translate("Check out date")</span>
                                     <span class="calendar-ico"></span>
                                 </label>
                                 <span class="field-error"></span>
@@ -87,7 +88,7 @@
                                         <option>4</option>
                                     </select>
                                     <label>
-                                        <span class="field-name">Guests</span>
+                                        <span class="field-name">@tBox.translate("Guests")</span>
                                     </label>
                                 </div>
                                 <div class="field-box select-box">
@@ -99,45 +100,46 @@
                                         <option>4</option>
                                     </select>
                                     <label>
-                                        <span class="field-name">Child</span>
+                                        <span class="field-name">@tBox.translate("Children")</span>
                                     </label>
                                 </div>
                             </div>
-                            <button class="btn" type="submit">check availability</button>
+                            <button class="btn" type="submit">@tBox.translate("check availability")</button>
                         </form>
 
                     </div>
                 </div>
 
                 <div class="contact-info">
-                    <p class="note">Contact 24/7 with Viber or Whatsapp</p>
+                    <p class="note">@tBox.translate("Contact 24/7 with Viber or Whatsapp")</p>
                     <div class="phone">
-                        <a href="#" class="number dropdown-toggle">38(096)123 45 67</a>
+                        <a href="#" class="number dropdown-toggle">+38(096)1661293</a>
                         <ul class="dropdown">
                             <li>
-                                <h4 class="thin">Booking</h4>
-                                <a href="tel:38(096)123 45 67" class="number">38(096)123 45 67</a>
+                                <h4 class="thin">@tBox.translate("Booking")</h4>
+                                <a href="tel:38(096)123 45 67" class="number">+38(096)1661293</a>
                             </li>
                             <li>
-                                <h4 class="thin">House keeping</h4>
-                                <a href="tel:38(096)123 45 67" class="number">38(096)676 67 67</a>
+                                <h4 class="thin">@tBox.translate("House keeping")</h4>
+                                <a href="tel:38(096)123 45 67" class="number">+38(098)7710149</a><br />
+                                <a href="tel:38(096)123 45 67" class="number">+38(050)9633266</a>
                             </li>
                         </ul>
                     </div>
-                    <a href="mailto:ksenia.korovina@gmail.com" class="mail">ksenia.korovina@gmail.com</a>
+                    <a href="mailto:ksenia.korovina5@gmail.com" class="mail">ksenia.korovina5@gmail.com</a>
                 </div>
 
                 <div class="lang-wrap">
                     <div class="language">
                         <div class="dropdown-toggle">
-                            <span class="name">EN</span>
+                            <span class="name">@ViewBag.currentLanguage</span>
                         </div>
                         <ul class="dropdown">
                             @{ 
                                 foreach(var language in languages)
                                 {
                                     <li>
-                                        <a href="#/lang/EN">
+                                        <a href="@pageURL?language=@language.languageCode">
                                             <span class="name">@language.languageCode</span>
                                             <span class="dscr">@language.name</span>
                                         </a>
@@ -179,16 +181,16 @@
 
         <footer class="visible-on-mobile">
             <div class="contact-info">
-                <p class="note">Contact 24/7 with Viber or Whatsapp</p>
+                <p class="note">@tBox.translate("Contact 24/7 with Viber or Whatsapp")</p>
                 <div class="phone">
                     <a href="#" class="number dropdown-toggle">38(096)123 45 67</a>
                     <ul class="dropdown">
                         <li>
-                            <h4 class="thin">Booking</h4>
+                            <h4 class="thin">@tBox.translate("Booking")</h4>
                             <a href="tel:38(096)123 45 67" class="number">38(096)123 45 67</a>
                         </li>
                         <li>
-                            <h4 class="thin">House keeping</h4>
+                            <h4 class="thin">@tBox.translate("House keeping")</h4>
                             <a href="tel:38(096)123 45 67" class="number">38(096)676 67 67</a>
                         </li>
                     </ul>

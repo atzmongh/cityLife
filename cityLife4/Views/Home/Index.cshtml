@@ -7,7 +7,7 @@
     TranslateBox tBox = ViewBag.tBox;
     ViewBag.Title = tBox.translate("home");
     IEnumerable<ApartmentMainPhoto> apartments = ViewBag.apartments;
-   
+
 
 
 
@@ -22,13 +22,26 @@
                 <div class="image" style="background-image: url('@apartmentPhoto.photo.filePath');"></div>
                 <div class="slide-dscr">
                     <div class="col">
-                        <h4 class="light">Apartment @apartmentPhoto.apart.number</h4>
-                        <h2 class="light">@apartmentPhoto.apart.addressKey</h2>
-                        <div class="btn">Book now</div>
+                        <h4 class="light">@tBox.translate("Apartment") @apartmentPhoto.apart.number</h4>
+                        <h2 class="light">@apartmentPhoto.apart.nameKey</h2>
+                        <div class="btn">@tBox.translate("Book now")</div>
                     </div>
                     <div class="col">
-                        <h4 class="light">Price</h4>
-                        <div class="price light">$150/night</div>
+                        <h4 class="light">
+                            @tBox.translate("Price")
+                        </h4>
+                        <div class="price light">
+                            @{
+                                //Look for the minimum price for that apartment
+                                int  minPrice = apartmentPhoto.apart.Price(adults: 1, children: 0, weekend: false);
+                                string priceText = "";
+                                if ( minPrice != 0)
+                                {
+                                    priceText = tBox.translate("from ")+"$"+ minPrice+"/"+tBox.translate("night");
+                                }
+                            }
+                            @priceText
+                        </div>
                     </div>
                 </div>
             </div>
@@ -37,12 +50,14 @@
 </div>
 <div class="main-description-wrap">
     <div class="proverb">
-        <p>To know the road ahead, ask those coming back.</p>
-        <p class="align-right">— Chinese Proverb</p>
+        <p>@tBox.translate("bottom left text")</p>
+        <p class="align-right">@tBox.translate("Ksenia")</p>
     </div>
     <div class="description main-description">
-        <p>Our apartment house is in a sunny and quiet location with good connections to hiking paths and cross country skiing runs. There are 10 comfortable apartments from 25m<sup>2</sup> to 45m<sup>2</sup></p>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. At deserunt ea et iusto, odit rerum soluta tempore vel! Ab accusantium error eum fuga magnam modi nam quasi ratione repellat veritatis?</p>
+        <p>@tBox.translate("bottom middle text") Our apartment house is in a sunny and quiet location with good connections to hiking paths and cross country skiing runs. There are 10 comfortable apartments from 25m<sup>2</sup> to 45m<sup>2</sup></p>
+        <p>@tBox.translate("bottom right text")Lorem ipsum dolor sit amet, consectetur adipisicing elit. At deserunt ea et iusto, odit rerum soluta tempore vel! Ab accusantium error eum fuga magnam modi nam quasi ratione repellat veritatis?</p>
+        @* <p>@tBox.translate("bottom middle text") sf sdf sdf sdf sdf sdf sdf sdf sdf sdf sf sf sdf  sfd sdf sdf sdf sdf sdf sdf sdf sf sdf sdf sf sf sf sf s fsf s fsdf</p>
+            @*<p>@tBox.translate("bottom right text") sdf sdf sdf sdf sdf sdf sdf sdf sdf sdf sdf sdf sdf sdf </p>*@
     </div>
 </div>
 

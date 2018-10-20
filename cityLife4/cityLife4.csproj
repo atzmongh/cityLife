@@ -24,6 +24,7 @@
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -224,6 +225,7 @@
     <Compile Include="Language.cs">
       <DependentUpon>cityLife.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Apartment.cs" />
     <Compile Include="OrientationType.cs">
       <DependentUpon>cityLife.tt</DependentUpon>
     </Compile>
@@ -255,7 +257,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

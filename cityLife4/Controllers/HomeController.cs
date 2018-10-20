@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Configuration;
 
 namespace cityLife.Controllers
 {
@@ -16,24 +17,43 @@ namespace cityLife.Controllers
     {
        
         [HttpGet]
-        public ActionResult Index()
+        public ActionResult Index(string language)
         {
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
             //get all apartments and for each apartment - its main photo.
             ViewBag.apartments = (from apartment in db.Apartments
                                 join mainPhoto in db.ApartmentPhotoes on apartment.Id equals mainPhoto.Apartment.Id
                                 where mainPhoto.type == PhotoType.Main
-                                select new ApartmentMainPhoto { apart = apartment, photo = mainPhoto });
+                                  select new ApartmentMainPhoto { apart = apartment, photo = mainPhoto });
+            if (language==null)
+            {
+                //No language has been selected by the user - set English as the initial target language
+                language = "EN";
+            }
+
+            TranslateBox tBox;
             if (Session["tBox"]== null)
             {
                 //Create a new translateBox object and save in session
-                Session["tBox"] = new TranslateBox(targetLanguageCode:"en",
-                                                   defaultLanguageCode: "ru",
-                                                   noTranslation: "showAsterisks");
+                tBox = new TranslateBox(targetLanguageCode: language,
+                                        defaultLanguageCode: "RU",
+                                        noTranslation: WebConfigurationManager.AppSettings["noTranslations"]);
+                Session["tBox"] = tBox;
             }
-            ViewBag.tBox = Session["tBox"];
+            else
+            {
+                tBox = (TranslateBox)Session["tBox"];
+            }
+            tBox.setTargetLanguage(language);
+            if (Session["currency"] == null)
+            {
+
+            }
+
+            ViewBag.tBox = tBox;
             ViewBag.languages = db.Languages;
             ViewBag.pageURL = "home";
+            ViewBag.currentLanguage = language;
            
 
 
@@ -49,6 +69,10 @@ namespace cityLife.Controllers
             return View();
         }
 
+        public ActionResult language()
+        {
+            return View("index");
+        }
         public ActionResult About()
         {
             ViewBag.Message = "Your application description page.";
