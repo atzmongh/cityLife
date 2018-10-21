@@ -160,6 +160,12 @@
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>cityLifeDB.Designer.cs</LastGenOutput>
     </EntityDeploy>
+    <Content Include="images\defaultLandscape.jpg" />
+    <Content Include="images\main_photo_05.JPG" />
+    <Content Include="images\main_photo_14.JPG" />
+    <Content Include="images\main_photo_22.jpg" />
+    <Content Include="images\main_photo_23.JPG" />
+    <Content Include="images\main_photo_24.JPG" />
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="cityLifeDB.csv" />
     <Content Include="cityLifeDB.xlsx" />
@@ -176,8 +182,6 @@
     <Content Include="icons\mail.svg" />
     <Content Include="icons\phone.svg" />
     <Content Include="icons\resize.svg" />
-    <Content Include="images\app1main.jpg" />
-    <Content Include="images\app2main.jpg" />
     <Content Include="images\mask.png" />
     <Content Include="images\svg\logo.svg" />
     <Content Include="js\libs.js" />
@@ -216,9 +220,18 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>cityLifeDB.edmx</DependentUpon>
     </Compile>
+    <Compile Include="classes\AppException.cs" />
+    <Compile Include="classes\ExtensionMethods.cs" />
+    <Compile Include="classes\FakeDateTime.cs" />
     <Compile Include="classes\TranslateBox.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Currency.cs">
+      <DependentUpon>cityLife.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CurrencyExchange.cs">
+      <DependentUpon>cityLife.tt</DependentUpon>
+    </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -226,6 +239,7 @@
       <DependentUpon>cityLife.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Apartment.cs" />
+    <Compile Include="Models\Pricing.cs" />
     <Compile Include="OrientationType.cs">
       <DependentUpon>cityLife.tt</DependentUpon>
     </Compile>

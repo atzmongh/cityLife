@@ -15,6 +15,11 @@
         <EntityTypeShape EntityType="cityLifeDB.Translation" Width="1.5" PointX="6.375" PointY="2.25" />
         <AssociationConnector Association="cityLifeDB.TranslationKeyTranslatio" />
         <AssociationConnector Association="cityLifeDB.LanguageTranslation" />
+        <EntityTypeShape EntityType="cityLifeDB.Currency" Width="1.5" PointX="0.5" PointY="3.75" />
+        <AssociationConnector Association="cityLifeDB.CurrencyPricing" />
+        <EntityTypeShape EntityType="cityLifeDB.CurrencyExchange" Width="1.5" PointX="0.5" PointY="6.625" />
+        <AssociationConnector Association="cityLifeDB.CurrencyCurrencyExchangeFrom" />
+        <AssociationConnector Association="cityLifeDB.CurrencyCurrencyExchangeTo" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

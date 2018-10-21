@@ -1,13 +1,20 @@
 ﻿
 @using cityLife.Controllers;
+@*
+    Viewbag contains:
+          ViewBag.apartments = apartmentList;  //apartment list plus prices
+          ViewBag.tBox = tBox;                 //translation box
+          ViewBag.currentCurrency               (Currency)the currency selected by the user, or the default currency
+
+*@
 
 @{
     Layout = "~/Views/sharing/_cityLifeLayout.cshtml";
 
     TranslateBox tBox = ViewBag.tBox;
     ViewBag.Title = tBox.translate("home");
-    IEnumerable<ApartmentMainPhoto> apartments = ViewBag.apartments;
-
+    IEnumerable<ApartmentPrice> apartments = ViewBag.apartments;
+    Currency currentCurrency = ViewBag.currentCurrency;
 
 
 
@@ -15,15 +22,35 @@
 
 <div class="slider main-slider">
 
-    @foreach (var apartmentPhoto in apartments)
+    @foreach (var apartmentAndPrice in apartments)
     {
+        ApartmentPhoto mainPhoto;
+        if (Request.Browser.IsMobileDevice)
+        {
+            mainPhoto = apartmentAndPrice.theApartment.MainPhotoPortrait();
+        }
+        else
+        {
+            mainPhoto = apartmentAndPrice.theApartment.MainPhotoLandscape();
+        }
+        string filePath;
+        if (mainPhoto == null)
+        {
+            //We did not find a photo - take a default photo
+            filePath = "/images/defaultLandscape.jpg";
+        }
+        else
+        {
+            //we found a photo - take it
+            filePath = mainPhoto.filePath;
+        }
         <div>
             <div class="slide">
-                <div class="image" style="background-image: url('@apartmentPhoto.photo.filePath');"></div>
+                <div class="image" style="background-image: url('@filePath');"></div>
                 <div class="slide-dscr">
                     <div class="col">
-                        <h4 class="light">@tBox.translate("Apartment") @apartmentPhoto.apart.number</h4>
-                        <h2 class="light">@apartmentPhoto.apart.nameKey</h2>
+                        <h4 class="light">@tBox.translate("Apartment") @apartmentAndPrice.theApartment.number</h4>
+                        <h2 class="light">@apartmentAndPrice.theApartment.nameKey</h2>
                         <div class="btn">@tBox.translate("Book now")</div>
                     </div>
                     <div class="col">
@@ -32,19 +59,42 @@
                         </h4>
                         <div class="price light">
                             @{
-                                //Look for the minimum price for that apartment
-                                int  minPrice = apartmentPhoto.apart.Price(adults: 1, children: 0, weekend: false);
+                                //Display either the minimum price per night, or the price per stay
                                 string priceText = "";
-                                if ( minPrice != 0)
+                                if (apartmentAndPrice.minPricePerNight != 0)
                                 {
-                                    priceText = tBox.translate("from ")+"$"+ minPrice+"/"+tBox.translate("night");
+                                    //We should display: from $20/night (because the length of stay is not known)
+                                    priceText = tBox.translate("from") +" "+ currentCurrency.symbol +apartmentAndPrice.minPricePerNight + "/" + tBox.translate("night");
+                                }
+                                else if (apartmentAndPrice.pricePerStay != 0)
+                                {
+                                    //We should display: $100 for 4 nights
+                                    string night_s = "night";     //signular or plural "night" or "nights"
+                                    if (apartmentAndPrice.nightCount > 1)
+                                    {
+                                        night_s += "s";
+                                    }
+                                    priceText = "$" + apartmentAndPrice.pricePerStay + " " +
+                                        tBox.translate("for") + " " + apartmentAndPrice.nightCount + " " + tBox.translate(night_s);
+                                }
+                                else
+                                {
+                                    //display nothing, as we do not have any price
                                 }
                             }
                             @priceText
                         </div>
+
+
                     </div>
+
+
                 </div>
+
+
             </div>
+
+
         </div>
     }
 </div>

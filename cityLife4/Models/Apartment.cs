@@ -7,8 +7,20 @@ namespace cityLife4
 {
     public partial class Apartment
     {
-        public int Price(int adults, int children, bool weekend)
+        /// <summary>
+        /// The method gives the nightly price for the apartment, without discounts
+        /// Note that discounts can be calculated only if you know the exact dates of 
+        /// staying in the apartment
+        /// </summary>
+        /// <param name="adults">number of adults</param>
+        /// <param name="children">number of fhildren</param>
+        /// <param name="weekend">true for weekend, false for weekday</param>
+        /// <param name="currencyCode">the currency code in which the price should be quoted.</param>
+        /// <param name="atDate">the date for which you want to get the exchange rate</param>
+        /// <returns>nightly price</returns>
+        public int PricePerNight(int adults, int children, bool weekend, string currencyCode, DateTime atDate)
         {
+            
             var thePrice = from price in this.Pricings
                            where price.adults == adults && price.children == children
                            select price;
@@ -21,13 +33,36 @@ namespace cityLife4
             {
                 if (weekend)
                 {
-                    return thePrice.First().priceWeekEnd;
+                    return thePrice.First().WeekendPriceBy(currencyCode, atDate);
                 }
                 else
                 {
-                    return thePrice.First().priceWeekDay;
+                    return thePrice.First().WeekdayPriceBy(currencyCode, atDate);
                 }
             }
+        }
+
+        /// <summary>
+        /// The method returns the main landscape photo of the apartment, if such exists, and null if none. If more than one photo is tagged
+        /// as "main"and "landscape" - return the first one
+        /// </summary>
+        /// <returns>apartment main photo or null if nont exists</returns>
+        public ApartmentPhoto MainPhotoLandscape()
+        {
+                ApartmentPhoto theMainPhoto = this.ApartmentPhotoes.FirstOrDefault(aPhoto => aPhoto.type == PhotoType.Main && 
+                                                                                   aPhoto.orientation == OrientationType.Landscape);
+                return theMainPhoto;
+        }
+        /// <summary>
+        /// The method returns the main portrait photo of the apartment, if such exists, and null if none. If more than one photo is tagged
+        /// as "main" and "portrait" - return the first one
+        /// </summary>
+        /// <returns>apartment main photo or null if nont exists</returns>
+        public ApartmentPhoto MainPhotoPortrait()
+        {
+            ApartmentPhoto theMainPhoto = this.ApartmentPhotoes.FirstOrDefault(aPhoto => aPhoto.type == PhotoType.Main &&
+                                                                               aPhoto.orientation == OrientationType.Portrait);
+            return theMainPhoto;
         }
     }
 }

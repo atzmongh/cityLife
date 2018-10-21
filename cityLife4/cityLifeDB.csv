@@ -1,26 +1,38 @@
 Apartments,id,number,nameKey,descriptionKey,addressKey,size,featuresKeys,
-,1,05,nice,very nice apartment,poltavski shlach,27,bathroom;shower;fan,
-,2,14,nice,very nice apartment,poltavski shlach,25,"bathroom,shower,fan",
-,3,22,nice,very nice apartment,poltavski shlach,22,"bathroom,shower,fan",
-,4,23,nice,very nice apartment,poltavski shlach,22,"bathroom,shower,fan",
-,5,24,nice,very nice apartment,poltavski shlach,25,"bathroom,shower,fan",
+,1,05,VIP,very nice apartment,poltavski shlach,27,bathroom;shower;fan,
+,2,14,Romance,very nice apartment,poltavski shlach,25,"bathroom,shower,fan",
+,3,22,Family style,very nice apartment,poltavski shlach,22,"bathroom,shower,fan",
+,4,23,Business Pleasure,very nice apartment,poltavski shlach,22,"bathroom,shower,fan",
+,5,24,Sweet Dreams,very nice apartment,poltavski shlach,25,"bathroom,shower,fan",
 ,,,,,,,,
 ApartmentPhotoes,id,filePath,type,orientation,width,height,sortOrder,apartment_Id
-,1,/images/main_photo_05,0,1,100,300,1,1
-,2,/images/main_photo_14,0,1,100,300,1,2
-,3,/images/main_photo_22,0,1,100,300,1,3
-,4,/images/main_photo_23,0,1,100,300,1,4
-,5,/images/main_photo_24,0,1,100,300,1,5
+,1,/images/main_photo_05.jpg,0,0,100,300,1,1
+,2,/images/main_photo_14.jpg,0,0,100,300,1,2
+,3,/images/main_photo_22.jpg,0,0,100,300,1,3
+,4,/images/main_photo_23.jpg,0,0,100,300,1,4
+,5,/images/main_photo_24.jpg,0,0,100,300,1,5
 ,,,,,,,,
-Pricings,id,Apartment_id,adults,children,priceWeekDay,priceWeekEnd,,
-,1,1,1,0,20,30,,
-,2,1,1,1,25,35,,
-,3,1,2,0,27,38,,
-,4,2,1,0,22,32,,
+Currencies,currencyCode,symbol,name,,,,,
+,UAH,₴,Гривна,,,,,
+,USD,$,Dollar,,,,,
+,EUR,€,Euro,,,,,
+,ILS,₪,New Israeli Shekel,,,,,
+,,,,,,,,
+Pricings,id,Apartment_id,adults,children,priceWeekDay,priceWeekEnd,Currency_currencyCode,
+,1,1,1,0,400,500,UAH,
+,2,1,1,1,500,600,UAH,
+,3,1,2,0,600,700,UAH,
+,4,2,1,0,20,30,USD,
 ,,,,,,,,
 ,,,,,,,,
 ,,,,,,,,
-,,,,,,,,
+CurrencyExchanges,id,conversionRate,date,FromCurrency_currencyCode,ToCurrency_currencyCode,,,
+,,28.18,2018-10-21,USD,UAH,,,
+,,32.5,2018-10-21,EUR,UAH,,,
+,,1.15,2018-10-21,EUR,USD,,,
+,,4.22,2018-10-21,EUR,ILS,,,
+,,3.66,2018-10-21,USD,ILS,,,
+,,7.71,2018-10-21,ILS,UAH,,,
 ,,,,,,,,
 Languages,languageCode,name,isDefault,,,,,
 ,RU,Русский,true,,,,,

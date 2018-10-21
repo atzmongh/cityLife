@@ -21,5 +21,6 @@ namespace cityLife4
         public int priceWeekEnd { get; set; }
     
         public virtual Apartment Apartment { get; set; }
+        public virtual Currency Currency { get; set; }
     }
 }

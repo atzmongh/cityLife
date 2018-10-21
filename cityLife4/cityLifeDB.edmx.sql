@@ -2,13 +2,13 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 10/19/2018 22:54:27
+-- Date Created: 10/21/2018 20:39:12
 -- Generated from EDMX file: C:\software\cityLife\cityLife4\cityLifeDB.edmx
 -- --------------------------------------------------
 
 SET QUOTED_IDENTIFIER OFF;
 GO
-USE [C:\SOFTWARE\CITYLIFE7.MDF];
+USE [C:\SOFTWARE\CITYLIFEDB8.MDF];
 GO
 IF SCHEMA_ID(N'dbo') IS NULL EXECUTE(N'CREATE SCHEMA [dbo]');
 GO
@@ -28,6 +28,15 @@ IF OBJECT_ID(N'[dbo].[FK_TranslationKeyTranslatio]', 'F') IS NOT NULL
 GO
 IF OBJECT_ID(N'[dbo].[FK_LanguageTranslation]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[Translations] DROP CONSTRAINT [FK_LanguageTranslation];
+GO
+IF OBJECT_ID(N'[dbo].[FK_CurrencyPricing]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[Pricings] DROP CONSTRAINT [FK_CurrencyPricing];
+GO
+IF OBJECT_ID(N'[dbo].[FK_CurrencyCurrencyExchangeFrom]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[CurrencyExchanges] DROP CONSTRAINT [FK_CurrencyCurrencyExchangeFrom];
+GO
+IF OBJECT_ID(N'[dbo].[FK_CurrencyCurrencyExchangeTo]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[CurrencyExchanges] DROP CONSTRAINT [FK_CurrencyCurrencyExchangeTo];
 GO
 
 -- --------------------------------------------------
@@ -51,6 +60,12 @@ IF OBJECT_ID(N'[dbo].[TranslationKeys]', 'U') IS NOT NULL
 GO
 IF OBJECT_ID(N'[dbo].[Translations]', 'U') IS NOT NULL
     DROP TABLE [dbo].[Translations];
+GO
+IF OBJECT_ID(N'[dbo].[Currencies]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Currencies];
+GO
+IF OBJECT_ID(N'[dbo].[CurrencyExchanges]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[CurrencyExchanges];
 GO
 
 -- --------------------------------------------------
@@ -89,7 +104,8 @@ CREATE TABLE [dbo].[Pricings] (
     [children] smallint  NOT NULL,
     [priceWeekDay] int  NOT NULL,
     [priceWeekEnd] int  NOT NULL,
-    [Apartment_Id] int  NOT NULL
+    [Apartment_Id] int  NOT NULL,
+    [Currency_currencyCode] nchar(3)  NOT NULL
 );
 GO
 
@@ -115,6 +131,24 @@ CREATE TABLE [dbo].[Translations] (
     [message] nvarchar(max)  NOT NULL,
     [TranslationKey_id] int  NOT NULL,
     [Language_languageCode] nchar(10)  NOT NULL
+);
+GO
+
+-- Creating table 'Currencies'
+CREATE TABLE [dbo].[Currencies] (
+    [currencyCode] nchar(3)  NOT NULL,
+    [symbol] nchar(1)  NOT NULL,
+    [name] nvarchar(max)  NOT NULL
+);
+GO
+
+-- Creating table 'CurrencyExchanges'
+CREATE TABLE [dbo].[CurrencyExchanges] (
+    [Id] int IDENTITY(1,1) NOT NULL,
+    [conversionRate] decimal(10,4)  NOT NULL,
+    [date] datetime  NOT NULL,
+    [FromCurrency_currencyCode] nchar(3)  NOT NULL,
+    [ToCurrency_currencyCode] nchar(3)  NOT NULL
 );
 GO
 
@@ -155,6 +189,18 @@ GO
 -- Creating primary key on [Id] in table 'Translations'
 ALTER TABLE [dbo].[Translations]
 ADD CONSTRAINT [PK_Translations]
+    PRIMARY KEY CLUSTERED ([Id] ASC);
+GO
+
+-- Creating primary key on [currencyCode] in table 'Currencies'
+ALTER TABLE [dbo].[Currencies]
+ADD CONSTRAINT [PK_Currencies]
+    PRIMARY KEY CLUSTERED ([currencyCode] ASC);
+GO
+
+-- Creating primary key on [Id] in table 'CurrencyExchanges'
+ALTER TABLE [dbo].[CurrencyExchanges]
+ADD CONSTRAINT [PK_CurrencyExchanges]
     PRIMARY KEY CLUSTERED ([Id] ASC);
 GO
 
@@ -220,6 +266,51 @@ GO
 CREATE INDEX [IX_FK_LanguageTranslation]
 ON [dbo].[Translations]
     ([Language_languageCode]);
+GO
+
+-- Creating foreign key on [Currency_currencyCode] in table 'Pricings'
+ALTER TABLE [dbo].[Pricings]
+ADD CONSTRAINT [FK_CurrencyPricing]
+    FOREIGN KEY ([Currency_currencyCode])
+    REFERENCES [dbo].[Currencies]
+        ([currencyCode])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_CurrencyPricing'
+CREATE INDEX [IX_FK_CurrencyPricing]
+ON [dbo].[Pricings]
+    ([Currency_currencyCode]);
+GO
+
+-- Creating foreign key on [FromCurrency_currencyCode] in table 'CurrencyExchanges'
+ALTER TABLE [dbo].[CurrencyExchanges]
+ADD CONSTRAINT [FK_CurrencyCurrencyExchangeFrom]
+    FOREIGN KEY ([FromCurrency_currencyCode])
+    REFERENCES [dbo].[Currencies]
+        ([currencyCode])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_CurrencyCurrencyExchangeFrom'
+CREATE INDEX [IX_FK_CurrencyCurrencyExchangeFrom]
+ON [dbo].[CurrencyExchanges]
+    ([FromCurrency_currencyCode]);
+GO
+
+-- Creating foreign key on [ToCurrency_currencyCode] in table 'CurrencyExchanges'
+ALTER TABLE [dbo].[CurrencyExchanges]
+ADD CONSTRAINT [FK_CurrencyCurrencyExchangeTo]
+    FOREIGN KEY ([ToCurrency_currencyCode])
+    REFERENCES [dbo].[Currencies]
+        ([currencyCode])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_CurrencyCurrencyExchangeTo'
+CREATE INDEX [IX_FK_CurrencyCurrencyExchangeTo]
+ON [dbo].[CurrencyExchanges]
+    ([ToCurrency_currencyCode]);
 GO
 
 -- --------------------------------------------------

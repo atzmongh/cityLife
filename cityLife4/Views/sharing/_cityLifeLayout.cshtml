@@ -1,9 +1,21 @@
 ﻿
 @using System.Data.Entity;
-@{ 
+@*
+    Viewbag contains:
+    Viewbag.tBox                 (TranslationBox) translation box
+    Viewbag.Title                (string) translated title
+    ViewBag.languages           //(DbSEt<Language>) list of all supported languages
+    ViewBag.pageURL             //(string) page URL
+    ViewBag.currentLanguage     //(string)current lagnauge selected by user (or by default)
+    ViewBag.currencies          //(DbSet<currency>) all currencies supported
+    ViewBag.currentCurrency     //(Currency) currency selected by the user (or by default)
+*@
+@{
     TranslateBox tBox = ViewBag.tBox;
     string booking = tBox.translate("booking");
     DbSet<Language> languages = ViewBag.languages;
+    DbSet<Currency> currencies = ViewBag.currencies;
+    Currency currentCurrency = ViewBag.currentCurrency;
     string pageURL = ViewBag.pageURL;
 }
 <!DOCTYPE html>
@@ -135,8 +147,8 @@
                             <span class="name">@ViewBag.currentLanguage</span>
                         </div>
                         <ul class="dropdown">
-                            @{ 
-                                foreach(var language in languages)
+                            @{
+                                foreach (var language in languages)
                                 {
                                     <li>
                                         <a href="@pageURL?language=@language.languageCode">
@@ -150,24 +162,19 @@
                     </div>
                     <div class="currency">
                         <div class="dropdown-toggle">
-                            <span class="name">USD</span>
+                            <span class="name">@currentCurrency.currencyCode</span>
                         </div>
                         <ul class="dropdown">
-                            <li>
-                                <a href="#">
-                                    <span class="name">USD</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    <span class="name">EUR</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    <span class="name">UAH</span>
-                                </a>
-                            </li>
+                            @{ 
+                                foreach (var aCurrency in currencies)
+                                {
+                                    <li>
+                                        <a href="@pageURL?currency=@aCurrency.currencyCode">
+                                            <span class="name">@aCurrency.currencyCode</span>
+                                        </a>
+                                    </li>
+                                }
+                            }
                         </ul>
                     </div>
                 </div>
@@ -198,7 +205,7 @@
                 <a href="mailto:ksenia.korovina@gmail.com" class="mail">ksenia.korovina@gmail.com</a>
             </div>
         </footer>
-</main>
+    </main>
     <script src="/js/libs.js"></script>
     <script src="/js/scripts.js"></script>
 </body>

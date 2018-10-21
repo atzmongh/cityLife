@@ -12,6 +12,8 @@
     <EntitySet Name="Languages" EntityType="cityLifeDB.Store.Languages" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="TranslationKeys" EntityType="cityLifeDB.Store.TranslationKeys" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="Translations" EntityType="cityLifeDB.Store.Translations" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Currencies" EntityType="cityLifeDB.Store.Currencies" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="CurrencyExchanges" EntityType="cityLifeDB.Store.CurrencyExchanges" store:Type="Tables" Schema="dbo" />
     <AssociationSet Name="ApartmentApartmentPhoto" Association="cityLifeDB.Store.ApartmentApartmentPhoto">
       <End Role="Apartment" EntitySet="Apartments" />
       <End Role="ApartmentPhoto" EntitySet="ApartmentPhotoes" />
@@ -27,6 +29,18 @@
     <AssociationSet Name="LanguageTranslation" Association="cityLifeDB.Store.LanguageTranslation">
       <End Role="Language" EntitySet="Languages" />
       <End Role="Translation" EntitySet="Translations" />
+    </AssociationSet>
+    <AssociationSet Name="CurrencyPricing" Association="cityLifeDB.Store.CurrencyPricing">
+      <End Role="Currency" EntitySet="Currencies" />
+      <End Role="Pricing" EntitySet="Pricings" />
+    </AssociationSet>
+    <AssociationSet Name="CurrencyCurrencyExchange" Association="cityLifeDB.Store.CurrencyCurrencyExchangeFrom">
+      <End Role="Currency" EntitySet="Currencies" />
+      <End Role="CurrencyExchange" EntitySet="CurrencyExchanges" />
+    </AssociationSet>
+    <AssociationSet Name="CurrencyCurrencyExchange1" Association="cityLifeDB.Store.CurrencyCurrencyExchangeTo">
+      <End Role="Currency" EntitySet="Currencies" />
+      <End Role="CurrencyExchange" EntitySet="CurrencyExchanges" />
     </AssociationSet>
   </EntityContainer>
   <EntityType Name="Apartments">
@@ -64,6 +78,7 @@
     <Property Name="priceWeekDay" Type="int" Nullable="false" />
     <Property Name="priceWeekEnd" Type="int" Nullable="false" />
     <Property Name="Apartment_Id" Type="int" Nullable="false" />
+    <Property Name="Currency_currencyCode" Type="nchar" MaxLength="3" Nullable="false" />
   </EntityType>
   <EntityType Name="Languages">
     <Key>
@@ -89,6 +104,24 @@
     <Property Name="message" Type="nvarchar(max)" Nullable="false" />
     <Property Name="TranslationKey_id" Type="int" Nullable="false" />
     <Property Name="Language_languageCode" Type="nchar" MaxLength="10" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Currencies">
+    <Key>
+      <PropertyRef Name="currencyCode" />
+    </Key>
+    <Property Name="currencyCode" Type="nchar" Nullable="false" MaxLength="3" />
+    <Property Name="symbol" Type="nchar" Nullable="false" MaxLength="1" />
+    <Property Name="name" Type="nvarchar(max)" Nullable="false" />
+  </EntityType>
+  <EntityType Name="CurrencyExchanges">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="conversionRate" Type="decimal" Nullable="false" Precision="10" Scale="4" />
+    <Property Name="date" Type="datetime" Nullable="false" />
+    <Property Name="FromCurrency_currencyCode" Type="nchar" MaxLength="3" Nullable="false" />
+    <Property Name="ToCurrency_currencyCode" Type="nchar" MaxLength="3" Nullable="false" />
   </EntityType>
   <Association Name="ApartmentApartmentPhoto">
     <End Role="Apartment" Type="cityLifeDB.Store.Apartments" Multiplicity="1" />
@@ -138,6 +171,42 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
+  <Association Name="CurrencyPricing">
+    <End Role="Currency" Type="cityLifeDB.Store.Currencies" Multiplicity="1" />
+    <End Role="Pricing" Type="cityLifeDB.Store.Pricings" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Currency">
+        <PropertyRef Name="currencyCode" />
+      </Principal>
+      <Dependent Role="Pricing">
+        <PropertyRef Name="Currency_currencyCode" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="CurrencyCurrencyExchangeFrom">
+    <End Role="Currency" Type="cityLifeDB.Store.Currencies" Multiplicity="1" />
+    <End Role="CurrencyExchange" Type="cityLifeDB.Store.CurrencyExchanges" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Currency">
+        <PropertyRef Name="currencyCode" />
+      </Principal>
+      <Dependent Role="CurrencyExchange">
+        <PropertyRef Name="FromCurrency_currencyCode" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="CurrencyCurrencyExchangeTo">
+    <End Role="Currency" Type="cityLifeDB.Store.Currencies" Multiplicity="1" />
+    <End Role="CurrencyExchange" Type="cityLifeDB.Store.CurrencyExchanges" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Currency">
+        <PropertyRef Name="currencyCode" />
+      </Principal>
+      <Dependent Role="CurrencyExchange">
+        <PropertyRef Name="ToCurrency_currencyCode" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
 </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
@@ -164,6 +233,20 @@
           <AssociationSet Name="LanguageTranslation" Association="cityLifeDB.LanguageTranslation">
             <End Role="Language" EntitySet="Languages" />
             <End Role="Translation" EntitySet="Translations" />
+          </AssociationSet>
+          <EntitySet Name="Currencies" EntityType="cityLifeDB.Currency" />
+          <AssociationSet Name="CurrencyPricing" Association="cityLifeDB.CurrencyPricing">
+            <End Role="Currency" EntitySet="Currencies" />
+            <End Role="Pricing" EntitySet="Pricings" />
+          </AssociationSet>
+          <EntitySet Name="CurrencyExchanges" EntityType="cityLifeDB.CurrencyExchange" />
+          <AssociationSet Name="CurrencyCurrencyExchange" Association="cityLifeDB.CurrencyCurrencyExchangeFrom">
+            <End Role="Currency" EntitySet="Currencies" />
+            <End Role="CurrencyExchange" EntitySet="CurrencyExchanges" />
+          </AssociationSet>
+          <AssociationSet Name="CurrencyCurrencyExchange1" Association="cityLifeDB.CurrencyCurrencyExchangeTo">
+            <End Role="Currency" EntitySet="Currencies" />
+            <End Role="CurrencyExchange" EntitySet="CurrencyExchanges" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="Apartment">
@@ -216,6 +299,7 @@
           <Property Name="priceWeekDay" Type="Int32" Nullable="false" />
           <Property Name="priceWeekEnd" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Apartment" Relationship="cityLifeDB.ApartmentPricing" FromRole="Pricing" ToRole="Apartment" />
+          <NavigationProperty Name="Currency" Relationship="cityLifeDB.CurrencyPricing" FromRole="Pricing" ToRole="Currency" />
         </EntityType>
         <Association Name="ApartmentPricing">
           <End Type="cityLifeDB.Apartment" Role="Apartment" Multiplicity="1" />
@@ -271,6 +355,39 @@
         <Association Name="LanguageTranslation">
           <End Type="cityLifeDB.Language" Role="Language" Multiplicity="1" />
           <End Type="cityLifeDB.Translation" Role="Translation" Multiplicity="*" />
+        </Association>
+        <EntityType Name="Currency">
+          <Key>
+            <PropertyRef Name="currencyCode" />
+          </Key>
+          <Property Name="currencyCode" Type="String" Nullable="false" annotation:StoreGeneratedPattern="None" Unicode="true" FixedLength="true" MaxLength="3" />
+          <Property Name="symbol" Type="String" Nullable="false" FixedLength="true" MaxLength="1" />
+          <Property Name="name" Type="String" Nullable="false" Unicode="true" />
+          <NavigationProperty Name="Pricings" Relationship="cityLifeDB.CurrencyPricing" FromRole="Currency" ToRole="Pricing" />
+          <NavigationProperty Name="FromCurrencyExchanges" Relationship="cityLifeDB.CurrencyCurrencyExchangeFrom" FromRole="Currency" ToRole="CurrencyExchange" />
+          <NavigationProperty Name="ToCurrencyExchanges" Relationship="cityLifeDB.CurrencyCurrencyExchangeTo" FromRole="Currency" ToRole="CurrencyExchange" />
+        </EntityType>
+        <Association Name="CurrencyPricing">
+          <End Type="cityLifeDB.Currency" Role="Currency" Multiplicity="1" />
+          <End Type="cityLifeDB.Pricing" Role="Pricing" Multiplicity="*" />
+        </Association>
+        <EntityType Name="CurrencyExchange">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="conversionRate" Type="Decimal" Nullable="false" Precision="10" Scale="4" />
+          <Property Name="date" Type="DateTime" Nullable="false" />
+          <NavigationProperty Name="FromCurrency" Relationship="cityLifeDB.CurrencyCurrencyExchangeFrom" FromRole="CurrencyExchange" ToRole="Currency" />
+          <NavigationProperty Name="ToCurrency" Relationship="cityLifeDB.CurrencyCurrencyExchangeTo" FromRole="CurrencyExchange" ToRole="Currency" />
+        </EntityType>
+        <Association Name="CurrencyCurrencyExchangeFrom">
+          <End Type="cityLifeDB.Currency" Role="Currency" Multiplicity="1" />
+          <End Type="cityLifeDB.CurrencyExchange" Role="CurrencyExchange" Multiplicity="*" />
+        </Association>
+        <Association Name="CurrencyCurrencyExchangeTo">
+          <End Type="cityLifeDB.Currency" Role="Currency" Multiplicity="1" />
+          <End Type="cityLifeDB.CurrencyExchange" Role="CurrencyExchange" Multiplicity="*" />
         </Association>
       </Schema>
     </edmx:ConceptualModels>
@@ -341,6 +458,24 @@
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
+    <EntitySetMapping Name="Currencies">
+      <EntityTypeMapping TypeName="IsTypeOf(cityLifeDB.Currency)">
+        <MappingFragment StoreEntitySet="Currencies">
+          <ScalarProperty Name="currencyCode" ColumnName="currencyCode" />
+          <ScalarProperty Name="symbol" ColumnName="symbol" />
+          <ScalarProperty Name="name" ColumnName="name" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="CurrencyExchanges">
+      <EntityTypeMapping TypeName="IsTypeOf(cityLifeDB.CurrencyExchange)">
+        <MappingFragment StoreEntitySet="CurrencyExchanges">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="conversionRate" ColumnName="conversionRate" />
+          <ScalarProperty Name="date" ColumnName="date" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
     <AssociationSetMapping Name="ApartmentApartmentPhoto" TypeName="cityLifeDB.ApartmentApartmentPhoto" StoreEntitySet="ApartmentPhotoes">
       <EndProperty Name="Apartment">
         <ScalarProperty Name="Id" ColumnName="Apartment_Id" />
@@ -370,6 +505,30 @@
         <ScalarProperty Name="languageCode" ColumnName="Language_languageCode" />
       </EndProperty>
       <EndProperty Name="Translation">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="CurrencyPricing" TypeName="cityLifeDB.CurrencyPricing" StoreEntitySet="Pricings">
+      <EndProperty Name="Currency">
+        <ScalarProperty Name="currencyCode" ColumnName="Currency_currencyCode" />
+      </EndProperty>
+      <EndProperty Name="Pricing">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="CurrencyCurrencyExchange" TypeName="cityLifeDB.CurrencyCurrencyExchangeFrom" StoreEntitySet="CurrencyExchanges">
+      <EndProperty Name="Currency">
+        <ScalarProperty Name="currencyCode" ColumnName="FromCurrency_currencyCode" />
+      </EndProperty>
+      <EndProperty Name="CurrencyExchange">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="CurrencyCurrencyExchange1" TypeName="cityLifeDB.CurrencyCurrencyExchangeTo" StoreEntitySet="CurrencyExchanges">
+      <EndProperty Name="Currency">
+        <ScalarProperty Name="currencyCode" ColumnName="ToCurrency_currencyCode" />
+      </EndProperty>
+      <EndProperty Name="CurrencyExchange">
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
     </AssociationSetMapping>
