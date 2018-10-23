@@ -18,7 +18,7 @@ namespace cityLife4
         /// <param name="currencyCode">the currency code in which the price should be quoted.</param>
         /// <param name="atDate">the date for which you want to get the exchange rate</param>
         /// <returns>nightly price</returns>
-        public int PricePerNight(int adults, int children, bool weekend, string currencyCode, DateTime atDate)
+        public Money PricePerNight(int adults, int children, bool weekend, string currencyCode, DateTime atDate)
         {
             
             var thePrice = from price in this.Pricings
@@ -27,19 +27,36 @@ namespace cityLife4
             if (thePrice.Count()==0)
             {
                 //We did not find a pricing record for that number of adults and children
-                return 0;
+                return null;
             }
             else
             {
+                Pricing thePricing = thePrice.First();
                 if (weekend)
                 {
-                    return thePrice.First().WeekendPriceBy(currencyCode, atDate);
+                    Money theMoney = thePricing.priceWeekendAsMoney();
+                    return theMoney.converTo(currencyCode, atDate, rounded: true);
                 }
                 else
                 {
-                    return thePrice.First().WeekdayPriceBy(currencyCode, atDate);
+                    Money theMoney = thePricing.priceWeekendAsMoney();
+                    return theMoney.converTo(currencyCode, atDate, rounded: true);
                 }
             }
+        }
+
+        /// <summary>
+        /// Calculates the exact price to be paid for the stay in the apartment. It takes into account:
+        /// number of adults, children, start date, end date, weekdays/weekends and discounts.
+        /// </summary>
+        /// <param name="thePricing">the pricing record by which to claculate the price (based on number of adults and children)</param>
+        /// <param name="currencyCode">currency by which to show the price</param>
+        /// <param name="fromDate">date of entrance</param>
+        /// <param name="toDate">date of exit</param>
+        /// <returns></returns>
+        public int pricePerStay(Pricing thePricing, string currencyCode, DateTime fromDate, DateTime toDate)
+        {
+            return 0;//TBD
         }
 
         /// <summary>

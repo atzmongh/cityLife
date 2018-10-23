@@ -6,7 +6,7 @@
     <edmx:Diagrams>
       <Diagram DiagramId="413d876f0084455baeaf7d87ac2e25da" Name="Diagram1" >
         <EntityTypeShape EntityType="cityLifeDB.Apartment" Width="1.5" PointX="4.125" PointY="0.75" />
-        <EntityTypeShape EntityType="cityLifeDB.ApartmentPhoto" Width="1.75" PointX="4" PointY="4.125" />
+        <EntityTypeShape EntityType="cityLifeDB.ApartmentPhoto" Width="1.75" PointX="5.125" PointY="4.5" />
         <AssociationConnector Association="cityLifeDB.ApartmentApartmentPhoto" />
         <EntityTypeShape EntityType="cityLifeDB.Pricing" Width="1.5" PointX="0.5" PointY="0.75" />
         <AssociationConnector Association="cityLifeDB.ApartmentPricing" />
@@ -20,6 +20,9 @@
         <EntityTypeShape EntityType="cityLifeDB.CurrencyExchange" Width="1.5" PointX="0.5" PointY="6.625" />
         <AssociationConnector Association="cityLifeDB.CurrencyCurrencyExchangeFrom" />
         <AssociationConnector Association="cityLifeDB.CurrencyCurrencyExchangeTo" />
+        <EntityTypeShape EntityType="cityLifeDB.ApartmentDay" Width="1.5" PointX="2.75" PointY="4.5" />
+        <AssociationConnector Association="cityLifeDB.CurrencyApartmentDay" />
+        <AssociationConnector Association="cityLifeDB.ApartmentApartmentDay" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

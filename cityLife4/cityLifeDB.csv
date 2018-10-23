@@ -11,6 +11,9 @@ ApartmentPhotoes,id,filePath,type,orientation,width,height,sortOrder,apartment_I
 ,3,/images/main_photo_22.jpg,0,0,100,300,1,3
 ,4,/images/main_photo_23.jpg,0,0,100,300,1,4
 ,5,/images/main_photo_24.jpg,0,0,100,300,1,5
+,6,/images/main_photo_14P.jpg,0,1,100,200,1,2
+,7,/images/main_photo_24P.jpg,0,1,100,200,1,5
+,,,,,,,,
 ,,,,,,,,
 Currencies,currencyCode,symbol,name,,,,,
 ,UAH,₴,Гривна,,,,,
@@ -30,6 +33,9 @@ CurrencyExchanges,id,conversionRate,date,FromCurrency_currencyCode,ToCurrency_cu
 ,,28.18,2018-10-21,USD,UAH,,,
 ,,32.5,2018-10-21,EUR,UAH,,,
 ,,1.15,2018-10-21,EUR,USD,,,
+,,1.2,2018-10-20,EUR,USD,,,
+,,1.3,2018-10-19,EUR,USD,,,
+,,1.4,2018-10-18,EUR,USD,,,
 ,,4.22,2018-10-21,EUR,ILS,,,
 ,,3.66,2018-10-21,USD,ILS,,,
 ,,7.71,2018-10-21,ILS,UAH,,,

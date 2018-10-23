@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 10/21/2018 20:39:12
+-- Date Created: 10/22/2018 23:20:15
 -- Generated from EDMX file: C:\software\cityLife\cityLife4\cityLifeDB.edmx
 -- --------------------------------------------------
 
@@ -38,6 +38,12 @@ GO
 IF OBJECT_ID(N'[dbo].[FK_CurrencyCurrencyExchangeTo]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[CurrencyExchanges] DROP CONSTRAINT [FK_CurrencyCurrencyExchangeTo];
 GO
+IF OBJECT_ID(N'[dbo].[FK_CurrencyApartmentDay]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[ApartmentDays] DROP CONSTRAINT [FK_CurrencyApartmentDay];
+GO
+IF OBJECT_ID(N'[dbo].[FK_ApartmentApartmentDay]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[ApartmentDays] DROP CONSTRAINT [FK_ApartmentApartmentDay];
+GO
 
 -- --------------------------------------------------
 -- Dropping existing tables
@@ -66,6 +72,9 @@ IF OBJECT_ID(N'[dbo].[Currencies]', 'U') IS NOT NULL
 GO
 IF OBJECT_ID(N'[dbo].[CurrencyExchanges]', 'U') IS NOT NULL
     DROP TABLE [dbo].[CurrencyExchanges];
+GO
+IF OBJECT_ID(N'[dbo].[ApartmentDays]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[ApartmentDays];
 GO
 
 -- --------------------------------------------------
@@ -152,6 +161,18 @@ CREATE TABLE [dbo].[CurrencyExchanges] (
 );
 GO
 
+-- Creating table 'ApartmentDays'
+CREATE TABLE [dbo].[ApartmentDays] (
+    [Id] int IDENTITY(1,1) NOT NULL,
+    [status] int  NOT NULL,
+    [isCleaned] bit  NOT NULL,
+    [revenue] int  NOT NULL,
+    [date] datetime  NOT NULL,
+    [Currency_currencyCode] nchar(3)  NULL,
+    [Apartment_Id] int  NOT NULL
+);
+GO
+
 -- --------------------------------------------------
 -- Creating all PRIMARY KEY constraints
 -- --------------------------------------------------
@@ -201,6 +222,12 @@ GO
 -- Creating primary key on [Id] in table 'CurrencyExchanges'
 ALTER TABLE [dbo].[CurrencyExchanges]
 ADD CONSTRAINT [PK_CurrencyExchanges]
+    PRIMARY KEY CLUSTERED ([Id] ASC);
+GO
+
+-- Creating primary key on [Id] in table 'ApartmentDays'
+ALTER TABLE [dbo].[ApartmentDays]
+ADD CONSTRAINT [PK_ApartmentDays]
     PRIMARY KEY CLUSTERED ([Id] ASC);
 GO
 
@@ -311,6 +338,36 @@ GO
 CREATE INDEX [IX_FK_CurrencyCurrencyExchangeTo]
 ON [dbo].[CurrencyExchanges]
     ([ToCurrency_currencyCode]);
+GO
+
+-- Creating foreign key on [Currency_currencyCode] in table 'ApartmentDays'
+ALTER TABLE [dbo].[ApartmentDays]
+ADD CONSTRAINT [FK_CurrencyApartmentDay]
+    FOREIGN KEY ([Currency_currencyCode])
+    REFERENCES [dbo].[Currencies]
+        ([currencyCode])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_CurrencyApartmentDay'
+CREATE INDEX [IX_FK_CurrencyApartmentDay]
+ON [dbo].[ApartmentDays]
+    ([Currency_currencyCode]);
+GO
+
+-- Creating foreign key on [Apartment_Id] in table 'ApartmentDays'
+ALTER TABLE [dbo].[ApartmentDays]
+ADD CONSTRAINT [FK_ApartmentApartmentDay]
+    FOREIGN KEY ([Apartment_Id])
+    REFERENCES [dbo].[Apartments]
+        ([Id])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_ApartmentApartmentDay'
+CREATE INDEX [IX_FK_ApartmentApartmentDay]
+ON [dbo].[ApartmentDays]
+    ([Apartment_Id]);
 GO
 
 -- --------------------------------------------------

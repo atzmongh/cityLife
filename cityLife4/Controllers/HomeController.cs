@@ -100,8 +100,32 @@ namespace cityLife.Controllers
         [HttpPost]
         public ActionResult Index(DateTime fromDate, DateTime toDate, int adultsCount, int childrenCount)
         {
-          
 
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+
+            //Check apartment availability for the given dates and for the given occupation
+            foreach (var anApartment in db.Apartments)
+            {
+                var nonFreeDays = from anApartmentDay in db.ApartmentDays
+                                  where anApartmentDay.date >= fromDate && anApartmentDay.date < toDate &&
+                                  anApartmentDay.status != ApartOccuStatus.Free
+                                  select anApartmentDay;
+                if (nonFreeDays.Count() == 0)
+                {
+                    //The apartment is free for the requested period - check number of adults and children
+                    var pricing = from aPricing in db.Pricings
+                                  where aPricing.adults == adultsCount && aPricing.children == childrenCount
+                                  select aPricing;
+                    if (pricing.Count() > 0)
+                    {
+                        //The apartment is suitable for that number of people. Calculate the price per stay and
+                        //add the apartment to the list of available apartments
+
+
+                    }
+                }
+
+            }
             return View();
         }
 

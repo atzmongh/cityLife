@@ -14,6 +14,7 @@
     <EntitySet Name="Translations" EntityType="cityLifeDB.Store.Translations" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="Currencies" EntityType="cityLifeDB.Store.Currencies" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="CurrencyExchanges" EntityType="cityLifeDB.Store.CurrencyExchanges" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="ApartmentDays" EntityType="cityLifeDB.Store.ApartmentDays" store:Type="Tables" Schema="dbo" />
     <AssociationSet Name="ApartmentApartmentPhoto" Association="cityLifeDB.Store.ApartmentApartmentPhoto">
       <End Role="Apartment" EntitySet="Apartments" />
       <End Role="ApartmentPhoto" EntitySet="ApartmentPhotoes" />
@@ -41,6 +42,14 @@
     <AssociationSet Name="CurrencyCurrencyExchange1" Association="cityLifeDB.Store.CurrencyCurrencyExchangeTo">
       <End Role="Currency" EntitySet="Currencies" />
       <End Role="CurrencyExchange" EntitySet="CurrencyExchanges" />
+    </AssociationSet>
+    <AssociationSet Name="CurrencyApartmentDay" Association="cityLifeDB.Store.CurrencyApartmentDay">
+      <End Role="Currency" EntitySet="Currencies" />
+      <End Role="ApartmentDay" EntitySet="ApartmentDays" />
+    </AssociationSet>
+    <AssociationSet Name="ApartmentApartmentDay" Association="cityLifeDB.Store.ApartmentApartmentDay">
+      <End Role="Apartment" EntitySet="Apartments" />
+      <End Role="ApartmentDay" EntitySet="ApartmentDays" />
     </AssociationSet>
   </EntityContainer>
   <EntityType Name="Apartments">
@@ -122,6 +131,18 @@
     <Property Name="date" Type="datetime" Nullable="false" />
     <Property Name="FromCurrency_currencyCode" Type="nchar" MaxLength="3" Nullable="false" />
     <Property Name="ToCurrency_currencyCode" Type="nchar" MaxLength="3" Nullable="false" />
+  </EntityType>
+  <EntityType Name="ApartmentDays">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="status" Type="int" Nullable="false" />
+    <Property Name="isCleaned" Type="bit" Nullable="false" DefaultValue="false" />
+    <Property Name="revenue" Type="int" Nullable="false" DefaultValue="0" />
+    <Property Name="date" Type="datetime" Nullable="false" />
+    <Property Name="Currency_currencyCode" Type="nchar" MaxLength="3" Nullable="true" />
+    <Property Name="Apartment_Id" Type="int" Nullable="false" />
   </EntityType>
   <Association Name="ApartmentApartmentPhoto">
     <End Role="Apartment" Type="cityLifeDB.Store.Apartments" Multiplicity="1" />
@@ -207,6 +228,30 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
+  <Association Name="CurrencyApartmentDay">
+    <End Role="Currency" Type="cityLifeDB.Store.Currencies" Multiplicity="0..1" />
+    <End Role="ApartmentDay" Type="cityLifeDB.Store.ApartmentDays" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Currency">
+        <PropertyRef Name="currencyCode" />
+      </Principal>
+      <Dependent Role="ApartmentDay">
+        <PropertyRef Name="Currency_currencyCode" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="ApartmentApartmentDay">
+    <End Role="Apartment" Type="cityLifeDB.Store.Apartments" Multiplicity="1" />
+    <End Role="ApartmentDay" Type="cityLifeDB.Store.ApartmentDays" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Apartment">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="ApartmentDay">
+        <PropertyRef Name="Apartment_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
 </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
@@ -248,6 +293,15 @@
             <End Role="Currency" EntitySet="Currencies" />
             <End Role="CurrencyExchange" EntitySet="CurrencyExchanges" />
           </AssociationSet>
+          <EntitySet Name="ApartmentDays" EntityType="cityLifeDB.ApartmentDay" />
+          <AssociationSet Name="CurrencyApartmentDay" Association="cityLifeDB.CurrencyApartmentDay">
+            <End Role="Currency" EntitySet="Currencies" />
+            <End Role="ApartmentDay" EntitySet="ApartmentDays" />
+          </AssociationSet>
+          <AssociationSet Name="ApartmentApartmentDay" Association="cityLifeDB.ApartmentApartmentDay">
+            <End Role="Apartment" EntitySet="Apartments" />
+            <End Role="ApartmentDay" EntitySet="ApartmentDays" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="Apartment">
           <Key>
@@ -262,6 +316,7 @@
           <Property Name="featuresKeys" Type="String" Nullable="true" />
           <NavigationProperty Name="ApartmentPhotoes" Relationship="cityLifeDB.ApartmentApartmentPhoto" FromRole="Apartment" ToRole="ApartmentPhoto" />
           <NavigationProperty Name="Pricings" Relationship="cityLifeDB.ApartmentPricing" FromRole="Apartment" ToRole="Pricing" />
+          <NavigationProperty Name="ApartmentDays" Relationship="cityLifeDB.ApartmentApartmentDay" FromRole="Apartment" ToRole="ApartmentDay" />
         </EntityType>
         <EntityType Name="ApartmentPhoto">
           <Key>
@@ -366,6 +421,7 @@
           <NavigationProperty Name="Pricings" Relationship="cityLifeDB.CurrencyPricing" FromRole="Currency" ToRole="Pricing" />
           <NavigationProperty Name="FromCurrencyExchanges" Relationship="cityLifeDB.CurrencyCurrencyExchangeFrom" FromRole="Currency" ToRole="CurrencyExchange" />
           <NavigationProperty Name="ToCurrencyExchanges" Relationship="cityLifeDB.CurrencyCurrencyExchangeTo" FromRole="Currency" ToRole="CurrencyExchange" />
+          <NavigationProperty Name="ApartmentDays" Relationship="cityLifeDB.CurrencyApartmentDay" FromRole="Currency" ToRole="ApartmentDay" />
         </EntityType>
         <Association Name="CurrencyPricing">
           <End Type="cityLifeDB.Currency" Role="Currency" Multiplicity="1" />
@@ -388,6 +444,31 @@
         <Association Name="CurrencyCurrencyExchangeTo">
           <End Type="cityLifeDB.Currency" Role="Currency" Multiplicity="1" />
           <End Type="cityLifeDB.CurrencyExchange" Role="CurrencyExchange" Multiplicity="*" />
+        </Association>
+        <EntityType Name="ApartmentDay">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="status" Type="cityLifeDB.ApartOccuStatus" Nullable="false" />
+          <Property Name="isCleaned" Type="Boolean" Nullable="false" DefaultValue="false" />
+          <Property Name="revenue" Type="Int32" Nullable="false" DefaultValue="0" />
+          <NavigationProperty Name="Currency" Relationship="cityLifeDB.CurrencyApartmentDay" FromRole="ApartmentDay" ToRole="Currency" />
+          <NavigationProperty Name="Apartment" Relationship="cityLifeDB.ApartmentApartmentDay" FromRole="ApartmentDay" ToRole="Apartment" />
+          <Property Name="date" Type="DateTime" Nullable="false" />
+        </EntityType>
+        <EnumType Name="ApartOccuStatus">
+          <Member Name="Free" />
+          <Member Name="Reserved" />
+          <Member Name="Occupied" />
+        </EnumType>
+        <Association Name="CurrencyApartmentDay">
+          <End Type="cityLifeDB.Currency" Role="Currency" Multiplicity="0..1" />
+          <End Type="cityLifeDB.ApartmentDay" Role="ApartmentDay" Multiplicity="*" />
+        </Association>
+        <Association Name="ApartmentApartmentDay">
+          <End Type="cityLifeDB.Apartment" Role="Apartment" Multiplicity="1" />
+          <End Type="cityLifeDB.ApartmentDay" Role="ApartmentDay" Multiplicity="*" />
         </Association>
       </Schema>
     </edmx:ConceptualModels>
@@ -476,6 +557,17 @@
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
+    <EntitySetMapping Name="ApartmentDays">
+      <EntityTypeMapping TypeName="IsTypeOf(cityLifeDB.ApartmentDay)">
+        <MappingFragment StoreEntitySet="ApartmentDays">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="status" ColumnName="status" />
+          <ScalarProperty Name="isCleaned" ColumnName="isCleaned" />
+          <ScalarProperty Name="revenue" ColumnName="revenue" />
+          <ScalarProperty Name="date" ColumnName="date" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
     <AssociationSetMapping Name="ApartmentApartmentPhoto" TypeName="cityLifeDB.ApartmentApartmentPhoto" StoreEntitySet="ApartmentPhotoes">
       <EndProperty Name="Apartment">
         <ScalarProperty Name="Id" ColumnName="Apartment_Id" />
@@ -529,6 +621,23 @@
         <ScalarProperty Name="currencyCode" ColumnName="ToCurrency_currencyCode" />
       </EndProperty>
       <EndProperty Name="CurrencyExchange">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="CurrencyApartmentDay" TypeName="cityLifeDB.CurrencyApartmentDay" StoreEntitySet="ApartmentDays">
+      <EndProperty Name="Currency">
+        <ScalarProperty Name="currencyCode" ColumnName="Currency_currencyCode" />
+      </EndProperty>
+      <EndProperty Name="ApartmentDay">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+      <Condition ColumnName="Currency_currencyCode" IsNull="false" />
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="ApartmentApartmentDay" TypeName="cityLifeDB.ApartmentApartmentDay" StoreEntitySet="ApartmentDays">
+      <EndProperty Name="Apartment">
+        <ScalarProperty Name="Id" ColumnName="Apartment_Id" />
+      </EndProperty>
+      <EndProperty Name="ApartmentDay">
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
     </AssociationSetMapping>

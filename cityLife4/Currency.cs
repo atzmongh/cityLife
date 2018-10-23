@@ -20,6 +20,7 @@ namespace cityLife4
             this.Pricings = new HashSet<Pricing>();
             this.FromCurrencyExchanges = new HashSet<CurrencyExchange>();
             this.ToCurrencyExchanges = new HashSet<CurrencyExchange>();
+            this.ApartmentDays = new HashSet<ApartmentDay>();
         }
     
         public string currencyCode { get; set; }
@@ -32,5 +33,7 @@ namespace cityLife4
         public virtual ICollection<CurrencyExchange> FromCurrencyExchanges { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<CurrencyExchange> ToCurrencyExchanges { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ApartmentDay> ApartmentDays { get; set; }
     }
 }
