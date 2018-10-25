@@ -19,6 +19,7 @@ namespace cityLife4
         {
             this.isCleaned = false;
             this.revenue = 0;
+            this.priceFactor = 1m;
         }
     
         public int Id { get; set; }
@@ -26,6 +27,7 @@ namespace cityLife4
         public bool isCleaned { get; set; }
         public int revenue { get; set; }
         public System.DateTime date { get; set; }
+        public decimal priceFactor { get; set; }
     
         public virtual Currency Currency { get; set; }
         public virtual Apartment Apartment { get; set; }

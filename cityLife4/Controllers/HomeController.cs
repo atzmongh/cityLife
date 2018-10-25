@@ -16,8 +16,8 @@ namespace cityLife.Controllers
     public class ApartmentPrice
     {
         public Apartment theApartment;
-        public int minPricePerNight;  //if not calculated - will be 0
-        public int pricePerStay;   //if not calculated - will be 0
+        public Money minPricePerNight;  //if not calculated - will be 0
+        public Money pricePerStay;   //if not calculated - will be 0
         public int nightCount;     //for how many nights is the price per stay. 0 if unknown
     }
     public class HomeController : Controller
@@ -81,8 +81,8 @@ namespace cityLife.Controllers
             List<ApartmentPrice> apartmentList = new List<ApartmentPrice>();
             foreach (var anApartment in db.Apartments)
             {
-                int minPrice = anApartment.PricePerNight(adults: 1, children: 0, weekend: false, currencyCode: currency, atDate: FakeDateTime.Now);
-                apartmentList.Add(new ApartmentPrice { theApartment = anApartment, minPricePerNight = minPrice, pricePerStay = 0, nightCount = 0 });
+                Money minPrice = anApartment.PricePerNight(adults: 1, children: 0, weekend: false, currencyCode: currency, atDate: FakeDateTime.Now);
+                apartmentList.Add(new ApartmentPrice { theApartment = anApartment, minPricePerNight = minPrice, pricePerStay = null, nightCount = 0 });
             }
 
 
@@ -106,9 +106,12 @@ namespace cityLife.Controllers
             //Check apartment availability for the given dates and for the given occupation
             foreach (var anApartment in db.Apartments)
             {
-                var nonFreeDays = from anApartmentDay in db.ApartmentDays
-                                  where anApartmentDay.date >= fromDate && anApartmentDay.date < toDate &&
-                                  anApartmentDay.status != ApartOccuStatus.Free
+                var apartmentDays = from anApartmentDay in db.ApartmentDays
+                                  where anApartmentDay.date >= fromDate && anApartmentDay.date < toDate 
+                                  select anApartmentDay;
+
+                var nonFreeDays = from anApartmentDay in apartmentDays
+                                  where anApartmentDay.status != ApartOccuStatus.Free
                                   select anApartmentDay;
                 if (nonFreeDays.Count() == 0)
                 {
@@ -120,7 +123,28 @@ namespace cityLife.Controllers
                     {
                         //The apartment is suitable for that number of people. Calculate the price per stay and
                         //add the apartment to the list of available apartments
-
+                        Pricing thePricing = pricing.First();  //Anyway we assume that only a single record will be found.
+                        Money pricePerDay;
+                        Money pricePerStay = 0;
+                        for (DateTime aDate=fromDate; aDate < toDate; aDate = aDate.AddDays(1))
+                        {
+                            if (aDate.IsWeekend())
+                            {
+                                pricePerDay = thePricing.priceWeekendAsMoney();
+                            }
+                            else
+                            {
+                                pricePerDay = thePricing.priceWeekdayAsMoney();
+                            }
+                            //Check if there is a discount for that day
+                            ApartmentDay anApartmentDay = apartmentDays.SingleOrDefault(record => record.date == aDate);
+                            if (anApartmentDay != null)
+                            {
+                                //There is an apartmentDay record for that day - it should contain a price factor. 
+                                pricePerDay *= anApartmentDay.priceFactor;
+                            }
+                            pricePerStay += pricePerDay;
+                        }
 
                     }
                 }

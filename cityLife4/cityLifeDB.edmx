@@ -141,6 +141,7 @@
     <Property Name="isCleaned" Type="bit" Nullable="false" DefaultValue="false" />
     <Property Name="revenue" Type="int" Nullable="false" DefaultValue="0" />
     <Property Name="date" Type="datetime" Nullable="false" />
+    <Property Name="priceFactor" Type="decimal" Nullable="false" DefaultValue="1" Precision="10" Scale="4" />
     <Property Name="Currency_currencyCode" Type="nchar" MaxLength="3" Nullable="true" />
     <Property Name="Apartment_Id" Type="int" Nullable="false" />
   </EntityType>
@@ -456,6 +457,12 @@
           <NavigationProperty Name="Currency" Relationship="cityLifeDB.CurrencyApartmentDay" FromRole="ApartmentDay" ToRole="Currency" />
           <NavigationProperty Name="Apartment" Relationship="cityLifeDB.ApartmentApartmentDay" FromRole="ApartmentDay" ToRole="Apartment" />
           <Property Name="date" Type="DateTime" Nullable="false" />
+          <Property Name="priceFactor" Type="Decimal" Nullable="false" Precision="10" Scale="4" DefaultValue="1" >
+            <Documentation>
+              <Summary>a factor by which we need to multiply the price to get the final price. </Summary>
+              <LongDescription>example: if the price is $100, and the factor is 0.9, then the price will be $90. If the factor is 1.1, then the price will be $110</LongDescription>
+            </Documentation>
+          </Property>
         </EntityType>
         <EnumType Name="ApartOccuStatus">
           <Member Name="Free" />
@@ -565,6 +572,7 @@
           <ScalarProperty Name="isCleaned" ColumnName="isCleaned" />
           <ScalarProperty Name="revenue" ColumnName="revenue" />
           <ScalarProperty Name="date" ColumnName="date" />
+          <ScalarProperty Name="priceFactor" ColumnName="priceFactor" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>

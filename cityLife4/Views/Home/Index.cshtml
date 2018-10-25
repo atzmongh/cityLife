@@ -2,7 +2,7 @@
 @using cityLife.Controllers;
 @*
     Viewbag contains:
-          ViewBag.apartments = apartmentList;  //apartment list plus prices
+          ViewBag.apartments = apartmentList;  //list<ApartmentPrice>
           ViewBag.tBox = tBox;                 //translation box
           ViewBag.currentCurrency               (Currency)the currency selected by the user, or the default currency
 
@@ -61,12 +61,12 @@
                             @{
                                 //Display either the minimum price per night, or the price per stay
                                 string priceText = "";
-                                if (apartmentAndPrice.minPricePerNight != 0)
+                                if (apartmentAndPrice.minPricePerNight != null)
                                 {
                                     //We should display: from $20/night (because the length of stay is not known)
-                                    priceText = tBox.translate("from") +" "+ currentCurrency.symbol +apartmentAndPrice.minPricePerNight + "/" + tBox.translate("night");
+                                    priceText = tBox.translate("from") +" "+ apartmentAndPrice.minPricePerNight.toMoneyString() + "/" + tBox.translate("night");
                                 }
-                                else if (apartmentAndPrice.pricePerStay != 0)
+                                else if (apartmentAndPrice.pricePerStay != null)
                                 {
                                     //We should display: $100 for 4 nights
                                     string night_s = "night";     //signular or plural "night" or "nights"
@@ -74,7 +74,7 @@
                                     {
                                         night_s += "s";
                                     }
-                                    priceText = "$" + apartmentAndPrice.pricePerStay + " " +
+                                    priceText = apartmentAndPrice.pricePerStay.toMoneyString() + " " +
                                         tBox.translate("for") + " " + apartmentAndPrice.nightCount + " " + tBox.translate(night_s);
                                 }
                                 else

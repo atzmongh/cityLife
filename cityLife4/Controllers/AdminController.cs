@@ -50,6 +50,7 @@ namespace cityLife4.Controllers
 
                 string[] lineFields = parser.ReadFields();
                 int startAt = -1;
+                int columnCount=0;
                 while (lineFields !=null)
                 {
                     if (lineFields[0] != "")
@@ -72,13 +73,18 @@ namespace cityLife4.Controllers
                             startAt = 1;
                         }
 
-                        for (int i = startAt; i < lineFields.Count(); i++)
+                        int i;
+                        for (i = startAt; i < lineFields.Count(); i++)
                         {
-                            if (lineFields[i] != "")
+                            if (lineFields[i] == "")
                             {
-                                columnNames.Add(lineFields[i]);
+                                //We reached an empty field in the column names. This means that we reahced the end of the table columns.
+                                break;
                             }
+                            columnNames.Add(lineFields[i]);
                         }
+                        //At this point i contains the number of fields in the table
+                        columnCount = i;
                     }
                     else if (lineFields[0].Contains("//"))
                     {
@@ -89,16 +95,18 @@ namespace cityLife4.Controllers
                         //this is a data line - create an insert command to insert it into the DB
                         //Copy all value names into the valueName list
                         columnValues.Clear();
-                       
-                        for (int i = startAt; i < lineFields.Count(); i++)
+
+                        bool valuesExist = false;
+                        for (int i = startAt; i < columnCount; i++)
                         {
                             if (lineFields[i] != "")
                             {
-                                columnValues.Add(lineFields[i]);
+                                valuesExist = true;
                             }
+                            columnValues.Add(lineFields[i]);
                         }
                         //At this point we have all column names in columnName list and valus in columnValues list
-                        if (columnValues.Count() == 0)
+                        if (valuesExist == false)
                         {
                             //This is an empty line - skip it
                             lineFields = parser.ReadFields();

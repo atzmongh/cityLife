@@ -84,13 +84,24 @@ namespace cityLife4
             else
             {
                 //Look for all exchange rates records that match the "to currency" and "from currency". 
-                //Note that if we wish to convert from USD to EUR, but in the DB we find only a conversion from EUR to USD - we can use this record  
-                //as well.
+                //Note that in the DB we do not keep both conversion rates: EUR->USD and USD->EUR - since one is the reciprocal
+                //of the other. We only keep the pair where the "from" curency code is alphabetically lower than the "to"
+                //So we keep EUR->USD, UAH->USD, etc.
+                string lowerCurrencyCode;
+                string upperCurrencyCOde;
+                if (this.currencyCode.CompareTo(newCurrencyCode)<0)
+                {
+                    lowerCurrencyCode = this.currencyCode;
+                    upperCurrencyCOde = newCurrencyCode;
+                }
+                else
+                {
+                    lowerCurrencyCode = newCurrencyCode;
+                    upperCurrencyCOde = this.currencyCode;
+                }
                 var exchangeRates = from anExchangeRate in Money.db.CurrencyExchanges
-                                    where (anExchangeRate.FromCurrency.currencyCode == this.currencyCode &&
-                                          anExchangeRate.ToCurrency.currencyCode    == newCurrencyCode) ||
-                                          (anExchangeRate.FromCurrency.currencyCode == newCurrencyCode &&
-                                          anExchangeRate.ToCurrency.currencyCode    == this.currencyCode) &&
+                                    where anExchangeRate.FromCurrency.currencyCode == lowerCurrencyCode &&
+                                          anExchangeRate.ToCurrency.currencyCode    == upperCurrencyCOde  &&
                                           anExchangeRate.date <= atDate
                                     orderby anExchangeRate.date descending
                                     select anExchangeRate;
