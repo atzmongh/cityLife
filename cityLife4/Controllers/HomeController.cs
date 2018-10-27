@@ -10,8 +10,8 @@ namespace cityLife.Controllers
 {
     /// <summary>
     /// contains an apartment with 2 possible prices:
-    /// - price per night (which is actually the minimum price per night)
-    /// / price per stay (exact price one we know the number of adults, children and dates)
+    /// - price per night (which is actually the minimum price per night) or
+    /// - price per stay (exact price one we know the number of adults, children and dates)
     /// </summary>
     public class ApartmentPrice
     {
@@ -27,51 +27,14 @@ namespace cityLife.Controllers
         /// </summary>
         /// <param name="language">when the user selcets a language drop-down - we get the language in the parameter
         /// We will change the language accordingly</param>
+        /// <param name="currency">when the user selects the currency drtop-down - we get the currency in this parameter</param>
         /// <returns></returns>
         [HttpGet]
         public ActionResult Index(string language, string currency)
         {
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
-
-
-            if (language == null)
-            {
-                //No language has been selected by the user - set English as the initial target language
-                language = "EN";
-            }
-
-            TranslateBox tBox;
-            if (Session["tBox"] == null)
-            {
-                //Create a new translateBox object and save in session
-                tBox = new TranslateBox(targetLanguageCode: language,
-                                        defaultLanguageCode: "RU",
-                                        noTranslation: WebConfigurationManager.AppSettings["noTranslations"]);
-                Session["tBox"] = tBox;
-            }
-            else
-            {
-                tBox = (TranslateBox)Session["tBox"];
-            }
-            tBox.setTargetLanguage(language);  //either EN as default or what has been set by the user
-
-            if (currency == null && Session["currency"] == null)
-            {
-                //use default currency
-                currency = "UAH";
-                Session["currency"] = currency;
-            }
-            else if (currency == null)
-            {
-                //the session contains a currency - use it
-                currency = (string)Session["currency"];
-            }
-            else
-            {
-                //currency contains a new currency selected by the user
-                Session["currency"] = currency;
-            }
-            Currency theCurrency = db.Currencies.Single(aCurrency => aCurrency.currencyCode == currency);
+            TranslateBox tBox = this.setTbox(language);
+            Currency theCurrency = this.setCurrency(currency);
 
             //get all apartments and for each apartment - its price.
             //Price can either be:
@@ -81,28 +44,40 @@ namespace cityLife.Controllers
             List<ApartmentPrice> apartmentList = new List<ApartmentPrice>();
             foreach (var anApartment in db.Apartments)
             {
-                Money minPrice = anApartment.PricePerNight(adults: 1, children: 0, weekend: false, currencyCode: currency, atDate: FakeDateTime.Now);
+                Money minPrice = anApartment.PricePerNight(adults: 1, children: 0, weekend: false, currencyCode: theCurrency.currencyCode, atDate: FakeDateTime.Now);
                 apartmentList.Add(new ApartmentPrice { theApartment = anApartment, minPricePerNight = minPrice, pricePerStay = null, nightCount = 0 });
             }
 
 
-            ViewBag.apartments = apartmentList;   
+            ViewBag.apartments = apartmentList;
             ViewBag.tBox = tBox;
             ViewBag.languages = db.Languages;
             ViewBag.pageURL = "home";
-            ViewBag.currentLanguage = language;
+            ViewBag.currentLanguage = tBox.targetLanguage;
             ViewBag.currencies = db.Currencies;
             ViewBag.currentCurrency = theCurrency;
+
 
             return View();
         }
 
+        /// <summary>
+        /// the action is called when the user entered booking information and pressed the search button.
+        /// </summary>
+        /// <param name="fromDate">check in date</param>
+        /// <param name="toDate">checkout date</param>
+        /// <param name="adultsCount">number of adults</param>
+        /// <param name="childrenCount">number of children</param>
+        /// <returns></returns>
         [HttpPost]
         public ActionResult Index(DateTime fromDate, DateTime toDate, int adultsCount, int childrenCount)
         {
 
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
+            TranslateBox tBox = this.setTbox(language: null);
+            Currency theCurrency = this.setCurrency(currency: null);
 
+            List<ApartmentPrice> apartmentList = new List<ApartmentPrice>();
             //Check apartment availability for the given dates and for the given occupation
             foreach (var anApartment in db.Apartments)
             {
@@ -124,17 +99,18 @@ namespace cityLife.Controllers
                         //The apartment is suitable for that number of people. Calculate the price per stay and
                         //add the apartment to the list of available apartments
                         Pricing thePricing = pricing.First();  //Anyway we assume that only a single record will be found.
+
                         Money pricePerDay;
-                        Money pricePerStay = 0;
+                        Money pricePerStay = new Money(0M,thePricing.Currency.currencyCode);
                         for (DateTime aDate=fromDate; aDate < toDate; aDate = aDate.AddDays(1))
                         {
                             if (aDate.IsWeekend())
                             {
-                                pricePerDay = thePricing.priceWeekendAsMoney();
+                                pricePerDay = new Money(thePricing.priceWeekendAsMoney());
                             }
                             else
                             {
-                                pricePerDay = thePricing.priceWeekdayAsMoney();
+                                pricePerDay = new Money(thePricing.priceWeekdayAsMoney());
                             }
                             //Check if there is a discount for that day
                             ApartmentDay anApartmentDay = apartmentDays.SingleOrDefault(record => record.date == aDate);
@@ -145,12 +121,99 @@ namespace cityLife.Controllers
                             }
                             pricePerStay += pricePerDay;
                         }
-
+                        //At this point pricePerStay contains the total price for staying in the apartment. 
+                        //COnvert it to the target currency
+                        Money pricePerStayTargetCurrency = pricePerStay.converTo(theCurrency.currencyCode, FakeDateTime.Now);
+                        int nightCount = (toDate - fromDate).Days;
+                        ApartmentPrice apartmentAndPrice = new ApartmentPrice()
+                        {
+                            theApartment = anApartment,
+                            pricePerStay = pricePerStayTargetCurrency,
+                            minPricePerNight = null,
+                            nightCount = nightCount
+                        };
+                        apartmentList.Add(apartmentAndPrice);
                     }
                 }
+            }
+            //At this point the apartment list contains the list of suitable apartments plus the price per stay for each.
+
+
+            ViewBag.apartments = apartmentList;
+            ViewBag.tBox = tBox;
+            ViewBag.languages = db.Languages;
+            ViewBag.pageURL = "home";
+            ViewBag.currentLanguage = tBox.targetLanguage;
+            ViewBag.currencies = db.Currencies;
+            ViewBag.currentCurrency = theCurrency;
+
+            return View();
+        }
+
+        /// <summary>
+        /// This method is an auxiliary method to create the translation box and to insert it if needed to the Session variable
+        /// </summary>
+        /// <param name="language">language code, if set by the user</param>
+        /// <returns>the translation box</returns>
+        private TranslateBox setTbox(string language)
+        {
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+
+
+            TranslateBox tBox;
+            if (Session["tBox"] == null)
+            {
+                //Create a new translateBox object and save in session
+                tBox = new TranslateBox(targetLanguageCode: "EN",
+                                        defaultLanguageCode: "RU",
+                                        noTranslation: WebConfigurationManager.AppSettings["noTranslations"]);
+                Session["tBox"] = tBox;
+            }
+            else
+            {
+                tBox = (TranslateBox)Session["tBox"];
+            }
+            if (language != null)
+            {
+                tBox.targetLanguage = language;  //set language to what has been set by the user
 
             }
-            return View();
+            return tBox;
+
+
+        }
+
+        /// <summary>
+        /// Auxiliary method to set the currency.
+        /// </summary>
+        /// <param name="currency">Currency code if entered by the user or null</param>
+        /// <returns>the currency currency object</returns>
+        private Currency setCurrency(string currency)
+        {
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+
+            if (currency == null && Session["currency"] == null)
+            {
+                //use default currency
+                currency = "UAH";
+                Session["currency"] = currency;
+            }
+            else if (currency == null)
+            {
+                //the session contains a currency - use it
+                currency = (string)Session["currency"];
+            }
+            else
+            {
+                //currency contains a new currency selected by the user
+                Session["currency"] = currency;
+            }
+            Currency theCurrency = db.Currencies.SingleOrDefault(aCurrency => aCurrency.currencyCode == currency);
+            if (theCurrency == null)
+            {
+                throw new AppException(105, "Currency not found in DB:" + currency);
+            }
+            return theCurrency;
         }
 
         public ActionResult language()

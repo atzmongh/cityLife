@@ -30,7 +30,35 @@ namespace cityLife4
             amount = m.amount;
             currencyCode = m.currencyCode;
         }
+        public static Money operator * (Money m1, Money m2)
+        {
+            if (m1.currencyCode != m2.currencyCode)
+            {
+                throw new AppException(103, "Multiplication of money objects - the 2 objects have different currency, which is not supported. " +
+                                       m1.ToString() + " " + m2.ToString());
+            }
+            Money result = new Money(m1.amount * m2.amount, m1.currencyCode);
+            return result;
+        }
+        public static Money operator +(Money m1, Money m2)
+        {
+            if (m1.currencyCode != m2.currencyCode)
+            {
+                throw new AppException(103, "Adsdition of money objects - the 2 objects have different currency, which is not supported. " +
+                                       m1.ToString() + " " + m2.ToString());
+            }
+            Money result = new Money(m1.amount + m2.amount, m1.currencyCode);
+            return result;
+        }
+
+        public static Money operator *(Money m1, decimal d2)
+        {
+            Money result = new Money(m1.amount * d2, m1.currencyCode);
+            return result;
+        }
+
         /// <summary>
+        /// 
         /// returns a string representation of the Money object as : USD 156.32
         /// </summary>
         /// <returns></returns>

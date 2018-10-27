@@ -35,9 +35,18 @@ namespace cityLife4
             _noTranslation = noTranslation;
         }
 
-        public void setTargetLanguage(string languageCode)
+        public string targetLanguage
         {
-            _targetLanguageCode = languageCode;
+            set
+            { 
+                if (db.Languages.Find(value) == null)
+                {
+                    //such language code does not exist in the language table
+                    throw new AppException(106, "an unsupported language requested:" + value);
+                }
+                _targetLanguageCode = value;
+        }
+            get { return _targetLanguageCode; }
         }
         public string translate(string translationKey)
         {
