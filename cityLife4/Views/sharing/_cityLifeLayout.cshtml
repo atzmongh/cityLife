@@ -9,6 +9,7 @@
     ViewBag.currentLanguage     //(string)current lagnauge selected by user (or by default)
     ViewBag.currencies          //(DbSet<currency>) all currencies supported
     ViewBag.currentCurrency     //(Currency) currency selected by the user (or by default)
+    ViewBag.bookingRequest     //(BookingRequest)
 *@
 @{
     TranslateBox tBox = ViewBag.tBox;
@@ -73,7 +74,7 @@
 
                     <div class="form">
                         <h2>@tBox.translate("booking")</h2>
-                        <form method="post" action="~/home/index">
+                        <form method="get" action="@pageURL">
                             <div class="field-box datepicker-box">
                                 <input type="text" id="fromDate" name="fromDate">
                                 <label for="fromDate">
@@ -165,7 +166,7 @@
                             <span class="name">@currentCurrency.currencyCode</span>
                         </div>
                         <ul class="dropdown">
-                            @{ 
+                            @{
                                 foreach (var aCurrency in currencies)
                                 {
                                     <li>

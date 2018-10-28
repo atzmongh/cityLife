@@ -5,8 +5,9 @@
           ViewBag.apartments = apartmentList;  //list<ApartmentPrice>
           ViewBag.tBox = tBox;                 //translation box
           ViewBag.currentCurrency               (Currency)the currency selected by the user, or the default currency
-
+          ViewBag.bookingRequest     //(BookingRequest)
 *@
+
 
 @{
     Layout = "~/Views/sharing/_cityLifeLayout.cshtml";
@@ -64,7 +65,7 @@
                                 if (apartmentAndPrice.minPricePerNight != null)
                                 {
                                     //We should display: from $20/night (because the length of stay is not known)
-                                    priceText = tBox.translate("from") +" "+ apartmentAndPrice.minPricePerNight.toMoneyString() + "/" + tBox.translate("night");
+                                    priceText = tBox.translate("from") + " " + apartmentAndPrice.minPricePerNight.toMoneyString() + "/" + tBox.translate("night");
                                 }
                                 else if (apartmentAndPrice.pricePerStay != null)
                                 {
@@ -77,9 +78,17 @@
                                     priceText = apartmentAndPrice.pricePerStay.toMoneyString() + " " +
                                         tBox.translate("for") + " " + apartmentAndPrice.nightCount + " " + tBox.translate(night_s);
                                 }
-                                else
+                                else 
                                 {
-                                    //display nothing, as we do not have any price
+                                    //display a "not available" message and the reason
+                                    if(apartmentAndPrice.availability == Availability.OCCUPIED)
+                                    {
+                                        priceText = tBox.translate("Apartment booked for these dates");
+                                    }
+                                    if (apartmentAndPrice.availability == Availability.NOT_SUITABLE)
+                                    {
+                                        priceText = tBox.translate("Not suitable for this group size");
+                                    }
                                 }
                             }
                             @priceText
