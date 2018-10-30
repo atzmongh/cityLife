@@ -1,5 +1,6 @@
 ﻿
 @using System.Data.Entity;
+@using cityLife.Controllers;
 @*
     Viewbag contains:
     Viewbag.tBox                 (TranslationBox) translation box
@@ -18,6 +19,21 @@
     DbSet<Currency> currencies = ViewBag.currencies;
     Currency currentCurrency = ViewBag.currentCurrency;
     string pageURL = ViewBag.pageURL;
+    BookingRequest theBookingRequest = ViewBag.bookingRequest;
+    string checkinDate = "";
+    string checkoutDate = "";
+    if (theBookingRequest.checkinDate != null)
+    {
+        checkinDate = ((DateTime)theBookingRequest.checkinDate).ToString("dd MMMM, yyyy");
+    }
+    if (theBookingRequest.checkoutDate != null)
+    {
+        checkoutDate = ((DateTime)theBookingRequest.checkoutDate).ToString("dd MMMM, yyyy");
+    }
+    int adults = theBookingRequest.adults ?? 2;
+    int children = theBookingRequest.children ?? 0;
+
+
 }
 <!DOCTYPE html>
 
@@ -76,7 +92,7 @@
                         <h2>@tBox.translate("booking")</h2>
                         <form method="get" action="@pageURL">
                             <div class="field-box datepicker-box">
-                                <input type="text" id="fromDate" name="fromDate">
+                                <input type="text" id="fromDate" name="fromDate" value="@checkinDate">
                                 <label for="fromDate">
                                     <span class="field-name">@tBox.translate("Check in date")</span>
                                     <span class="calendar-ico"></span>
@@ -84,7 +100,7 @@
                                 <span class="field-error"></span>
                             </div>
                             <div class="field-box datepicker-box">
-                                <input type="text" id="toDate" name="toDate">
+                                <input type="text" id="toDate" name="toDate" value="@checkoutDate">
                                 <label for="toDate">
                                     <span class="field-name">@tBox.translate("Check out date")</span>
                                     <span class="calendar-ico"></span>
@@ -94,6 +110,19 @@
                             <div class="form-box-wrap">
                                 <div class="field-box select-box">
                                     <select name="adultsCount">
+                                        @{ 
+                                            for(int i = 0; i <= 4; i++)
+                                            {
+                                                if (adults == i)
+                                                {
+                                                    <option selected>@i</option>
+                                                }
+                                                else
+                                                {
+                                                    <option>@i</option>
+                                                }
+                                            }
+                                        }
                                         <option>0</option>
                                         <option>1</option>
                                         <option>2</option>

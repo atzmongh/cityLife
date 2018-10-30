@@ -52,7 +52,13 @@
                     <div class="col">
                         <h4 class="light">@tBox.translate("Apartment") @apartmentAndPrice.theApartment.number</h4>
                         <h2 class="light">@apartmentAndPrice.theApartment.nameKey</h2>
-                        <div class="btn">@tBox.translate("Book now")</div>
+                        @{
+                            if (apartmentAndPrice.availability == Availability.AVAILABLE)
+                            {
+                                <div class="btn">@tBox.translate("Book now")</div>
+                            }
+                        }
+
                     </div>
                     <div class="col">
                         <h4 class="light">
