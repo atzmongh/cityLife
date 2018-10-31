@@ -27,7 +27,7 @@ namespace cityLife4.Controllers
             
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
            
-            //db.Database.ExecuteSqlCommand(createDBsql);
+            db.Database.ExecuteSqlCommand(createDBsql);
             PopulateDB(db);
            
 
@@ -49,8 +49,8 @@ namespace cityLife4.Controllers
                 List<string> columnValues =  new List<string>();
 
                 string[] lineFields = parser.ReadFields();
-                int startAt = -1;
                 int columnCount=0;
+                string setIdentityOn = "";
                 while (lineFields !=null)
                 {
                     if (lineFields[0] != "")
@@ -58,23 +58,21 @@ namespace cityLife4.Controllers
                         //This is a new table - the line contains the table name and then the field names
                         tableName = lineFields[0];
                         columnNames.Clear();
-                        //Set current table to be ON, so we can insert id's explicitly
-                      //  db.Database.ExecuteSqlCommand("SET IDENTITY_INSERT " + tableName + " ON");
                         columnNames = new List<string>();
 
-                        //copy all column names to the columnNames list - if the first column is "id" - skip it, because it has autoamtic sequencing
+                        //copy all column names to the columnNames list - if the first column is "id" - generate a "set identity_insert on command"
+                        //so that we can insert ids explicitly
                         if (lineFields[1] == "id")
                         {
-                            //The first column is "id", which has an automatic sequencing - jump over it.
-                            startAt = 2;
+                            setIdentityOn = "SET IDENTITY_INSERT " + tableName + " ON;";
                         }
                         else
                         {
-                            startAt = 1;
+                            setIdentityOn = "";
                         }
 
                         int i;
-                        for (i = startAt; i < lineFields.Count(); i++)
+                        for (i = 1; i < lineFields.Count(); i++)
                         {
                             if (lineFields[i] == "")
                             {
@@ -97,7 +95,7 @@ namespace cityLife4.Controllers
                         columnValues.Clear();
 
                         bool valuesExist = false;
-                        for (int i = startAt; i < columnCount; i++)
+                        for (int i = 1; i < columnCount; i++)
                         {
                             if (lineFields[i] != "")
                             {
@@ -112,7 +110,7 @@ namespace cityLife4.Controllers
                             lineFields = parser.ReadFields();
                             continue;
                         }
-                        StringBuilder insertCommand = new StringBuilder("INSERT INTO ");
+                        StringBuilder insertCommand = new StringBuilder(setIdentityOn + "  INSERT INTO ");
                         insertCommand.Append(tableName);                   //INSERT INTO apartment
                         insertCommand.Append("(");                         //INSERT INTO apartment(
                         insertCommand.Append(columnNames[0]);              //INSERT INTO apartment(id
