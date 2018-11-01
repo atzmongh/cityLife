@@ -18,8 +18,7 @@ namespace cityLife4.Controllers
         {
             return View();
         }
-        [HttpPost]
-        public ActionResult Index(string recreateDB)
+        public ActionResult uploadDB()
         {
             //drop all DB tables and create a new DB schema with empty DB
             StreamReader sqlReader = new StreamReader(Server.MapPath("/cityLifeDB.edmx.sql"));
@@ -31,7 +30,7 @@ namespace cityLife4.Controllers
             PopulateDB(db);
            
 
-            return View();
+            return View("index");
         }
         /// <summary>
         /// The function reads the CSV file that contains the DB content and creates SQL statements to populate it

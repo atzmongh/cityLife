@@ -234,6 +234,7 @@
     <Compile Include="classes\ExtensionMethods.cs" />
     <Compile Include="classes\FakeDateTime.cs" />
     <Compile Include="classes\Money.cs" />
+    <Compile Include="classes\Test.cs" />
     <Compile Include="classes\TranslateBox.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -265,6 +266,9 @@
       <DependentUpon>cityLife.tt</DependentUpon>
     </Compile>
     <Compile Include="TranslationKey.cs">
+      <DependentUpon>cityLife.tt</DependentUpon>
+    </Compile>
+    <Compile Include="unitTest.cs">
       <DependentUpon>cityLife.tt</DependentUpon>
     </Compile>
   </ItemGroup>

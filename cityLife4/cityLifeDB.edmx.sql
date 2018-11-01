@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 10/25/2018 22:31:45
+-- Date Created: 11/01/2018 22:35:57
 -- Generated from EDMX file: C:\software\cityLife\cityLife4\cityLifeDB.edmx
 -- --------------------------------------------------
 
@@ -76,7 +76,9 @@ IF OBJECT_ID(N'[dbo].[CurrencyExchanges]', 'U') IS NOT NULL
 IF OBJECT_ID(N'[dbo].[ApartmentDays]', 'U') IS NOT NULL
     DROP TABLE [dbo].[ApartmentDays];
 --GO
-
+IF OBJECT_ID(N'[dbo].[UnitTests]', 'U') IS NOT NULL
+    DROP TABLE [dbo].UnitTests;
+-- -------------------------------------------
 -- --------------------------------------------------
 -- Creating all tables
 -- --------------------------------------------------
@@ -174,6 +176,17 @@ CREATE TABLE [dbo].[ApartmentDays] (
 );
 --GO
 
+-- Creating table 'unitTests'
+CREATE TABLE [dbo].[unitTests] (
+    [series] nchar(64)  NOT NULL,
+    [number] int  NOT NULL,
+    [expectedResult] nvarchar(max)  NULL,
+    [actualResult] nvarchar(max)  NULL,
+    [dateLastRun] datetime  NOT NULL,
+    [correctFlag] bit  NULL
+);
+--GO
+
 -- --------------------------------------------------
 -- Creating all PRIMARY KEY constraints
 -- --------------------------------------------------
@@ -230,6 +243,12 @@ ADD CONSTRAINT [PK_CurrencyExchanges]
 ALTER TABLE [dbo].[ApartmentDays]
 ADD CONSTRAINT [PK_ApartmentDays]
     PRIMARY KEY CLUSTERED ([Id] ASC);
+--GO
+
+-- Creating primary key on [series], [number] in table 'unitTests'
+ALTER TABLE [dbo].[unitTests]
+ADD CONSTRAINT [PK_unitTests]
+    PRIMARY KEY CLUSTERED ([series], [number] ASC);
 --GO
 
 -- --------------------------------------------------
