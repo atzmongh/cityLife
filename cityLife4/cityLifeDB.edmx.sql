@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 11/01/2018 22:35:57
+-- Date Created: 11/04/2018 23:42:26
 -- Generated from EDMX file: C:\software\cityLife\cityLife4\cityLifeDB.edmx
 -- --------------------------------------------------
 
@@ -76,9 +76,10 @@ IF OBJECT_ID(N'[dbo].[CurrencyExchanges]', 'U') IS NOT NULL
 IF OBJECT_ID(N'[dbo].[ApartmentDays]', 'U') IS NOT NULL
     DROP TABLE [dbo].[ApartmentDays];
 --GO
-IF OBJECT_ID(N'[dbo].[UnitTests]', 'U') IS NOT NULL
-    DROP TABLE [dbo].UnitTests;
--- -------------------------------------------
+IF OBJECT_ID(N'[dbo].[unitTests]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[unitTests];
+--GO
+
 -- --------------------------------------------------
 -- Creating all tables
 -- --------------------------------------------------
@@ -187,6 +188,26 @@ CREATE TABLE [dbo].[unitTests] (
 );
 --GO
 
+-- Creating table 'ErrorCodes'
+CREATE TABLE [dbo].[ErrorCodes] (
+    [code] int  NOT NULL,
+    [message] nvarchar(max)  NULL,
+    [occurenceCount] int  NOT NULL,
+    [lastOccurenceDate] datetime  NOT NULL
+);
+--GO
+
+-- Creating table 'ErrorMessages'
+CREATE TABLE [dbo].[ErrorMessages] (
+    [Id] int IDENTITY(1,1) NOT NULL,
+    [formattedMessage] nvarchar(max)  NOT NULL,
+    [stackTrace] nvarchar(max)  NOT NULL,
+    [lastOccurenceDate] datetime  NOT NULL,
+    [occurenceCount] int  NOT NULL,
+    [ErrorCode_code] int  NOT NULL
+);
+--GO
+
 -- --------------------------------------------------
 -- Creating all PRIMARY KEY constraints
 -- --------------------------------------------------
@@ -249,6 +270,18 @@ ADD CONSTRAINT [PK_ApartmentDays]
 ALTER TABLE [dbo].[unitTests]
 ADD CONSTRAINT [PK_unitTests]
     PRIMARY KEY CLUSTERED ([series], [number] ASC);
+--GO
+
+-- Creating primary key on [code] in table 'ErrorCodes'
+ALTER TABLE [dbo].[ErrorCodes]
+ADD CONSTRAINT [PK_ErrorCodes]
+    PRIMARY KEY CLUSTERED ([code] ASC);
+--GO
+
+-- Creating primary key on [Id] in table 'ErrorMessages'
+ALTER TABLE [dbo].[ErrorMessages]
+ADD CONSTRAINT [PK_ErrorMessages]
+    PRIMARY KEY CLUSTERED ([Id] ASC);
 --GO
 
 -- --------------------------------------------------
@@ -388,6 +421,21 @@ ADD CONSTRAINT [FK_ApartmentApartmentDay]
 CREATE INDEX [IX_FK_ApartmentApartmentDay]
 ON [dbo].[ApartmentDays]
     ([Apartment_Id]);
+--GO
+
+-- Creating foreign key on [ErrorCode_code] in table 'ErrorMessages'
+ALTER TABLE [dbo].[ErrorMessages]
+ADD CONSTRAINT [FK_ErrorCodeErrorMessage]
+    FOREIGN KEY ([ErrorCode_code])
+    REFERENCES [dbo].[ErrorCodes]
+        ([code])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+--GO
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_ErrorCodeErrorMessage'
+CREATE INDEX [IX_FK_ErrorCodeErrorMessage]
+ON [dbo].[ErrorMessages]
+    ([ErrorCode_code]);
 --GO
 
 -- --------------------------------------------------

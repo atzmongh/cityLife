@@ -16,6 +16,8 @@
     <EntitySet Name="CurrencyExchanges" EntityType="cityLifeDB.Store.CurrencyExchanges" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="ApartmentDays" EntityType="cityLifeDB.Store.ApartmentDays" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="unitTests" EntityType="cityLifeDB.Store.unitTests" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="ErrorCodes" EntityType="cityLifeDB.Store.ErrorCodes" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="ErrorMessages" EntityType="cityLifeDB.Store.ErrorMessages" store:Type="Tables" Schema="dbo" />
     <AssociationSet Name="ApartmentApartmentPhoto" Association="cityLifeDB.Store.ApartmentApartmentPhoto">
       <End Role="Apartment" EntitySet="Apartments" />
       <End Role="ApartmentPhoto" EntitySet="ApartmentPhotoes" />
@@ -51,6 +53,10 @@
     <AssociationSet Name="ApartmentApartmentDay" Association="cityLifeDB.Store.ApartmentApartmentDay">
       <End Role="Apartment" EntitySet="Apartments" />
       <End Role="ApartmentDay" EntitySet="ApartmentDays" />
+    </AssociationSet>
+    <AssociationSet Name="ErrorCodeErrorMessage" Association="cityLifeDB.Store.ErrorCodeErrorMessage">
+      <End Role="ErrorCode" EntitySet="ErrorCodes" />
+      <End Role="ErrorMessage" EntitySet="ErrorMessages" />
     </AssociationSet>
   </EntityContainer>
   <EntityType Name="Apartments">
@@ -157,6 +163,26 @@
     <Property Name="actualResult" Type="nvarchar(max)" Nullable="true" />
     <Property Name="dateLastRun" Type="datetime" Nullable="false" />
     <Property Name="correctFlag" Type="bit" Nullable="true" />
+  </EntityType>
+  <EntityType Name="ErrorCodes">
+    <Key>
+      <PropertyRef Name="code" />
+    </Key>
+    <Property Name="code" Type="int" Nullable="false" />
+    <Property Name="message" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="occurenceCount" Type="int" Nullable="false" DefaultValue="1" />
+    <Property Name="lastOccurenceDate" Type="datetime" Nullable="false" />
+  </EntityType>
+  <EntityType Name="ErrorMessages">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="formattedMessage" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="stackTrace" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="lastOccurenceDate" Type="datetime" Nullable="false" />
+    <Property Name="occurenceCount" Type="int" Nullable="false" DefaultValue="1" />
+    <Property Name="ErrorCode_code" Type="int" Nullable="false" />
   </EntityType>
   <Association Name="ApartmentApartmentPhoto">
     <End Role="Apartment" Type="cityLifeDB.Store.Apartments" Multiplicity="1" />
@@ -266,6 +292,18 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
+  <Association Name="ErrorCodeErrorMessage">
+    <End Role="ErrorCode" Type="cityLifeDB.Store.ErrorCodes" Multiplicity="1" />
+    <End Role="ErrorMessage" Type="cityLifeDB.Store.ErrorMessages" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="ErrorCode">
+        <PropertyRef Name="code" />
+      </Principal>
+      <Dependent Role="ErrorMessage">
+        <PropertyRef Name="ErrorCode_code" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
 </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
@@ -317,6 +355,12 @@
             <End Role="ApartmentDay" EntitySet="ApartmentDays" />
           </AssociationSet>
           <EntitySet Name="unitTests" EntityType="cityLifeDB.unitTest" />
+          <EntitySet Name="ErrorCodes" EntityType="cityLifeDB.ErrorCode" />
+          <EntitySet Name="ErrorMessages" EntityType="cityLifeDB.ErrorMessage" />
+          <AssociationSet Name="ErrorCodeErrorMessage" Association="cityLifeDB.ErrorCodeErrorMessage">
+            <End Role="ErrorCode" EntitySet="ErrorCodes" />
+            <End Role="ErrorMessage" EntitySet="ErrorMessages" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="Apartment">
           <Key>
@@ -503,6 +547,31 @@
           <Property Name="dateLastRun" Type="DateTime" Nullable="false" />
           <Property Name="correctFlag" Type="Boolean" Nullable="true" />
         </EntityType>
+        <EntityType Name="ErrorCode">
+          <Key>
+            <PropertyRef Name="code" />
+          </Key>
+          <Property Name="code" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="None" />
+          <Property Name="message" Type="String" Nullable="true" />
+          <Property Name="occurenceCount" Type="Int32" Nullable="false" DefaultValue="1" />
+          <Property Name="lastOccurenceDate" Type="DateTime" Nullable="false" />
+          <NavigationProperty Name="ErrorMessages" Relationship="cityLifeDB.ErrorCodeErrorMessage" FromRole="ErrorCode" ToRole="ErrorMessage" />
+        </EntityType>
+        <EntityType Name="ErrorMessage">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="ErrorCode" Relationship="cityLifeDB.ErrorCodeErrorMessage" FromRole="ErrorMessage" ToRole="ErrorCode" />
+          <Property Name="formattedMessage" Type="String" Nullable="false" />
+          <Property Name="stackTrace" Type="String" Nullable="false" />
+          <Property Name="lastOccurenceDate" Type="DateTime" Nullable="false" />
+          <Property Name="occurenceCount" Type="Int32" Nullable="false" DefaultValue="1" />
+        </EntityType>
+        <Association Name="ErrorCodeErrorMessage">
+          <End Type="cityLifeDB.ErrorCode" Role="ErrorCode" Multiplicity="1" />
+          <End Type="cityLifeDB.ErrorMessage" Role="ErrorMessage" Multiplicity="*" />
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -614,6 +683,27 @@
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
+    <EntitySetMapping Name="ErrorCodes">
+      <EntityTypeMapping TypeName="IsTypeOf(cityLifeDB.ErrorCode)">
+        <MappingFragment StoreEntitySet="ErrorCodes">
+          <ScalarProperty Name="code" ColumnName="code" />
+          <ScalarProperty Name="message" ColumnName="message" />
+          <ScalarProperty Name="occurenceCount" ColumnName="occurenceCount" />
+          <ScalarProperty Name="lastOccurenceDate" ColumnName="lastOccurenceDate" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ErrorMessages">
+      <EntityTypeMapping TypeName="IsTypeOf(cityLifeDB.ErrorMessage)">
+        <MappingFragment StoreEntitySet="ErrorMessages">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="formattedMessage" ColumnName="formattedMessage" />
+          <ScalarProperty Name="stackTrace" ColumnName="stackTrace" />
+          <ScalarProperty Name="lastOccurenceDate" ColumnName="lastOccurenceDate" />
+          <ScalarProperty Name="occurenceCount" ColumnName="occurenceCount" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
     <AssociationSetMapping Name="ApartmentApartmentPhoto" TypeName="cityLifeDB.ApartmentApartmentPhoto" StoreEntitySet="ApartmentPhotoes">
       <EndProperty Name="Apartment">
         <ScalarProperty Name="Id" ColumnName="Apartment_Id" />
@@ -684,6 +774,14 @@
         <ScalarProperty Name="Id" ColumnName="Apartment_Id" />
       </EndProperty>
       <EndProperty Name="ApartmentDay">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="ErrorCodeErrorMessage" TypeName="cityLifeDB.ErrorCodeErrorMessage" StoreEntitySet="ErrorMessages">
+      <EndProperty Name="ErrorCode">
+        <ScalarProperty Name="code" ColumnName="ErrorCode_code" />
+      </EndProperty>
+      <EndProperty Name="ErrorMessage">
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
     </AssociationSetMapping>

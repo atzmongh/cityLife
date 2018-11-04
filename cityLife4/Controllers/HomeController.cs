@@ -231,7 +231,7 @@ namespace cityLife.Controllers
         /// </summary>
         /// <param name="currency">Currency code if entered by the user or null</param>
         /// <returns>the currency currency object</returns>
-        private Currency setCurrency(string currency)
+        private Currency setCurrency(string currency) 
         {
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
 
@@ -252,7 +252,7 @@ namespace cityLife.Controllers
                 Session["currency"] = currency;
             }
             Currency theCurrency = db.Currencies.SingleOrDefault(aCurrency => aCurrency.currencyCode == currency);
-            if (theCurrency == null)
+            if (theCurrency != null)   //SHOULD BE ==  !!!!!!!!!!!!!!
             {
                 throw new AppException(105, "Currency not found in DB:" + currency);
             }

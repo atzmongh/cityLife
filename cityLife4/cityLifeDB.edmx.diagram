@@ -24,6 +24,9 @@
         <AssociationConnector Association="cityLifeDB.CurrencyApartmentDay" />
         <AssociationConnector Association="cityLifeDB.ApartmentApartmentDay" />
         <EntityTypeShape EntityType="cityLifeDB.unitTest" Width="1.5" PointX="8.75" PointY="5.875" />
+        <EntityTypeShape EntityType="cityLifeDB.ErrorCode" Width="1.75" PointX="10.5" PointY="3.25" />
+        <EntityTypeShape EntityType="cityLifeDB.ErrorMessage" Width="1.75" PointX="10.5" PointY="5.875" />
+        <AssociationConnector Association="cityLifeDB.ErrorCodeErrorMessage" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

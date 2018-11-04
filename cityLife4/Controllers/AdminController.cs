@@ -18,7 +18,13 @@ namespace cityLife4.Controllers
         {
             return View();
         }
+        [HttpGet]
         public ActionResult uploadDB()
+        {
+            return View();
+        }
+        [HttpPost]
+        public ActionResult uploadDB(HttpPostedFileBase dbCSV)
         {
             //drop all DB tables and create a new DB schema with empty DB
             StreamReader sqlReader = new StreamReader(Server.MapPath("/cityLifeDB.edmx.sql"));
@@ -27,19 +33,31 @@ namespace cityLife4.Controllers
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
            
             db.Database.ExecuteSqlCommand(createDBsql);
-            PopulateDB(db);
+            Stream csvFileStream = dbCSV.InputStream;
+            
+            PopulateDB(db,csvFileStream);
            
 
-            return View("index");
+            return View("uploadDB");
+        }
+
+        public ActionResult unitTests(string theAction)
+        {
+            if (theAction == "run Tests")
+            {
+                DateTime testTime = this.runTests();
+                ViewBag.testTime = testTime;
+            }
+            return View();
         }
         /// <summary>
         /// The function reads the CSV file that contains the DB content and creates SQL statements to populate it
         /// Then it executes this SQL and populates the DB
         /// </summary>
-        private void PopulateDB(cityLifeDBContainer1 db)
+        private void PopulateDB(cityLifeDBContainer1 db, Stream csvFileStream)
         {
-            string CSVFilePath = Server.MapPath("/cityLifeDB.csv");
-            using (TextFieldParser parser = new TextFieldParser(CSVFilePath))
+            //string CSVFilePath = Server.MapPath("/cityLifeDB.csv");
+            using (TextFieldParser parser = new TextFieldParser(csvFileStream))
             {
                 parser.Delimiters = new string[] { "," };
 
@@ -133,6 +151,15 @@ namespace cityLife4.Controllers
                 }
                 return;
             }
+        }
+
+        private DateTime runTests()
+        {
+            DateTime testTime = Test.startTestCycle();
+            Test.startTestSeries("stam");
+            Test.check(1, "kuku the great");
+            Test.check(2, "muku the great");
+            return testTime;
         }
     }
 }

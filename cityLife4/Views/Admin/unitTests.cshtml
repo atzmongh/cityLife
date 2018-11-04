@@ -1,0 +1,17 @@
+﻿
+@{
+    ViewBag.Title = "unitTests";
+    Layout = "~/Views/sharing/_adminLayout.cshtml";
+}
+
+<h2>Unit Tests</h2><br />
+<form action="/admin/unitTests" method="get">
+    <input type="submit" name="theAction" value="run Tests" /> 
+    <input type="submit" name="theAction" value="show Tests" />
+</form>
+@{ 
+    if (ViewBag.testTime != null)
+    {
+        <p>"test cycle run at:" @ViewBag.testTime</p>
+    }
+}

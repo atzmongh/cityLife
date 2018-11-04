@@ -35,5 +35,7 @@ namespace cityLife4
         public virtual DbSet<CurrencyExchange> CurrencyExchanges { get; set; }
         public virtual DbSet<ApartmentDay> ApartmentDays { get; set; }
         public virtual DbSet<unitTest> unitTests { get; set; }
+        public virtual DbSet<ErrorCode> ErrorCodes { get; set; }
+        public virtual DbSet<ErrorMessage> ErrorMessages { get; set; }
     }
 }

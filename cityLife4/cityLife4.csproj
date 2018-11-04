@@ -114,6 +114,7 @@
       <DependentUpon>cityLifeDB.edmx</DependentUpon>
     </Content>
     <Content Include="cityLifeDB.edmx.sql" />
+    <Content Include="classes\errorCodes.txt" />
     <Content Include="css\libs.css" />
     <Content Include="css\styles.css" />
     <Content Include="fonts\icons\clife-icons.svg" />
@@ -173,6 +174,8 @@
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="cityLifeDB.csv" />
     <Content Include="cityLifeDB.xlsx" />
+    <Content Include="Views\Admin\uploadDB.cshtml" />
+    <Content Include="Views\Admin\unitTests.cshtml" />
     <None Include="Views\Home\IndexOLD.cshtml" />
     <Content Include="icons\arr-b.svg" />
     <Content Include="icons\arr-l.svg" />
@@ -244,6 +247,12 @@
     <Compile Include="CurrencyExchange.cs">
       <DependentUpon>cityLife.tt</DependentUpon>
     </Compile>
+    <Compile Include="ErrorCode.cs">
+      <DependentUpon>cityLife.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ErrorMessage.cs">
+      <DependentUpon>cityLife.tt</DependentUpon>
+    </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -277,6 +286,7 @@
     <Content Include="packages.config" />
     <Content Include="Views\sharing\_cityLifeLayout.cshtml" />
     <Content Include="Views\Home\index.cshtml" />
+    <Content Include="Views\sharing\_adminLayout.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

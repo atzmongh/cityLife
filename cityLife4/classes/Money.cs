@@ -44,7 +44,7 @@ namespace cityLife4
         {
             if (m1.currencyCode != m2.currencyCode)
             {
-                throw new AppException(103, "Adsdition of money objects - the 2 objects have different currency, which is not supported. " +
+                throw new AppException(103, "Addition of money objects - the 2 objects have different currency, which is not supported. " +
                                        m1.ToString() + " " + m2.ToString());
             }
             Money result = new Money(m1.amount + m2.amount, m1.currencyCode);
