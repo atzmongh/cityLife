@@ -179,7 +179,7 @@
     </Key>
     <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="formattedMessage" Type="nvarchar(max)" Nullable="false" />
-    <Property Name="stackTrace" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="stackTrace" Type="nvarchar(max)" Nullable="true" />
     <Property Name="lastOccurenceDate" Type="datetime" Nullable="false" />
     <Property Name="occurenceCount" Type="int" Nullable="false" DefaultValue="1" />
     <Property Name="ErrorCode_code" Type="int" Nullable="false" />
@@ -564,7 +564,7 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <NavigationProperty Name="ErrorCode" Relationship="cityLifeDB.ErrorCodeErrorMessage" FromRole="ErrorMessage" ToRole="ErrorCode" />
           <Property Name="formattedMessage" Type="String" Nullable="false" />
-          <Property Name="stackTrace" Type="String" Nullable="false" />
+          <Property Name="stackTrace" Type="String" Nullable="true" />
           <Property Name="lastOccurenceDate" Type="DateTime" Nullable="false" />
           <Property Name="occurenceCount" Type="Int32" Nullable="false" DefaultValue="1" />
         </EntityType>

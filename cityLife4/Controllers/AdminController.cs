@@ -41,12 +41,24 @@ namespace cityLife4.Controllers
             return View("uploadDB");
         }
 
-        public ActionResult unitTests(string theAction)
+        public ActionResult unitTests(string theAction,  bool? skipCorrectTests)
         {
-            if (theAction == "run Tests")
+            if (theAction == null)
+            {
+                //initial call to unit tests
+                ViewBag.testTime = null;
+                ViewBag.unitTests = null;
+            }
+            else if (theAction == "run Tests")
             {
                 DateTime testTime = this.runTests();
                 ViewBag.testTime = testTime;
+            }
+            else
+            {
+                //The action is "show test"
+                cityLifeDBContainer1 db = new cityLifeDBContainer1();
+                ViewBag.unitTests = db.unitTests;
             }
             return View();
         }

@@ -114,7 +114,6 @@
       <DependentUpon>cityLifeDB.edmx</DependentUpon>
     </Content>
     <Content Include="cityLifeDB.edmx.sql" />
-    <Content Include="classes\errorCodes.txt" />
     <Content Include="css\libs.css" />
     <Content Include="css\styles.css" />
     <Content Include="fonts\icons\clife-icons.svg" />

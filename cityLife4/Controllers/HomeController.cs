@@ -252,7 +252,7 @@ namespace cityLife.Controllers
                 Session["currency"] = currency;
             }
             Currency theCurrency = db.Currencies.SingleOrDefault(aCurrency => aCurrency.currencyCode == currency);
-            if (theCurrency != null)   //SHOULD BE ==  !!!!!!!!!!!!!!
+            if (theCurrency == null)   
             {
                 throw new AppException(105, "Currency not found in DB:" + currency);
             }

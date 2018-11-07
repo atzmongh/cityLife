@@ -16,6 +16,7 @@ namespace cityLife4
             {104,"Multiplication of money objects - the 2 objects have different currency, which is not supported. {0} and {1}"},
             {105,"Currency not found in DB:{0}"},
             {106,"an unsupported language requested:{0}"},
+            {107,"Before running setStartSeries you must run startTestCycle" }
 
         };
         public static bool exists(int code)
@@ -72,7 +73,7 @@ namespace cityLife4
                 //such exact error message does not exist - add it
                 theErrorMessage = new ErrorMessage()
                 {
-                   //ErrorCode = theErrorCode,
+                   ErrorCode = theErrorCode,
                     formattedMessage = formattedMessage,
                     lastOccurenceDate = DateTime.Now,
                     occurenceCount = 1,

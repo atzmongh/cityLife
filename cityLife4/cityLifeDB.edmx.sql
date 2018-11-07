@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 11/04/2018 23:42:26
+-- Date Created: 11/06/2018 23:11:43
 -- Generated from EDMX file: C:\software\cityLife\cityLife4\cityLifeDB.edmx
 -- --------------------------------------------------
 
@@ -44,6 +44,9 @@ IF OBJECT_ID(N'[dbo].[FK_CurrencyApartmentDay]', 'F') IS NOT NULL
 IF OBJECT_ID(N'[dbo].[FK_ApartmentApartmentDay]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[ApartmentDays] DROP CONSTRAINT [FK_ApartmentApartmentDay];
 --GO
+IF OBJECT_ID(N'[dbo].[FK_ErrorCodeErrorMessage]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[ErrorMessages] DROP CONSTRAINT [FK_ErrorCodeErrorMessage];
+--GO
 
 -- --------------------------------------------------
 -- Dropping existing tables
@@ -78,6 +81,12 @@ IF OBJECT_ID(N'[dbo].[ApartmentDays]', 'U') IS NOT NULL
 --GO
 IF OBJECT_ID(N'[dbo].[unitTests]', 'U') IS NOT NULL
     DROP TABLE [dbo].[unitTests];
+--GO
+IF OBJECT_ID(N'[dbo].[ErrorCodes]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[ErrorCodes];
+--GO
+IF OBJECT_ID(N'[dbo].[ErrorMessages]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[ErrorMessages];
 --GO
 
 -- --------------------------------------------------
@@ -201,7 +210,7 @@ CREATE TABLE [dbo].[ErrorCodes] (
 CREATE TABLE [dbo].[ErrorMessages] (
     [Id] int IDENTITY(1,1) NOT NULL,
     [formattedMessage] nvarchar(max)  NOT NULL,
-    [stackTrace] nvarchar(max)  NOT NULL,
+    [stackTrace] nvarchar(max)  NULL,
     [lastOccurenceDate] datetime  NOT NULL,
     [occurenceCount] int  NOT NULL,
     [ErrorCode_code] int  NOT NULL

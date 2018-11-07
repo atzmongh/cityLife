@@ -8,10 +8,21 @@
 <form action="/admin/unitTests" method="get">
     <input type="submit" name="theAction" value="run Tests" /> 
     <input type="submit" name="theAction" value="show Tests" />
+    <input type="checkbox" name="skipCorrectTests" value="TRUE" checked />Skip correct tests
 </form>
 @{ 
     if (ViewBag.testTime != null)
     {
         <p>"test cycle run at:" @ViewBag.testTime</p>
+    }
+    if (ViewBag.unitTests == null)
+    {
+        return;
+    }
+    //Here we create the table showing the results of the last test run
+    IEnumerable<unitTest> unitTests = ViewBag.unitTests;
+    foreach(var aUnitTest in unitTests)
+    {
+        <p>@aUnitTest.actualResult</p>
     }
 }
