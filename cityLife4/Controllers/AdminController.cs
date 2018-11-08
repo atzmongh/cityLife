@@ -58,7 +58,9 @@ namespace cityLife4.Controllers
             {
                 //The action is "show test"
                 cityLifeDBContainer1 db = new cityLifeDBContainer1();
-                ViewBag.unitTests = db.unitTests;
+                ViewBag.unitTests = from aUnitTest in db.unitTests
+                                    orderby aUnitTest.series, aUnitTest.number
+                                    select aUnitTest;
             }
             return View();
         }

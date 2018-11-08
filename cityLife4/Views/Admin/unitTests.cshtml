@@ -6,14 +6,14 @@
 
 <h2>Unit Tests</h2><br />
 <form action="/admin/unitTests" method="get">
-    <input type="submit" name="theAction" value="run Tests" /> 
+    <input type="submit" name="theAction" value="run Tests" />
     <input type="submit" name="theAction" value="show Tests" />
     <input type="checkbox" name="skipCorrectTests" value="TRUE" checked />Skip correct tests
 </form>
-@{ 
+@{
     if (ViewBag.testTime != null)
     {
-        <p>"test cycle run at:" @ViewBag.testTime</p>
+<p><b>"test cycle run at:" @ViewBag.testTime</b></p>
     }
     if (ViewBag.unitTests == null)
     {
@@ -21,8 +21,56 @@
     }
     //Here we create the table showing the results of the last test run
     IEnumerable<unitTest> unitTests = ViewBag.unitTests;
-    foreach(var aUnitTest in unitTests)
+    string lastSeries = "";
+    foreach (var aUnitTest in unitTests)
     {
-        <p>@aUnitTest.actualResult</p>
+        if (aUnitTest.series != lastSeries)
+        {
+            //This is the beginning of a new series of tests - display series title
+            lastSeries = aUnitTest.series;
+            if (lastSeries != "")
+            {
+                //This is not the first series - close the body and table of the previous series
+                @Html.Raw("</body></table>");
+            }
+            //open new table and the header line
+            <span><b>Test series: @aUnitTest.series</b></span>
+            @Html.Raw("<table class='table'>");
+            <thead>
+                <tr>
+                    <th>number</th>
+                    <th>expected result</th>
+                    <th>actual results</th>
+                    <th>correct</th>
+                    <th>incorrect</th>
+                </tr>
+            </thead>
+            @Html.Raw("<body>");
+        }
+        //Create one test
+            <tr>
+                <td>@aUnitTest.number</td>
+                <td>@aUnitTest.expectedResult</td>
+                <td>@aUnitTest.actualResult</td>
+                @{ 
+                    string correctChecked = "";
+                    string incorrectChecked = "";
+                    if (aUnitTest.correctFlag == true)
+                    {
+                        correctChecked = "checked";
+                    }
+                    else if (aUnitTest.correctFlag == false)
+                    {
+                        incorrectChecked = "checked";
+                    }
+                }
+                <td><input type="radio" name="@aUnitTest.series-@aUnitTest.number" value="correct"    @correctChecked /></td>
+                <td><input type="radio" name="@aUnitTest.series-@aUnitTest.number" value="incorrect"  @incorrectChecked/></td>
+            </tr>
     }
+    //close last body and table
+    @Html.Raw("</body></table>");
+
 }
+
+
