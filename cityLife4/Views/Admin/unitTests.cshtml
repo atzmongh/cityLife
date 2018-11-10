@@ -1,9 +1,19 @@
 ﻿
 @{
+    //_Page_Views_Admin_unitTests_cshtml/unitTest view
     ViewBag.Title = "unitTests";
     Layout = "~/Views/sharing/_adminLayout.cshtml";
 }
-
+<script>
+    //The function creates an ajax call to the server to update the test result
+    function updateTestResult(theCheckBox) {
+        var result = [];
+        result["name"]  = theCheckBox.name;
+        result["value"] = theCheckBox.value;
+        alert(result["name"] + result["value"]);
+        $.post("/admin/unitTestsResult", result["name"],null);
+    }
+</script>
 <h2>Unit Tests</h2><br />
 <form action="/admin/unitTests" method="get">
     <input type="submit" name="theAction" value="run Tests" />
@@ -64,7 +74,7 @@
                         incorrectChecked = "checked";
                     }
                 }
-                <td><input type="radio" name="@aUnitTest.series-@aUnitTest.number" value="correct"    @correctChecked /></td>
+                <td><input type="radio" name="@aUnitTest.series-@aUnitTest.number" value="correct" onclick="updateTestResult(this)"    @correctChecked /></td>
                 <td><input type="radio" name="@aUnitTest.series-@aUnitTest.number" value="incorrect"  @incorrectChecked/></td>
             </tr>
     }

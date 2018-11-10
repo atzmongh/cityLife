@@ -52,7 +52,7 @@ namespace cityLife4
             if (Test.testStartTime == null)
             {
                 //We did not call the unit test start before calling this method. throw an exception
-                throw new AppException(107);
+                throw new AppException(107, null);
             }
             Test.seriesName = seriesName;
         }

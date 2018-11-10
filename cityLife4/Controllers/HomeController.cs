@@ -254,7 +254,7 @@ namespace cityLife.Controllers
             Currency theCurrency = db.Currencies.SingleOrDefault(aCurrency => aCurrency.currencyCode == currency);
             if (theCurrency == null)   
             {
-                throw new AppException(105, "Currency not found in DB:" + currency);
+                throw new AppException(105, null, "Currency not found in DB:" + currency);
             }
             return theCurrency;
         }

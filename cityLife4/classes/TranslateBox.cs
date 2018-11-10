@@ -42,7 +42,7 @@ namespace cityLife4
                 if (db.Languages.Find(value) == null)
                 {
                     //such language code does not exist in the language table
-                    throw new AppException(106, "an unsupported language requested:" + value);
+                    throw new AppException(106, null, "an unsupported language requested:" + value);
                 }
                 _targetLanguageCode = value;
         }

@@ -34,7 +34,7 @@ namespace cityLife4
         {
             if (m1.currencyCode != m2.currencyCode)
             {
-                throw new AppException(103, "Multiplication of money objects - the 2 objects have different currency, which is not supported. " +
+                throw new AppException(103, null, "Multiplication of money objects - the 2 objects have different currency, which is not supported. " +
                                        m1.ToString() + " " + m2.ToString());
             }
             Money result = new Money(m1.amount * m2.amount, m1.currencyCode);
@@ -44,7 +44,7 @@ namespace cityLife4
         {
             if (m1.currencyCode != m2.currencyCode)
             {
-                throw new AppException(103, "Addition of money objects - the 2 objects have different currency, which is not supported. " +
+                throw new AppException(103, null, "Addition of money objects - the 2 objects have different currency, which is not supported. " +
                                        m1.ToString() + " " + m2.ToString());
             }
             Money result = new Money(m1.amount + m2.amount, m1.currencyCode);
@@ -77,7 +77,7 @@ namespace cityLife4
             var theCurrency = Money.db.Currencies.SingleOrDefault(aCurrency => aCurrency.currencyCode == this.currencyCode);
             if (theCurrency == null)
             {
-                throw new AppException(102, "such currency does not exist in DB:" + this.currencyCode);
+                throw new AppException(102, null, "such currency does not exist in DB:" + this.currencyCode);
             }
             string moneyString;
             if (showCents)
@@ -138,7 +138,7 @@ namespace cityLife4
                     //no suitable exchange rate was found
                     string message = string.Format("no suitable exchange rate was found for currencies: {0} and {1} for date {2} (or later). Sum was {3}",
                                                                this.currencyCode, newCurrencyCode, atDate, this.amount);
-                    throw new AppException(101, message);
+                    throw new AppException(101, null, message);
                 }
                 var theExchangeRate = exchangeRates.First();  //take the latest record which is still before or at the requested date
                 decimal result;

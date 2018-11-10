@@ -64,6 +64,57 @@ namespace cityLife4.Controllers
             }
             return View();
         }
+
+        /// <summary>
+        /// The method is called by ajax post request from the unit test view after the user pressed a "correct" or "incorrect" 
+        /// checkbox button in the unit test table. The method updates the unit test record accordingly
+        /// </summary>
+        /// <param name="checkBoxName">the name contains testSeries-number (for example: money-23  </testSeries></param>
+        /// <param name="checkBoxValue"> either "correct" or "incorrect"</param>
+        [HttpPost]
+        public void unitTestsResult(string checkBoxName)//, string checkBoxValue)
+        {
+            string series;
+            int number;
+            try
+            {
+                //split the "series" and the "nunber" from the name component
+                string [] seriesAndNumber = checkBoxName.Split('-');  //create an array containing series name and number
+                series = seriesAndNumber[0];
+                number = int.Parse(seriesAndNumber[1]);
+            }
+            catch(Exception innerException)
+            {
+                throw new AppException(108, innerException, checkBoxName);
+            }
+
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+            unitTest theUnitTest = db.unitTests.SingleOrDefault(aRecord => aRecord.series == series && aRecord.number == number);
+            if (theUnitTest == null)
+            {
+                throw new AppException(109, null, series, number);
+            }
+
+            //if (checkBoxValue == "correct")
+            //{
+            //    //The result is correct - update correct flag and expected result
+            //    theUnitTest.correctFlag = true;
+            //    theUnitTest.expectedResult = theUnitTest.actualResult;
+            //}
+            //else
+            //{
+            //    //The result is incorrect
+            //    theUnitTest.correctFlag = false;
+            //    if (theUnitTest.expectedResult == theUnitTest.actualResult)
+            //    {
+            //        //Currently the expected is equal to the actual. However, we know that the result is incorrect. Erase the
+            //        //expected result
+            //        theUnitTest.expectedResult = null;  
+            //    }
+            //}
+
+
+        }
         /// <summary>
         /// The function reads the CSV file that contains the DB content and creates SQL statements to populate it
         /// Then it executes this SQL and populates the DB
