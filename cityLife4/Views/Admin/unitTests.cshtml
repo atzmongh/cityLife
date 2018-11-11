@@ -3,15 +3,17 @@
     //_Page_Views_Admin_unitTests_cshtml/unitTest view
     ViewBag.Title = "unitTests";
     Layout = "~/Views/sharing/_adminLayout.cshtml";
+    //ViewBag.unitTestBySeries contains list of series. Each series is a igrouping<string,UnitTest>
+    // ViewBag.skipCorrectTests = skipCorrectTests;
 }
 <script>
     //The function creates an ajax call to the server to update the test result
     function updateTestResult(theCheckBox) {
-        var result = [];
-        result["name"]  = theCheckBox.name;
-        result["value"] = theCheckBox.value;
-        alert(result["name"] + result["value"]);
-        $.post("/admin/unitTestsResult", result["name"],null);
+        var result = {};
+        result.checkBoxName = theCheckBox.name;
+        result.checkBoxValue = theCheckBox.value;
+        $.post("/admin/unitTestsResult", result);
+
     }
 </script>
 <h2>Unit Tests</h2><br />
@@ -23,46 +25,47 @@
 @{
     if (ViewBag.testTime != null)
     {
-<p><b>"test cycle run at:" @ViewBag.testTime</b></p>
+        <p><b>"test cycle run at:" @ViewBag.testTime</b></p>
     }
-    if (ViewBag.unitTests == null)
+    if (ViewBag.unitTestsBySeries == null)
     {
         return;
     }
-    //Here we create the table showing the results of the last test run
-    IEnumerable<unitTest> unitTests = ViewBag.unitTests;
-    string lastSeries = "";
-    foreach (var aUnitTest in unitTests)
+    bool skipCorrectTests = ViewBag.skipCorrectTests;
+
+    foreach (IGrouping<string, unitTest> aSeries in ViewBag.unitTestsBySeries)
     {
-        if (aUnitTest.series != lastSeries)
-        {
-            //This is the beginning of a new series of tests - display series title
-            lastSeries = aUnitTest.series;
-            if (lastSeries != "")
-            {
-                //This is not the first series - close the body and table of the previous series
-                @Html.Raw("</body></table>");
-            }
-            //open new table and the header line
-            <span><b>Test series: @aUnitTest.series</b></span>
-            @Html.Raw("<table class='table'>");
-            <thead>
-                <tr>
-                    <th>number</th>
-                    <th>expected result</th>
-                    <th>actual results</th>
-                    <th>correct</th>
-                    <th>incorrect</th>
-                </tr>
-            </thead>
-            @Html.Raw("<body>");
-        }
-        //Create one test
+        //open new table and the header line
+        <span><b>Test series: @aSeries.Key</b></span>
+        @Html.Raw("<table class='table'>");
+        <thead>
             <tr>
-                <td>@aUnitTest.number</td>
-                <td>@aUnitTest.expectedResult</td>
-                <td>@aUnitTest.actualResult</td>
-                @{ 
+                <th>number</th>
+                <th>expected result</th>
+                <th>actual results</th>
+                <th>correct</th>
+                <th>incorrect</th>
+            </tr>
+        </thead>
+        @Html.Raw("<body>");
+
+        int correctTests = aSeries.Count(aRecord => aRecord.correctFlag == true);
+        int falseTests = aSeries.Count(aRecord => aRecord.correctFlag == false);
+        int unknownTests = aSeries.Count(aRecord => aRecord.correctFlag == null);
+        foreach (var aUnitTest in aSeries)
+        {
+            //Create one line for a single test
+            if (aUnitTest.correctFlag == true && skipCorrectTests)
+            {
+                //skip this line, as it is a correct line
+            }
+            else
+            {
+                <tr>
+                    <td>@aUnitTest.number</td>
+                    <td>@aUnitTest.expectedResult</td>
+                    <td>@aUnitTest.actualResult</td>
+                    @{
                     string correctChecked = "";
                     string incorrectChecked = "";
                     if (aUnitTest.correctFlag == true)
@@ -74,13 +77,16 @@
                         incorrectChecked = "checked";
                     }
                 }
-                <td><input type="radio" name="@aUnitTest.series-@aUnitTest.number" value="correct" onclick="updateTestResult(this)"    @correctChecked /></td>
-                <td><input type="radio" name="@aUnitTest.series-@aUnitTest.number" value="incorrect"  @incorrectChecked/></td>
-            </tr>
-    }
-    //close last body and table
-    @Html.Raw("</body></table>");
+                    <td><input type="radio" name="@aSeries.Key-@aUnitTest.number" value="correct" onclick="updateTestResult(this)" @correctChecked /></td>
+                    <td><input type="radio" name="@aUnitTest.series-@aUnitTest.number" value="incorrect" onclick="updateTestResult(this)" @incorrectChecked /></td>
+                </tr>
+            }
 
+        }
+        //close the table
+        @Html.Raw("</body></table>");
+        <span>correct: @correctTests incorrect: @falseTests unknown: @unknownTests</span><br/>
+    }
 }
 
 

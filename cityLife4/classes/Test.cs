@@ -7,7 +7,6 @@ namespace cityLife4
 {
     public static class Test
     {
-        private static cityLifeDBContainer1 db = new cityLifeDBContainer1();
         private static string seriesName = "undefined";
         private static DateTime? testStartTime=null;
 
@@ -21,6 +20,7 @@ namespace cityLife4
         /// </summary>
         public static DateTime startTestCycle()
         {
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
             unitTest unitTestStart = db.unitTests.SingleOrDefault(aRecord => aRecord.series == "testStart");
             if (unitTestStart == null)
             {
@@ -69,6 +69,7 @@ namespace cityLife4
         /// </returns>
         public static bool? check(int number, string actualResult)
         {
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
             string series = Test.seriesName;
             unitTest theUnitTest = db.unitTests.SingleOrDefault(aTest => aTest.series == series && aTest.number == number);
 
@@ -83,26 +84,67 @@ namespace cityLife4
             else
             {
                 //A unit test record exists - check if it is correct
-                theUnitTest.actualResult = actualResult;
+               // theUnitTest.actualResult = actualResult;
                 theUnitTest.dateLastRun = DateTime.Now;
                 if (theUnitTest.expectedResult != null && theUnitTest.expectedResult == actualResult)
                 {
-                    //both results are equal - do nothing
-                    return true;
+                    //both results are equal
+                    theUnitTest.correctFlag = true;
                 }
                 else if (theUnitTest.expectedResult != null)
                 {
                     //the results are not the equal
+                    theUnitTest.actualResult = actualResult;
                     theUnitTest.correctFlag = false;
                 }
                 else
                 {
-                    //there are not expected results
+                    //there are no expected results
                     theUnitTest.correctFlag = null;
                 }
                 db.SaveChanges();
-                return theUnitTest.correctFlag;  //either false or null
+                return theUnitTest.correctFlag;  //either true, false or null
             }
+        }
+
+        public static bool? check(int number, object actualResult)
+        {
+            return check(number, actualResult.ToString());
+        }
+
+        /// <summary>
+        /// the method updates the test results based on user's input. 
+        /// </summary>
+        /// <param name="series">test series</param>
+        /// <param name="number">test number (series and number uniquely identify a specific test)</param>
+        /// <param name="isCorrect">specifies if the test result is correct</param>
+        public static void updateTestResult(string series, int number, bool isCorrect)
+        {
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+            unitTest theUnitTest = db.unitTests.SingleOrDefault(aRecord => aRecord.series == series && aRecord.number == number);
+            if (theUnitTest == null)
+            {
+                throw new AppException(109, null, series, number);
+            }
+
+            if (isCorrect)
+            {
+                //The result is correct - update correct flag and expected result
+                theUnitTest.correctFlag = true;
+                theUnitTest.expectedResult = theUnitTest.actualResult;
+            }
+            else
+            {
+                //The result is incorrect
+                theUnitTest.correctFlag = false;
+                if (theUnitTest.expectedResult == theUnitTest.actualResult)
+                {
+                    //Currently the expected is equal to the actual. However, we know that the result is incorrect. Erase the
+                    //expected result
+                    theUnitTest.expectedResult = null;
+                }
+            }
+            db.SaveChanges();
         }
 
     }

@@ -58,9 +58,14 @@ namespace cityLife4.Controllers
             {
                 //The action is "show test"
                 cityLifeDBContainer1 db = new cityLifeDBContainer1();
-                ViewBag.unitTests = from aUnitTest in db.unitTests
+                var unitTestsBySeries = from aUnitTest in db.unitTests
                                     orderby aUnitTest.series, aUnitTest.number
-                                    select aUnitTest;
+                                    group aUnitTest by aUnitTest.series;
+                ViewBag.unitTestsBySeries = unitTestsBySeries;
+                ViewBag.skipCorrectTests = skipCorrectTests ?? false;
+                                    
+               
+                        
             }
             return View();
         }
@@ -69,51 +74,28 @@ namespace cityLife4.Controllers
         /// The method is called by ajax post request from the unit test view after the user pressed a "correct" or "incorrect" 
         /// checkbox button in the unit test table. The method updates the unit test record accordingly
         /// </summary>
-        /// <param name="checkBoxName">the name contains testSeries-number (for example: money-23  </testSeries></param>
+        /// <param name="checkBoxName">the name contains testSeries-number (for example: money-23  </param>
         /// <param name="checkBoxValue"> either "correct" or "incorrect"</param>
         [HttpPost]
-        public void unitTestsResult(string checkBoxName)//, string checkBoxValue)
+        public void unitTestsResult(string checkBoxName, string checkBoxValue)
         {
             string series;
             int number;
+            bool isCorrect;
             try
             {
                 //split the "series" and the "nunber" from the name component
                 string [] seriesAndNumber = checkBoxName.Split('-');  //create an array containing series name and number
                 series = seriesAndNumber[0];
                 number = int.Parse(seriesAndNumber[1]);
+                isCorrect = (checkBoxValue == "correct");
             }
             catch(Exception innerException)
             {
                 throw new AppException(108, innerException, checkBoxName);
             }
 
-            cityLifeDBContainer1 db = new cityLifeDBContainer1();
-            unitTest theUnitTest = db.unitTests.SingleOrDefault(aRecord => aRecord.series == series && aRecord.number == number);
-            if (theUnitTest == null)
-            {
-                throw new AppException(109, null, series, number);
-            }
-
-            //if (checkBoxValue == "correct")
-            //{
-            //    //The result is correct - update correct flag and expected result
-            //    theUnitTest.correctFlag = true;
-            //    theUnitTest.expectedResult = theUnitTest.actualResult;
-            //}
-            //else
-            //{
-            //    //The result is incorrect
-            //    theUnitTest.correctFlag = false;
-            //    if (theUnitTest.expectedResult == theUnitTest.actualResult)
-            //    {
-            //        //Currently the expected is equal to the actual. However, we know that the result is incorrect. Erase the
-            //        //expected result
-            //        theUnitTest.expectedResult = null;  
-            //    }
-            //}
-
-
+            Test.updateTestResult(series, number, isCorrect);
         }
         /// <summary>
         /// The function reads the CSV file that contains the DB content and creates SQL statements to populate it
@@ -224,7 +206,70 @@ namespace cityLife4.Controllers
             Test.startTestSeries("stam");
             Test.check(1, "kuku the great");
             Test.check(2, "muku the great");
+            moneyTests();
+            TranslateBoxTest();
             return testTime;
+        }
+        private void moneyTests()
+        {
+            Test.startTestSeries("money");
+            Money m1 = new Money(1234.56M, "USD");
+            Test.check(1, m1);
+            Test.check(2, m1.toMoneyString());
+
+            Money m2 = new Money(m1);
+            Test.check(3, m2.toMoneyString());
+            Test.check(4, m2.toMoneyString(showCents: false));
+
+            Money m3 = m1.converTo("EUR", new DateTime(2018, 10, 25), rounded: false);
+            Test.check(5, m3);
+
+            Money m9 = m1.converTo("EUR", new DateTime(2018, 10, 25), rounded: true);
+            Test.check(6, m9);
+           // Assert.AreEqual("EUR 1074.00", m9.ToString());
+
+            Money m6 = m1.converTo("EUR", new DateTime(2018, 10, 20), rounded: false);
+            Test.check(7, m6);
+          // Assert.AreEqual("EUR 1028.80", m6.ToString());
+
+            Money m4 = m3.converTo("USD", new DateTime(2018, 10, 25));
+            Test.check(8, m4.toMoneyString());
+           // Assert.AreEqual("$1,234.56", m4.toMoneyString());
+            string anException = "exception was not raised";
+            try
+            {
+                Money m5 = m1.converTo("EUR", new DateTime(2018, 10, 17));
+            }
+            catch
+            {
+                anException = "exception was raised";
+            }
+            Test.check(9, anException);
+            //Assert.AreEqual("exception was raised", anException);
+        }
+
+        public void TranslateBoxTest()
+        {
+            //Tests with "showAsterisks" mode
+            TranslateBox tBox = new TranslateBox("en", "ru", "showAsterisks");
+            Test.startTestSeries("TranslationBox");
+            Test.check(1, tBox.translate("sunday"));
+            Test.check(2, tBox.translate("Monday"));
+            Test.check(3, tBox.translate("Tuesday"));
+            Test.check(4, tBox.translate("Wednesday"));
+            Test.check(5, tBox.translate("Thursday"));
+
+
+            tBox = new TranslateBox("ru", "en", "showAsterisks");
+            Test.check(6, tBox.translate("Thursday"));
+
+            //Tests with "dont show" mode
+            tBox = new TranslateBox("en", "ru", "dontShow");
+            Test.check(7, tBox.translate("sunday"));//translation key does not exist
+            Test.check(8, tBox.translate("Monday"));//translation does not exist 
+            Test.check(9, tBox.translate("Tuesday"));//translation exists in target language 
+            Test.check(10, tBox.translate("Wednesday"));//translation exists only in default language
+            Test.check(11, tBox.translate("Thursday"));//translation exists in both languages
         }
     }
 }
