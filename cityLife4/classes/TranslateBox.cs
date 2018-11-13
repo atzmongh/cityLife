@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Web;
 
 namespace cityLife4
@@ -48,15 +49,27 @@ namespace cityLife4
         }
             get { return _targetLanguageCode; }
         }
-        public string translate(string translationKey)
+        /// <summary>
+        /// perform a translation operation to the target languagewhich was defined in the constructor.
+        /// </summary>
+        /// <param name="translationKey">the translation key which needs to be translated</param>
+        /// <param name="lineNumber">the line number in the code where the translate method was last called. Note that 
+        /// if the same key is requested in more than one place in the code - the DB will only save the last call</param>
+        /// <param name="filePath">the file path where the method was last called</param>
+        /// <returns>the translation in the required language. If translation was not found in the required language - 
+        /// will try to return the translation in the default language. Otherwise will return the trnaslation key
+        /// itself. If "show asterisks" is set - then will reutnr the translation key with surounded with asterisks</returns>
+        public string translate(string translationKey, 
+                               [CallerLineNumber] int lineNumber = 0,
+                               [CallerFilePath]   string filePath = null)
         {
             TranslationKey theTranslationKey =  db.TranslationKeys.SingleOrDefault(record => record.transKey == translationKey);
             if (theTranslationKey==null)
             {
                 //the translation key does not exist. Add it to the translation key table
-                //theTranslationKey = new TranslationKey() { transKey = translationKey, isUsed = true };
-                //db.TranslationKeys.Add(theTranslationKey);
-                //db.SaveChanges();
+                theTranslationKey = new TranslationKey() { transKey = translationKey, isUsed = true, filePath = filePath, lineNumber = lineNumber };
+                db.TranslationKeys.Add(theTranslationKey);
+                db.SaveChanges();
                 if (_noTranslation == "showAsterisks")
                 {
                     //return the translation key surrounded by asterisks for QA
@@ -71,7 +84,16 @@ namespace cityLife4
             }
             else
             {
-                //The translation key exists - check if we have translation in the desired language
+                //The translation key exists -
+                if (theTranslationKey.lineNumber != lineNumber || theTranslationKey.filePath != filePath)
+                {
+                    //The file path or the line number where the call was performed has changed. Assuming it is because we added some lines of
+                    //code, or refactored the code - update the file path tne line number
+                    theTranslationKey.lineNumber = lineNumber;
+                    theTranslationKey.filePath = filePath;
+                    db.SaveChanges();
+                }
+                //check if we have translation in the desired language
                 Translation theTranslation = db.Translations.SingleOrDefault(record => record.TranslationKey.id == theTranslationKey.id && 
                                                                                      record.Language.languageCode == _targetLanguageCode);
                 if (theTranslation != null)

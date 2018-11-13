@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 11/06/2018 23:11:43
+-- Date Created: 11/13/2018 23:02:09
 -- Generated from EDMX file: C:\software\cityLife\cityLife4\cityLifeDB.edmx
 -- --------------------------------------------------
 
@@ -142,7 +142,9 @@ CREATE TABLE [dbo].[Languages] (
 CREATE TABLE [dbo].[TranslationKeys] (
     [id] int IDENTITY(1,1) NOT NULL,
     [transKey] nvarchar(max)  NOT NULL,
-    [isUsed] bit  NOT NULL
+    [isUsed] bit  NOT NULL,
+    [filePath] nvarchar(max)  NULL,
+    [lineNumber] int  NULL
 );
 --GO
 

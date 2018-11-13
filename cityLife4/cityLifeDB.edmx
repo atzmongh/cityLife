@@ -111,6 +111,8 @@
     <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="transKey" Type="nvarchar(max)" Nullable="false" />
     <Property Name="isUsed" Type="bit" Nullable="false" DefaultValue="false" />
+    <Property Name="filePath" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="lineNumber" Type="int" Nullable="true" />
   </EntityType>
   <EntityType Name="Translations">
     <Key>
@@ -452,6 +454,17 @@
             </Documentation>
           </Property>
           <NavigationProperty Name="Translatios" Relationship="cityLifeDB.TranslationKeyTranslatio" FromRole="TranslationKey" ToRole="Translatio" />
+          <Property Name="filePath" Type="String" Nullable="true" >
+            <Documentation>
+              <Summary>The file path where the translate method was last called for this translation key
+</Summary>
+            </Documentation>
+          </Property>
+          <Property Name="lineNumber" Type="Int32" Nullable="true" >
+            <Documentation>
+              <Summary>the line number in the source code where the translate method was last called for this translation key</Summary>
+            </Documentation>
+          </Property>
         </EntityType>
         <EntityType Name="Translation">
           <Key>
@@ -630,6 +643,8 @@
           <ScalarProperty Name="id" ColumnName="id" />
           <ScalarProperty Name="transKey" ColumnName="transKey" />
           <ScalarProperty Name="isUsed" ColumnName="isUsed" />
+          <ScalarProperty Name="filePath" ColumnName="filePath" />
+          <ScalarProperty Name="lineNumber" ColumnName="lineNumber" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>

@@ -24,6 +24,8 @@ namespace cityLife4
         public int id { get; set; }
         public string transKey { get; set; }
         public bool isUsed { get; set; }
+        public string filePath { get; set; }
+        public Nullable<int> lineNumber { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Translation> Translatios { get; set; }
