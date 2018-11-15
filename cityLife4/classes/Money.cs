@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace cityLife4
+namespace cityLife
 {
     /// <summary>
     /// Money represents an amount of money in a specific currency.

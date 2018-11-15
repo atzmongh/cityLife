@@ -1,12 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using cityLife4;
+using cityLife;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace cityLife4.Tests
+namespace cityLife.Tests
 {
     [TestClass()]
     public class MoneyTests

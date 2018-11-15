@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace cityLife4
+namespace cityLife
 {
     using System;
     using System.Collections.Generic;

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web;
-
-namespace cityLife4
+// look in: https://stackoverflow.com/questions/4272579/how-to-print-full-stack-trace-in-exception
+//for getting full stack trace
+namespace cityLife
 {
     public static class ErrorCodeCollection
     {

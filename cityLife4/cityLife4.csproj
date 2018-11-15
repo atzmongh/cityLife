@@ -175,6 +175,7 @@
     <Content Include="cityLifeDB.xlsx" />
     <Content Include="Views\Admin\uploadDB.cshtml" />
     <Content Include="Views\Admin\unitTests.cshtml" />
+    <Content Include="Views\Admin\translations.cshtml" />
     <None Include="Views\Home\IndexOLD.cshtml" />
     <Content Include="icons\arr-b.svg" />
     <Content Include="icons\arr-l.svg" />

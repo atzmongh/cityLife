@@ -1,0 +1,60 @@
+﻿@using cityLife;
+@{
+    ViewBag.Title = "translations";
+    Layout = "~/Views/sharing/_adminLayout.cshtml";
+    // ViewBag.fromLanguages   List<language> - the liste of origin languages
+    //ViewBag.toLanguages      List<language> - the list of target languages
+    List<Language> fromLanguages = ViewBag.fromLanguages;
+    List<Language> toLanguages = ViewBag.toLanguages;
+}
+
+
+<h2>translations</h2>
+    From <div style="width:200px;">
+        <select name="fromLanguage" id="fromLanguage">
+            @foreach (var aLanguage in fromLanguages)
+            {
+                <option value="@aLanguage.languageCode">@aLanguage.name</option>
+            }
+        </select>
+    </div>
+    To <div style="width:200px;">
+        <select name="toLanguage" id="toLanguage">
+            @foreach (var aLanguage in toLanguages)
+            {
+                <option value="@aLanguage.languageCode">@aLanguage.name</option>
+            }
+        </select>
+    </div>
+    <input type="checkbox" name="showOnlyMissing" id="showOnlyMissing" checked />Show only missing translations<br />
+    <button onclick="populateTranslations()">OK</button>
+<table>
+    <thead>
+        <tr>
+            <th>t.Key ID</th>
+            <th>file path</th>
+            <th>line</th>
+            <th>from </th>
+            <th>to</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+<script>
+    function populateTranslations() {
+        var translationParameters = {};
+        translationParameters.fromLanguage = $("#fromLanguage").val();
+        translationParameters.toLanguage = $("#toLanguage").val();
+        translationParameters.showOnlyMissing = $("#showOnlyMissing").val();
+
+        $.getJSON("/admin/getTranslations", translationParameters).done(addLinesToTable);
+    }
+    function addLinesToTable(translations) {
+        confirm("ajax finished");
+    }
+</script>
+    
+

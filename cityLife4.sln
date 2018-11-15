@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2046
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cityLife4", "cityLife4\cityLife4.csproj", "{8A32E6A4-CF81-4E39-8640-8547CFC08B42}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cityLife4Tests", "cityLife4Tests\cityLife4Tests.csproj", "{DF81E1DC-2706-4EE9-ADC5-5BE750150F8D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,12 +15,11 @@ Global
 		{8A32E6A4-CF81-4E39-8640-8547CFC08B42}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A32E6A4-CF81-4E39-8640-8547CFC08B42}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8A32E6A4-CF81-4E39-8640-8547CFC08B42}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DF81E1DC-2706-4EE9-ADC5-5BE750150F8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DF81E1DC-2706-4EE9-ADC5-5BE750150F8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DF81E1DC-2706-4EE9-ADC5-5BE750150F8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DF81E1DC-2706-4EE9-ADC5-5BE750150F8D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F357EA32-EFDC-4D8E-8356-1D5BC9EDDC0B}
 	EndGlobalSection
 EndGlobal

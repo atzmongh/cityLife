@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Web;
 
-namespace cityLife4
+namespace cityLife
 {
     /// <summary>
     /// this class translates messages into the desired language

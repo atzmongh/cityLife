@@ -9,7 +9,10 @@ using System.Text;
 using System.Configuration;
 using System.Data.SqlClient;
 
-namespace cityLife4.Controllers
+//Look in http://www.binaryintellect.net/articles/6d19edd9-7582-4caf-b254-73deca44ecfb.aspx
+//for how to create infinite scrolling using MVC and Jquery.
+
+namespace cityLife.Controllers
 {
     public class AdminController : Controller
     {
@@ -41,6 +44,7 @@ namespace cityLife4.Controllers
             return View("uploadDB");
         }
 
+        [HttpGet]
         public ActionResult unitTests(string theAction,  bool? skipCorrectTests)
         {
             if (theAction == null)
@@ -67,7 +71,7 @@ namespace cityLife4.Controllers
                
                         
             }
-            return View();
+            return View("unitTests");
         }
 
         /// <summary>
@@ -96,6 +100,38 @@ namespace cityLife4.Controllers
             }
 
             Test.updateTestResult(series, number, isCorrect);
+        }
+
+        /// <summary>
+        /// The method displays the translation screen which lets the user see which translations exist and add/edit translations in various languages
+        /// </summary>
+        /// <returns>A starting screen - without the actual translations, as they will be added by an ajax call</returns>
+        [HttpGet]
+        public ActionResult translations()
+        {
+            //Read the languages available - remove the XX language if exists, and add the translation key to the "from" languages
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+            //The "toLanguages" is the list of target languages
+            var toLanguages = (from aLanguage in db.Languages
+                             where aLanguage.languageCode != "XX"
+                             select aLanguage).ToList();
+            
+            //"fromLanguages" is the list of origin languages. The "translation key" is also a "language" for the origin language list
+            List<Language> fromLanguages = new List<Language>();
+            var translationKey = new Language() { languageCode = "TK", name = "translation key", isDefault = false };
+            fromLanguages.Add(translationKey);
+            fromLanguages.AddRange(toLanguages);
+
+            ViewBag.fromLanguages = fromLanguages;
+            ViewBag.toLanguages = toLanguages;
+
+            return View("translations");
+        }
+        [HttpGet]
+        public ActionResult getTranslations(string fromLanguage, string toLanguage, bool showOnlyMissing)
+        {
+            int a = 1;
+            return View();
         }
         /// <summary>
         /// The function reads the CSV file that contains the DB content and creates SQL statements to populate it

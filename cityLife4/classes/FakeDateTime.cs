@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace cityLife4
+namespace cityLife
 {
     /// <summary>
     /// The class behaves much like DateTime with the property Now. However, we  can set the time to be a different time
