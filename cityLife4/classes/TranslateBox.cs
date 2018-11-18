@@ -1,10 +1,11 @@
-﻿using System;
+﻿using cityLife4;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Web;
 
-namespace cityLife
+namespace cityLife4
 {
     /// <summary>
     /// this class translates messages into the desired language
@@ -14,7 +15,6 @@ namespace cityLife
         private string _targetLanguageCode;
         private string _defaultLanguageCode;
         private string _noTranslation;
-        private cityLifeDBContainer1 db = new cityLifeDBContainer1();
 
         /// <summary>
         /// constructor
@@ -39,7 +39,8 @@ namespace cityLife
         public string targetLanguage
         {
             set
-            { 
+            {
+                cityLifeDBContainer1 db = new cityLifeDBContainer1();
                 if (db.Languages.Find(value) == null)
                 {
                     //such language code does not exist in the language table
@@ -50,7 +51,9 @@ namespace cityLife
             get { return _targetLanguageCode; }
         }
         /// <summary>
-        /// perform a translation operation to the target languagewhich was defined in the constructor.
+        /// perform a translation operation to the target languagewhich was defined in the constructor. If the translation key does not exist
+        /// creates a record in the translation key table, and also a record in the translation table for the English text. So default English
+        /// translation will be created immediately. This translation can later be changed.
         /// </summary>
         /// <param name="translationKey">the translation key which needs to be translated</param>
         /// <param name="lineNumber">the line number in the code where the translate method was last called. Note that 
@@ -63,12 +66,18 @@ namespace cityLife
                                [CallerLineNumber] int lineNumber = 0,
                                [CallerFilePath]   string filePath = null)
         {
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
             TranslationKey theTranslationKey =  db.TranslationKeys.SingleOrDefault(record => record.transKey == translationKey);
             if (theTranslationKey==null)
             {
-                //the translation key does not exist. Add it to the translation key table
+                //the translation key does not exist. Add it to the translation key table and add the
+                //same text to the translation text as English text
                 theTranslationKey = new TranslationKey() { transKey = translationKey, isUsed = true, filePath = filePath, lineNumber = lineNumber };
                 db.TranslationKeys.Add(theTranslationKey);
+                db.SaveChanges();
+                Language english = db.Languages.Single(a => a.languageCode == "EN");
+                Translation theEnglishTranslation = new Translation() { Language = english, TranslationKey = theTranslationKey, message = translationKey };
+                db.Translations.Add(theEnglishTranslation);
                 db.SaveChanges();
                 if (_noTranslation == "showAsterisks")
                 {

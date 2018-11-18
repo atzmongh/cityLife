@@ -8,12 +8,26 @@ using Microsoft.VisualBasic.FileIO;
 using System.Text;
 using System.Configuration;
 using System.Data.SqlClient;
+using cityLife4;
 
 //Look in http://www.binaryintellect.net/articles/6d19edd9-7582-4caf-b254-73deca44ecfb.aspx
 //for how to create infinite scrolling using MVC and Jquery.
+//look in the following link to see how to log errors:
+//https://docs.microsoft.com/en-us/aspnet/web-forms/overview/older-versions-getting-started/deploying-web-site-projects/processing-unhandled-exceptions-cs
+//https://stackify.com/aspnet-mvc-error-handling/
+
 
 namespace cityLife.Controllers
 {
+    public class TranslationData
+    {
+        public int translationKeyId;
+        public string filePath;
+        public int lineNumber;
+        public string translationKey;
+        public string textOriginLanguage;
+        public string textDestinationLanguage;
+    }
     public class AdminController : Controller
     {
         // GET: Admin
@@ -32,20 +46,20 @@ namespace cityLife.Controllers
             //drop all DB tables and create a new DB schema with empty DB
             StreamReader sqlReader = new StreamReader(Server.MapPath("/cityLifeDB.edmx.sql"));
             string createDBsql = sqlReader.ReadToEnd();
-            
+
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
-           
+
             db.Database.ExecuteSqlCommand(createDBsql);
             Stream csvFileStream = dbCSV.InputStream;
-            
-            PopulateDB(db,csvFileStream);
-           
+
+            PopulateDB(db, csvFileStream);
+
 
             return View("uploadDB");
         }
 
         [HttpGet]
-        public ActionResult unitTests(string theAction,  bool? skipCorrectTests)
+        public ActionResult unitTests(string theAction, bool? skipCorrectTests)
         {
             if (theAction == null)
             {
@@ -63,13 +77,13 @@ namespace cityLife.Controllers
                 //The action is "show test"
                 cityLifeDBContainer1 db = new cityLifeDBContainer1();
                 var unitTestsBySeries = from aUnitTest in db.unitTests
-                                    orderby aUnitTest.series, aUnitTest.number
-                                    group aUnitTest by aUnitTest.series;
+                                        orderby aUnitTest.series, aUnitTest.number
+                                        group aUnitTest by aUnitTest.series;
                 ViewBag.unitTestsBySeries = unitTestsBySeries;
                 ViewBag.skipCorrectTests = skipCorrectTests ?? false;
-                                    
-               
-                        
+
+
+
             }
             return View("unitTests");
         }
@@ -89,12 +103,12 @@ namespace cityLife.Controllers
             try
             {
                 //split the "series" and the "nunber" from the name component
-                string [] seriesAndNumber = checkBoxName.Split('-');  //create an array containing series name and number
+                string[] seriesAndNumber = checkBoxName.Split('-');  //create an array containing series name and number
                 series = seriesAndNumber[0];
                 number = int.Parse(seriesAndNumber[1]);
                 isCorrect = (checkBoxValue == "correct");
             }
-            catch(Exception innerException)
+            catch (Exception innerException)
             {
                 throw new AppException(108, innerException, checkBoxName);
             }
@@ -109,29 +123,112 @@ namespace cityLife.Controllers
         [HttpGet]
         public ActionResult translations()
         {
-            //Read the languages available - remove the XX language if exists, and add the translation key to the "from" languages
+            //Read the languages available - remove the XX language if exists
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
-            //The "toLanguages" is the list of target languages
-            var toLanguages = (from aLanguage in db.Languages
+            var languages = (from aLanguage in db.Languages
                              where aLanguage.languageCode != "XX"
                              select aLanguage).ToList();
-            
-            //"fromLanguages" is the list of origin languages. The "translation key" is also a "language" for the origin language list
-            List<Language> fromLanguages = new List<Language>();
-            var translationKey = new Language() { languageCode = "TK", name = "translation key", isDefault = false };
-            fromLanguages.Add(translationKey);
-            fromLanguages.AddRange(toLanguages);
 
-            ViewBag.fromLanguages = fromLanguages;
-            ViewBag.toLanguages = toLanguages;
+            ViewBag.languages = languages;
 
             return View("translations");
         }
         [HttpGet]
-        public ActionResult getTranslations(string fromLanguage, string toLanguage, bool showOnlyMissing)
+        public JsonResult getTranslations(string fromLanguage, string toLanguage, bool showOnlyMissing)
         {
-            int a = 1;
-            return View();
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+            List<TranslationData> translationDataList = new List<TranslationData>();
+
+
+            //Reach each translation key and attach to it the translation in the origin language and destination language, if exist.
+            foreach (var aTranslationKey in db.TranslationKeys)
+            {
+                var aTranslationFrom = db.Translations.FirstOrDefault(aRecord => aRecord.TranslationKey.id == aTranslationKey.id &&
+                                                                             aRecord.Language.languageCode == fromLanguage);
+                var aTranslationTo = db.Translations.FirstOrDefault(aRecord => aRecord.TranslationKey.id == aTranslationKey.id &&
+                                                                             aRecord.Language.languageCode == toLanguage);
+                string textDestinationLanguage = "";
+                string textOriginLanguage = "";
+                if (showOnlyMissing && aTranslationTo != null)
+                {
+                    //The destination translation exists, and user wants to see only missing translations - skip this translation
+                    continue;
+                }
+                if (aTranslationTo != null)
+                {
+                    textDestinationLanguage = aTranslationTo.message;
+                }
+                if (aTranslationFrom == null)
+                {
+                    //The translation in the origin language does not exist - insert appropriate message
+                    textOriginLanguage = "(missing)";
+                }
+                else
+                {
+                    textOriginLanguage = aTranslationFrom.message;
+                }
+                // Trimout the start path that always looks like: C:\software\cityLife\cityLife4
+                string shortFilePath = aTranslationKey.filePath != null ? aTranslationKey.filePath.Substring(31) : "";
+                translationDataList.Add(new TranslationData
+                {
+                    translationKeyId = aTranslationKey.id,
+                    filePath = shortFilePath,  
+                    lineNumber = aTranslationKey.lineNumber ?? 0,
+                    translationKey = aTranslationKey.transKey,
+                    textOriginLanguage = textOriginLanguage,
+                    textDestinationLanguage = textDestinationLanguage
+                });
+            }
+
+            JsonResult jResult = Json(translationDataList, JsonRequestBehavior.AllowGet);
+            return jResult;
+        }
+        /// <summary>
+        /// the method is called when the user presses the "save all" button in the page. The form is submitted along with a list of 
+        /// all translations. Each translation contains: name of the form en-1 (language code, then the translation key id). The value is the 
+        /// translated text for that transaltion key
+        /// </summary>
+        [HttpPost]
+        public ActionResult saveTranslations()
+        {
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+            foreach (var aKey in Request.Form.AllKeys)
+            {
+                if (Request[aKey] == "")
+                {
+                    //No translation has been given - no need to do anything
+                    continue;
+                }
+                try
+                {
+                    var langCodeAndId = aKey.Split('-');
+                    string languageCode = langCodeAndId[0];
+                    int transKeyId = int.Parse(langCodeAndId[1]);
+
+                    //Look if such translation already exists
+                    var theTranslation = db.Translations.FirstOrDefault(aRecord => aRecord.TranslationKey.id == transKeyId && aRecord.Language.languageCode == languageCode);
+                    var theTranslationKey = db.TranslationKeys.Single(aRecord => aRecord.id == transKeyId);
+                    var theLanguage = db.Languages.Single(aRecord => aRecord.languageCode == languageCode);
+                    if (theTranslation == null)
+                    {
+                        //Such translation does not exist - add it
+                        theTranslation = new Translation() { Language = theLanguage, TranslationKey = theTranslationKey, message = Request[aKey] };
+                        db.Translations.Add(theTranslation);
+                    }
+                    else
+                    {
+                        //The translation exists - update the translated text
+                        theTranslation.message = Request[aKey];
+                    }
+                    db.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    throw new AppException(111, null, aKey);
+                }
+
+            }
+            return this.translations();
         }
         /// <summary>
         /// The function reads the CSV file that contains the DB content and creates SQL statements to populate it
@@ -144,14 +241,14 @@ namespace cityLife.Controllers
             {
                 parser.Delimiters = new string[] { "," };
 
-                string tableName="undefined";
+                string tableName = "undefined";
                 List<string> columnNames = new List<string>();
-                List<string> columnValues =  new List<string>();
+                List<string> columnValues = new List<string>();
 
                 string[] lineFields = parser.ReadFields();
-                int columnCount=0;
+                int columnCount = 0;
                 string setIdentityOn = "";
-                while (lineFields !=null)
+                while (lineFields != null)
                 {
                     if (lineFields[0] != "")
                     {
@@ -220,11 +317,11 @@ namespace cityLife.Controllers
                             insertCommand.Append(columnNames[i]);          //INSERT INTO apartment(id,name
                         }
                         insertCommand.Append(") VALUES (");                //INSERT INTO apartment(id,name,description) VALUES (
-                        insertCommand.Append("N'"+columnValues[0]+"'");     //INSERT INTO apartment(id,name,description) VALUES (N'123'
+                        insertCommand.Append("N'" + columnValues[0] + "'");     //INSERT INTO apartment(id,name,description) VALUES (N'123'
                         for (int i = 1; i < columnValues.Count(); i++)
                         {
                             insertCommand.Append(",");                     //INSERT INTO apartment(id,name,description) VALUES (N'123',
-                            insertCommand.Append("N'"+columnValues[i]+"'"); //INSERT INTO apartment(id,name,description) VALUES (N'123',N'nice'
+                            insertCommand.Append("N'" + columnValues[i] + "'"); //INSERT INTO apartment(id,name,description) VALUES (N'123',N'nice'
                         }
                         insertCommand.Append(")");
                         string insertCommandSt = insertCommand.ToString();
@@ -262,15 +359,15 @@ namespace cityLife.Controllers
 
             Money m9 = m1.converTo("EUR", new DateTime(2018, 10, 25), rounded: true);
             Test.check(6, m9);
-           // Assert.AreEqual("EUR 1074.00", m9.ToString());
+            // Assert.AreEqual("EUR 1074.00", m9.ToString());
 
             Money m6 = m1.converTo("EUR", new DateTime(2018, 10, 20), rounded: false);
             Test.check(7, m6);
-          // Assert.AreEqual("EUR 1028.80", m6.ToString());
+            // Assert.AreEqual("EUR 1028.80", m6.ToString());
 
             Money m4 = m3.converTo("USD", new DateTime(2018, 10, 25));
             Test.check(8, m4.toMoneyString());
-           // Assert.AreEqual("$1,234.56", m4.toMoneyString());
+            // Assert.AreEqual("$1,234.56", m4.toMoneyString());
             string anException = "exception was not raised";
             try
             {
@@ -287,7 +384,7 @@ namespace cityLife.Controllers
         public void TranslateBoxTest()
         {
             //Tests with "showAsterisks" mode
-            TranslateBox tBox = new TranslateBox("en", "ru", "showAsterisks");
+            TranslateBox tBox = new TranslateBox("EN", "RU", "showAsterisks");
             Test.startTestSeries("TranslationBox");
             Test.check(1, tBox.translate("sunday"));
             Test.check(2, tBox.translate("Monday"));
@@ -296,11 +393,11 @@ namespace cityLife.Controllers
             Test.check(5, tBox.translate("Thursday"));
 
 
-            tBox = new TranslateBox("ru", "en", "showAsterisks");
+            tBox = new TranslateBox("RU", "EN", "showAsterisks");
             Test.check(6, tBox.translate("Thursday"));
 
             //Tests with "dont show" mode
-            tBox = new TranslateBox("en", "ru", "dontShow");
+            tBox = new TranslateBox("EN", "RU", "dontShow");
             Test.check(7, tBox.translate("sunday"));//translation key does not exist
             Test.check(8, tBox.translate("Monday"));//translation does not exist 
             Test.check(9, tBox.translate("Tuesday"));//translation exists in target language 

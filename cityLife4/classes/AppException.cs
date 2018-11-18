@@ -1,11 +1,12 @@
-﻿using System;
+﻿using cityLife4;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web;
 // look in: https://stackoverflow.com/questions/4272579/how-to-print-full-stack-trace-in-exception
 //for getting full stack trace
-namespace cityLife
+namespace cityLife4
 {
     public static class ErrorCodeCollection
     {
@@ -19,7 +20,9 @@ namespace cityLife
             {106,"an unsupported language requested:{0}"},
             {107,"Before running setStartSeries you must run startTestCycle" },
             {108,"checkbox name of unit test report has an unexpected format. Actual content:{0}. Expected format:<series>-<number>" },
-            {109,"unit test series {0} number {1} was not found in DB" }
+            {109,"unit test series {0} number {1} was not found in DB" },
+            {110,"HTTP exception occured. Code:{0} type:{1} message:{2}" },
+            {111,"the name of each element in the translation form should be of the form XX-NN where XX is the language code and NN is the transaltion key id. Actual format was: {0}" }
 
         };
         public static bool exists(int code)
@@ -41,8 +44,13 @@ namespace cityLife
     }
     public class AppException : Exception
     {
-        public AppException(int code, Exception innerException, params object[] parameters): base(AppException.formatMessage(code,parameters), 
+        public AppException(int code, Exception innerException, params object[] parameters) : base(AppException.formatMessage(code, parameters),
                                                                                                   innerException)
+        {
+            writeException(code, innerException, this.StackTrace, parameters);
+        }
+
+        public static void writeException(int code, Exception innerException, string stackTrace, params object[] parameters)
         {
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
             ErrorCode theErrorCode = db.ErrorCodes.SingleOrDefault(aRecord => aRecord.code == code);
@@ -64,7 +72,7 @@ namespace cityLife
             string formattedMessage = AppException.formatMessage(code, parameters);
             ErrorMessage theErrorMessage = (from anErrorMessage in theErrorCode.ErrorMessages
                                             where anErrorMessage.formattedMessage == formattedMessage &&
-                                                  anErrorMessage.stackTrace == base.StackTrace
+                                                  anErrorMessage.stackTrace == stackTrace
                                             select anErrorMessage).FirstOrDefault();  //actually we expect only a single record to be found
             if (theErrorMessage != null)
             {
@@ -81,7 +89,7 @@ namespace cityLife
                     formattedMessage = formattedMessage,
                     lastOccurenceDate = DateTime.Now,
                     occurenceCount = 1,
-                    stackTrace = StackTrace,
+                    stackTrace = stackTrace,
                 };
                 db.ErrorMessages.Add(theErrorMessage);
             }

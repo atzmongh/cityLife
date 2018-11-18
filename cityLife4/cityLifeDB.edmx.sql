@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 11/13/2018 23:02:09
+-- Date Created: 11/16/2018 22:30:44
 -- Generated from EDMX file: C:\software\cityLife\cityLife4\cityLifeDB.edmx
 -- --------------------------------------------------
 
@@ -132,8 +132,8 @@ CREATE TABLE [dbo].[Pricings] (
 
 -- Creating table 'Languages'
 CREATE TABLE [dbo].[Languages] (
-    [languageCode] nchar(10)  NOT NULL,
-    [name] nchar(30)  NOT NULL,
+    [languageCode] nvarchar(10)  NOT NULL,
+    [name] nvarchar(30)  NOT NULL,
     [isDefault] bit  NOT NULL
 );
 --GO
@@ -153,7 +153,7 @@ CREATE TABLE [dbo].[Translations] (
     [Id] int IDENTITY(1,1) NOT NULL,
     [message] nvarchar(max)  NOT NULL,
     [TranslationKey_id] int  NOT NULL,
-    [Language_languageCode] nchar(10)  NOT NULL
+    [Language_languageCode] nvarchar(10)  NOT NULL
 );
 --GO
 
@@ -190,7 +190,7 @@ CREATE TABLE [dbo].[ApartmentDays] (
 
 -- Creating table 'unitTests'
 CREATE TABLE [dbo].[unitTests] (
-    [series] nchar(64)  NOT NULL,
+    [series] nvarchar(64)  NOT NULL,
     [number] int  NOT NULL,
     [expectedResult] nvarchar(max)  NULL,
     [actualResult] nvarchar(max)  NULL,

@@ -1,9 +1,10 @@
-﻿using System;
+﻿using cityLife4;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace cityLife
+namespace cityLife4
 {
     /// <summary>
     /// Money represents an amount of money in a specific currency.
@@ -12,7 +13,7 @@ namespace cityLife
     {
         private decimal amount=0;
         private string currencyCode;
-        private static cityLifeDBContainer1 db = new cityLifeDBContainer1();
+       // private static cityLifeDBContainer1 db = new cityLifeDBContainer1();
         /// <summary>
         /// constructor
         /// </summary>
@@ -74,7 +75,8 @@ namespace cityLife
         /// <returns>$1,234.56 orf $1235 bsaed on the showCents param</returns>
         public string toMoneyString(bool showCents = true)
         {
-            var theCurrency = Money.db.Currencies.SingleOrDefault(aCurrency => aCurrency.currencyCode == this.currencyCode);
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+            var theCurrency = db.Currencies.SingleOrDefault(aCurrency => aCurrency.currencyCode == this.currencyCode);
             if (theCurrency == null)
             {
                 throw new AppException(102, null, "such currency does not exist in DB:" + this.currencyCode);
@@ -104,6 +106,7 @@ namespace cityLife
         /// such record exists)</exception>
         public Money converTo(string newCurrencyCode, DateTime atDate, bool rounded = false)
         {
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
             if (currencyCode == newCurrencyCode)
             {
                 //current and target currencies are the same - no conversion needed.
@@ -127,7 +130,7 @@ namespace cityLife
                     lowerCurrencyCode = newCurrencyCode;
                     upperCurrencyCOde = this.currencyCode;
                 }
-                var exchangeRates = from anExchangeRate in Money.db.CurrencyExchanges
+                var exchangeRates = from anExchangeRate in db.CurrencyExchanges
                                     where anExchangeRate.FromCurrency.currencyCode == lowerCurrencyCode &&
                                           anExchangeRate.ToCurrency.currencyCode    == upperCurrencyCOde  &&
                                           anExchangeRate.date <= atDate

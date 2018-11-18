@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Configuration;
+using cityLife4;
 
 namespace cityLife.Controllers
 {
@@ -251,6 +252,7 @@ namespace cityLife.Controllers
                 //currency contains a new currency selected by the user
                 Session["currency"] = currency;
             }
+
             Currency theCurrency = db.Currencies.SingleOrDefault(aCurrency => aCurrency.currencyCode == currency);
             if (theCurrency == null)   
             {

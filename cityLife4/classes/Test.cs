@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace cityLife
+namespace cityLife4
 {
     public static class Test
     {
@@ -84,7 +84,7 @@ namespace cityLife
             else
             {
                 //A unit test record exists - check if it is correct
-               // theUnitTest.actualResult = actualResult;
+                theUnitTest.actualResult = actualResult;
                 theUnitTest.dateLastRun = DateTime.Now;
                 if (theUnitTest.expectedResult != null && theUnitTest.expectedResult == actualResult)
                 {
@@ -94,7 +94,6 @@ namespace cityLife
                 else if (theUnitTest.expectedResult != null)
                 {
                     //the results are not the equal
-                    theUnitTest.actualResult = actualResult;
                     theUnitTest.correctFlag = false;
                 }
                 else

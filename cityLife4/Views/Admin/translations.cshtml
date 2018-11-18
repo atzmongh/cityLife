@@ -1,18 +1,17 @@
-﻿@using cityLife;
+﻿@using cityLife4;
 @{
     ViewBag.Title = "translations";
     Layout = "~/Views/sharing/_adminLayout.cshtml";
     // ViewBag.fromLanguages   List<language> - the liste of origin languages
     //ViewBag.toLanguages      List<language> - the list of target languages
-    List<Language> fromLanguages = ViewBag.fromLanguages;
-    List<Language> toLanguages = ViewBag.toLanguages;
+    List<Language> languages = ViewBag.languages;    
 }
 
 
 <h2>translations</h2>
     From <div style="width:200px;">
         <select name="fromLanguage" id="fromLanguage">
-            @foreach (var aLanguage in fromLanguages)
+            @foreach (var aLanguage in languages)
             {
                 <option value="@aLanguage.languageCode">@aLanguage.name</option>
             }
@@ -20,40 +19,60 @@
     </div>
     To <div style="width:200px;">
         <select name="toLanguage" id="toLanguage">
-            @foreach (var aLanguage in toLanguages)
+            @foreach (var aLanguage in languages)
             {
                 <option value="@aLanguage.languageCode">@aLanguage.name</option>
             }
         </select>
     </div>
-    <input type="checkbox" name="showOnlyMissing" id="showOnlyMissing" checked />Show only missing translations<br />
-    <button onclick="populateTranslations()">OK</button>
-<table>
-    <thead>
-        <tr>
-            <th>t.Key ID</th>
-            <th>file path</th>
-            <th>line</th>
-            <th>from </th>
-            <th>to</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-
-    </tbody>
-</table>
+    <input type="checkbox" name="showOnlyMissing" id="showOnlyMissing" value="true" checked />Show only missing translations<br />
+    <button onclick="populateTranslations()">Show Translations</button>
+    <form method="post" action="/admin/saveTranslations">
+        <table>
+            <thead>
+                <tr>
+                    <th>t.Key ID</th>
+                    <th>file path</th>
+                    <th>line</th>
+                    <th>t.Key</th>
+                    <th>from </th>
+                    <th>to</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="bodyTable"></tbody>
+        </table>
+        <br />
+        <input type="submit" value="Save All" />
+        <br />
+    </form>
 <script>
     function populateTranslations() {
+        $.ajaxSetup({ cache: false });
         var translationParameters = {};
         translationParameters.fromLanguage = $("#fromLanguage").val();
         translationParameters.toLanguage = $("#toLanguage").val();
-        translationParameters.showOnlyMissing = $("#showOnlyMissing").val();
+        translationParameters.showOnlyMissing = document.getElementById("showOnlyMissing").checked;
 
         $.getJSON("/admin/getTranslations", translationParameters).done(addLinesToTable);
     }
+    //The "translation" object is an array of TranslationData objects (see admin "TranslationData" class)
     function addLinesToTable(translations) {
-        confirm("ajax finished");
+        $("#bodyTable").children().remove();
+        for (var i = 0; i < translations.length; i++) {
+            var aTranslation = translations[i];
+
+            var line = "<tr>" +
+                "<td>" + aTranslation.translationKeyId + "</td>" +
+                "<td>" + aTranslation.filePath + "</td>" +
+                "<td>" + aTranslation.lineNumber + "</td>" +
+                "<td>" + aTranslation.translationKey + "</td>" +
+                "<td>" + aTranslation.textOriginLanguage + "</td>" +
+                "<td>" + '<input type="text" style="width:400px" name="' + $("#toLanguage").val() + '-'+ aTranslation.translationKeyId + '" value="' + aTranslation.textDestinationLanguage + '"/>' + "</td>" +
+                "</tr>";
+                //The name property of <input type="text" is of the form name="en-1" where en isthe language code and 1 is the translation key id
+            $("#bodyTable").append(line);
+        }
     }
 </script>
     

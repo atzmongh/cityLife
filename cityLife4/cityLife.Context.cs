@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace cityLife
+namespace cityLife4
 {
     using System;
     using System.Data.Entity;

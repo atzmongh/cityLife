@@ -100,8 +100,8 @@
     <Key>
       <PropertyRef Name="languageCode" />
     </Key>
-    <Property Name="languageCode" Type="nchar" Nullable="false" MaxLength="10" />
-    <Property Name="name" Type="nchar" Nullable="false" MaxLength="30" />
+    <Property Name="languageCode" Type="nvarchar" Nullable="false" MaxLength="10" />
+    <Property Name="name" Type="nvarchar" Nullable="false" MaxLength="30" />
     <Property Name="isDefault" Type="bit" Nullable="false" DefaultValue="false" />
   </EntityType>
   <EntityType Name="TranslationKeys">
@@ -121,7 +121,7 @@
     <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="message" Type="nvarchar(max)" Nullable="false" />
     <Property Name="TranslationKey_id" Type="int" Nullable="false" />
-    <Property Name="Language_languageCode" Type="nchar" MaxLength="10" Nullable="false" />
+    <Property Name="Language_languageCode" Type="nvarchar" MaxLength="10" Nullable="false" />
   </EntityType>
   <EntityType Name="Currencies">
     <Key>
@@ -159,7 +159,7 @@
       <PropertyRef Name="series" />
       <PropertyRef Name="number" />
     </Key>
-    <Property Name="series" Type="nchar" Nullable="false" MaxLength="64" />
+    <Property Name="series" Type="nvarchar" Nullable="false" MaxLength="64" />
     <Property Name="number" Type="int" Nullable="false" />
     <Property Name="expectedResult" Type="nvarchar(max)" Nullable="true" />
     <Property Name="actualResult" Type="nvarchar(max)" Nullable="true" />
@@ -425,12 +425,12 @@
           <Key>
             <PropertyRef Name="languageCode" />
           </Key>
-          <Property Name="languageCode" Type="String" Nullable="false" FixedLength="true" MaxLength="10" Unicode="true" >
+          <Property Name="languageCode" Type="String" Nullable="false" FixedLength="false" MaxLength="10" Unicode="true" >
             <Documentation>
               <Summary>the standard 5 letter code of the language, such as en-US</Summary>
             </Documentation>
           </Property>
-          <Property Name="name" Type="String" Nullable="false" FixedLength="true" MaxLength="30" >
+          <Property Name="name" Type="String" Nullable="false" FixedLength="false" MaxLength="30" >
             <Documentation>
               <Summary>the language name in its own language.</Summary>
             </Documentation>
@@ -553,7 +553,7 @@
             <PropertyRef Name="series" />
             <PropertyRef Name="number" />
           </Key>
-          <Property Name="series" Type="String" Nullable="false" FixedLength="true" MaxLength="64" Unicode="true" />
+          <Property Name="series" Type="String" Nullable="false" FixedLength="false" MaxLength="64" Unicode="true" />
           <Property Name="number" Type="Int32" Nullable="false" />
           <Property Name="expectedResult" Type="String" Nullable="true" />
           <Property Name="actualResult" Type="String" Nullable="true" />
