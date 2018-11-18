@@ -1,0 +1,49 @@
+@import "variables";
+
+.btn, a.btn {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 180px;
+  height: 60px;
+  padding: 10px 20px;
+  text-align: center;
+  text-transform: uppercase;
+  text-decoration: none;
+  background: $blue-light;
+  border-radius: 0;
+  border: 2px solid $blue-light;
+  box-shadow: none;
+  font-family: $lato-bold;
+  font-size: 1rem;
+  line-height: 1.2;
+  letter-spacing: 2px;
+  color: $white;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: $blue-hover;
+    text-decoration: none;
+  }
+
+  > span{
+    display: block;
+    z-index: 1;
+  }
+
+  &:disabled{
+    cursor: not-allowed;
+    opacity: 0.8;
+  }
+}
+
+
+
+@media screen and ($tablet-min) and ($desktop-medium) {
+  .btn, a.btn {
+    height: 50px;
+    min-width: 150px;
+  }
+}

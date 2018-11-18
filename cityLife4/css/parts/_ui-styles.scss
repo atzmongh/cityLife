@@ -1,0 +1,540 @@
+@import "variables";
+@import "fonts";
+@import "icons";
+
+
+
+html,
+body{
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  min-width: 320px;
+  max-width: 1920px;
+
+  &.active-popup {
+    position: fixed;
+    overflow: hidden;
+  }
+
+  &.active-menu {
+    overflow: hidden;
+  }
+}
+
+header,
+footer{
+  width: 100%;
+}
+
+main {
+  position: relative;
+}
+
+p {
+  margin: 0 0 15px;
+}
+
+a {
+  color: $blue-dark;
+  text-decoration: none;
+}
+
+sup {
+  font-size: 0.563rem; //9px;
+}
+
+.main-wrapper {
+  margin-left: 420px;
+  min-height: 900px;
+}
+
+.wrapper {
+  display: flex;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+.align-right {
+  text-align: right;
+}
+
+.align-center {
+  text-align: center;
+}
+
+.visible-on-mobile {
+  display: none !important;
+}
+
+.link {
+  font-family: $lato-semibold;
+  font-size: 1.125rem;  //18px;
+  color: $blue-light;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.price {
+  font-family: $lora-regular;
+  font-size: 2.25rem; //36px
+  line-height: 1.3;
+  color: $grey-txt;
+  margin-bottom: 40px;
+
+  &.light {
+    color: $white;
+  }
+}
+
+.note {
+  color: $grey-txt;
+  font-family: $lato-semibold;
+  font-size: 1.125rem; //18px
+  line-height: 1.2;
+
+  &.blue {
+    color: $blue-light;
+  }
+}
+
+.clife-ico {
+  position: relative;
+}
+
+strong.blue {
+  color: $blue-light;
+  font-weight: normal;
+}
+
+.form-box-wrap {
+  display: flex;
+  justify-content: space-between;
+
+  .select-box {
+    width: 48%;
+  }
+}
+
+.description {
+  font-family: $lora-regular;
+
+  p:first-child:first-letter {
+    font-size: 350%;
+    float: left;
+    margin-top: 10px;
+    margin-right: 3px;
+  }
+}
+
+.main-description-wrap {
+  display: flex;
+  width: 100%;
+  //height: calc(100% - 650px);
+
+  .proverb {
+    width: 33.33%;
+    padding: 95px 60px 50px;
+    font-family: $lora-italic;
+    background: url("../images/mask.png") no-repeat 110% 100% $light;
+    background-size: 55% auto;
+
+    p:first-child {
+      margin-bottom: 3px;
+    }
+  }
+
+  .main-description {
+    width: 66.66%;
+    padding: 60px 60px 50px;
+    columns: 100px 2;
+    column-gap: 60px;
+  }
+}
+
+.dscr-list {
+  columns: 100px 2;
+  column-gap: 40px;
+  padding-top: 20px;
+  margin-bottom: 40px;
+  border-top: 2px solid $light;
+  li {
+    &:before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      display: inline-block;
+      vertical-align: top;
+      border: 2px solid $grey;
+      margin-right: 15px;
+      margin-top: 10px;
+    }
+  }
+}
+
+.contact-info {
+  .note {
+    margin-bottom: 25px;
+  }
+}
+
+.dropdown-toggle {
+  cursor: pointer;
+}
+
+.dropdown {
+  display: none;
+  position: absolute;
+  left: 0;
+  border: 1px solid $grey-txt;
+  background: $white;
+  z-index: 3;
+
+  &.open {
+    display: block;
+  }
+}
+
+.phone {
+  position: relative;
+  margin-bottom: 10px;
+
+  .number {
+    font-family: $lato-bold;
+    font-size: 1.375rem; //22px
+    color: $blue-dark;
+    letter-spacing: 1px;
+  }
+
+  .dropdown-toggle {
+    padding-right: 40px;
+    &:before {
+      @extend .clife-ico-phone;
+    }
+    &:after {
+      content: '';
+      width: 20px;
+      height: 20px;
+      position: absolute;
+      top: 8px;
+      right: 0;
+      background: url("../icons/arrow.svg") no-repeat;
+    }
+  }
+
+  .dropdown {
+    top: 0;
+    width: 100%;
+    padding: 10px 40px;
+  }
+}
+
+.mail {
+  font-size: 1.125rem; //18px
+  color: $blue-light;
+  font-family: $lato-semibold;
+  text-decoration: underline;
+  &:before {
+    @extend .clife-ico-mail;
+  }
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.phone .dropdown-toggle,
+.mail {
+  position: relative;
+  padding-left: 40px;
+  &:before {
+    font-family: 'clife-icons';
+    font-size: 1.4rem;
+    line-height: 1;
+    color: $blue-light;
+    @extend .vert-align;
+    left: 0;
+  }
+}
+
+.icon-btn {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  &:before {
+    font-family: 'clife-icons';
+    font-size: 20px;
+    color: $white;
+    transition: color 0.2s;
+  }
+  &.location {
+    &:before {
+      @extend .clife-ico-location;
+    }
+  }
+  &.resize {
+    &:before {
+      @extend .clife-ico-resize;
+    }
+  }
+  &:hover {
+    &:before {
+      color: $blue-hover;
+    }
+  }
+}
+
+.rules {
+  counter-reset: title-counter;
+
+  .col {
+    height: 100vh;
+    min-height: 900px;
+    &.has-bg {
+      width: 540px;
+      padding: 60px 55px;
+      background: url("../images/mask.png") no-repeat 90% 100% $light;
+      background-size: 55% auto;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    &.has-main-txt {
+      width: calc(100% - 540px);
+      padding: 192px 16%;
+      overflow-y: auto;
+      overflow-x: hidden;
+
+      .counter-list {
+        margin-left: -30px;
+      }
+    }
+  }
+
+  h2 {
+    margin-bottom: 60px;
+  }
+
+  h4.blue {
+    margin-bottom: 20px;
+    counter-reset: list-counter;
+    &:before {
+      counter-increment: title-counter;
+      content: counter(title-counter)  ". ";
+    }
+  }
+
+  .counter-list {
+    margin-bottom: 50px;
+    li {
+      position: relative;
+      padding-left: 30px;
+      margin-bottom: 30px;
+
+      &:before {
+        position: absolute;
+        top: 4px;
+        left: 0;
+        font-size: 12px;
+        counter-increment: list-counter;
+        content: counter(title-counter)  ". " counter(list-counter);
+      }
+    }
+  }
+}
+
+.booking-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  .form {
+    max-width: 500px;
+  }
+
+  h2 {
+    margin-bottom: 30px;
+  }
+
+  textarea {
+    margin-bottom: 20px;
+  }
+}
+
+.total-sum {
+  font-family: $lora-regular;
+  font-size: 36px;
+  color: $grey-txt;
+}
+
+
+
+
+@media screen and ($tablet-min) and ($desktop-medium) {
+  .main-wrapper {
+    margin-left: 350px;
+    min-height: 680px;
+  }
+
+  .main-description-wrap {
+    .main-description {
+      padding: 30px;
+    }
+
+    .proverb {
+      padding: 60px 30px 30px;
+    }
+  }
+
+  .rules {
+    .col {
+      min-height: 680px;
+      &.has-bg {
+        width: 450px;
+        padding: 40px;
+      }
+      &.has-main-txt {
+        width: calc(100% - 450px);
+        padding: 163px 8%;
+      }
+    }
+  }
+}
+
+
+
+
+@media screen and ($desktop-medium) {
+  h2.thanks-note {
+    font-size: 18px;
+  }
+}
+
+
+
+@media screen and ($laptop) {
+  .wrapper {
+    flex-wrap: wrap;
+  }
+}
+
+
+
+@media screen and ($laptop-small) {
+  .rules {
+    h2 {
+      margin-bottom: 35px;
+    }
+    .col {
+      height: auto;
+      min-height: auto;
+      &.has-bg {
+        width: 100%;
+        padding: 40px 30px;
+        background-size: 25% auto;
+      }
+      &.has-main-txt {
+        width: 100%;
+        padding: 40px 30px;
+
+        .counter-list {
+          margin-left: 0;
+        }
+      }
+    }
+    .counter-list {
+      li {
+        margin-bottom: 20px;
+      }
+    }
+  }
+}
+
+
+
+@media screen and ($tablet) {
+  .main-wrapper {
+    margin-left: 0;
+  }
+}
+
+
+
+@media screen and ($mobile) {
+  .note {
+    font-size: 1rem;
+  }
+
+  .price {
+    font-size: 28px;
+  }
+
+  .visible-on-mobile {
+    display: block !important;
+  }
+
+  .hidden-on-mobile {
+    display: none !important;
+  }
+
+  .main-description-wrap {
+    flex-wrap: wrap;
+
+    .proverb {
+      width: 100%;
+      padding: 90px 20px;
+      background-size: initial;
+      background-position: 220% 100%;
+    }
+
+    .main-description {
+      width: 100%;
+      padding: 20px 20px 0;
+      columns: 100px 1;
+      column-gap: 0;
+
+      p {
+        margin: 30px 0;
+      }
+    }
+  }
+
+  .dscr-list {
+    columns: 1;
+    padding-top: 0;
+    border-top: none;
+  }
+
+  .rules {
+    .col {
+      &.has-bg {
+        padding: 70px 20px 0;
+        background-size: 70% auto;
+        background-position: 160% 100%;
+      }
+      &.has-main-txt {
+        padding: 30px 20px 0;
+      }
+    }
+  }
+
+  .booking-form textarea {
+    margin-bottom: 20px;
+  }
+
+  .total-sum {
+    font-size: 28px;
+  }
+
+  .contact-info {
+    padding-top: 25px;
+    border-top: 2px solid $light;
+    text-align: center;
+  }
+
+  footer {
+    padding: 0 20px 50px;
+  }
+}

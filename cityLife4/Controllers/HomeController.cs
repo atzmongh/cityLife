@@ -47,9 +47,33 @@ namespace cityLife.Controllers
         /// <param name="language">when the user selcets a language drop-down - we get the language in the parameter
         /// We will change the language accordingly</param>
         /// <param name="currency">when the user selects the currency drtop-down - we get the currency in this parameter</param>
+        /// <param name="fromDate">Date of checkin</param>
+        /// <param name="toDate">Date of checkout</param>
+        /// <param name="adultsCount">number of adults</param>
+        /// <param name="childrenCount">number of children</param>
         /// <returns></returns>
         [HttpGet]
         public ActionResult Index(string language, string currency, DateTime? fromDate, DateTime? toDate, int? adultsCount, int? childrenCount)
+        {
+            this.prepareApartmentData(language, currency, fromDate, toDate, adultsCount, childrenCount);
+
+            ViewBag.pageURL = "/home";
+
+
+            return View();
+        }
+
+        public ActionResult apartments(string language, string currency, DateTime? fromDate, DateTime? toDate, int? adultsCount, int? childrenCount)
+        {
+            this.prepareApartmentData(language, currency, fromDate, toDate, adultsCount, childrenCount);
+
+            ViewBag.pageURL = "/home/apartments";
+
+
+            return View("apartments");
+        }
+
+        private void prepareApartmentData(string language, string currency, DateTime? fromDate, DateTime? toDate, int? adultsCount, int? childrenCount)
         {
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
             TranslateBox tBox = this.setTbox(language);
@@ -89,8 +113,6 @@ namespace cityLife.Controllers
             ViewBag.currentCurrency = theCurrency;
             ViewBag.bookingRequest = theBookingRequest;
 
-
-            return View();
         }
 
         /// <summary>
@@ -300,28 +322,5 @@ namespace cityLife.Controllers
             return theBookingRequest;
         }
 
-        public ActionResult language()
-        {
-            return View("index");
-        }
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
-        }
-
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
-        }
-        public ActionResult Home()
-        {
-            ViewBag.Message = "Your home page.";
-
-            return View();
-        }
     }
 }

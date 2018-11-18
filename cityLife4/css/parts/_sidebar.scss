@@ -1,0 +1,62 @@
+@import "variables";
+
+
+
+.sidebar {
+  height: 100vh;
+  min-height: 900px;
+  overflow-y: auto;
+  flex-shrink: 0;
+  width: 545px;
+  padding: 60px;
+
+  .btn {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .note {
+    margin-bottom: 40px;
+    text-align: center;
+  }
+}
+
+
+
+@media screen and ($tablet-min) and ($desktop-medium) {
+  .sidebar {
+    width: 400px;
+    min-height: 680px;
+    padding: 30px;
+  }
+}
+
+
+
+@media screen and ($laptop) {
+  .sidebar {
+    order: 3;
+    width: 100%;
+    height: auto;
+    min-height: auto;
+    overflow-y: visible;
+
+    .btn {
+      max-width: 300px;
+    }
+    .note {
+      text-align: left;
+    }
+  }
+}
+
+@media screen and ($mobile) {
+  .sidebar {
+    padding: 50px 20px 30px;
+
+    .note {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+  }
+}

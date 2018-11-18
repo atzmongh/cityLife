@@ -1,0 +1,150 @@
+@import "variables";
+
+@font-face {
+  font-family: 'lato-regular';
+  src: url('../fonts/lato-regular.eot');
+  src: url('../fonts/lato-regular.eot') format('embedded-opentype'),
+  url('../fonts/lato-regular.woff2') format('woff2'),
+  url('../fonts/lato-regular.woff') format('woff'),
+  url('../fonts/lato-regular.ttf') format('truetype'),
+  url('../fonts/lato-regular.svg#lato-regular') format('svg');
+}
+
+@font-face {
+  font-family: 'lato-medium';
+  src: url('../fonts/lato-medium.eot');
+  src: url('../fonts/lato-medium.eot') format('embedded-opentype'),
+  url('../fonts/lato-medium.woff2') format('woff2'),
+  url('../fonts/lato-medium.woff') format('woff'),
+  url('../fonts/lato-medium.ttf') format('truetype'),
+  url('../fonts/lato-medium.svg#lato-medium') format('svg');
+}
+
+@font-face {
+  font-family: 'lato-semibold';
+  src: url('../fonts/lato-semibold.eot');
+  src: url('../fonts/lato-semibold.eot') format('embedded-opentype'),
+  url('../fonts/lato-semibold.woff2') format('woff2'),
+  url('../fonts/lato-semibold.woff') format('woff'),
+  url('../fonts/lato-semibold.ttf') format('truetype'),
+  url('../fonts/lato-semibold.svg#lato-semibold') format('svg');
+}
+
+@font-face {
+  font-family: 'lato-bold';
+  src: url('../fonts/lato-bold.eot');
+  src: url('../fonts/lato-bold.eot') format('embedded-opentype'),
+  url('../fonts/lato-bold.woff2') format('woff2'),
+  url('../fonts/lato-bold.woff') format('woff'),
+  url('../fonts/lato-bold.ttf') format('truetype'),
+  url('../fonts/lato-bold.svg#lato-bold') format('svg');
+}
+
+@font-face {
+  font-family: 'lato-extrabold';
+  src: url('../fonts/lato-extrabold.eot');
+  src: url('../fonts/lato-extrabold.eot') format('embedded-opentype'),
+  url('../fonts/lato-extrabold.woff2') format('woff2'),
+  url('../fonts/lato-extrabold.woff') format('woff'),
+  url('../fonts/lato-extrabold.ttf') format('truetype'),
+  url('../fonts/lato-extrabold.svg#lato-extrabold') format('svg');
+}
+
+@font-face {
+  font-family: 'lora-regular';
+  src: url('../fonts/lora-regular.eot');
+  src: url('../fonts/lora-regular.eot') format('embedded-opentype'),
+  url('../fonts/lora-regular.woff2') format('woff2'),
+  url('../fonts/lora-regular.woff') format('woff'),
+  url('../fonts/lora-regular.ttf') format('truetype'),
+  url('../fonts/lora-regular.svg#lora-regular') format('svg');
+}
+
+@font-face {
+  font-family: 'lora-italic';
+  src: url('../fonts/lora-italic.eot');
+  src: url('../fonts/lora-italic.eot') format('embedded-opentype'),
+  url('../fonts/lora-italic.woff2') format('woff2'),
+  url('../fonts/lora-italic.woff') format('woff'),
+  url('../fonts/lora-italic.ttf') format('truetype'),
+  url('../fonts/lora-italic.svg#lora-italic') format('svg');
+}
+
+
+html {
+  font-family: $lato-regular;
+  font-weight: normal;
+  font-size: 16px;
+  line-height: 1.8;
+  color: $blue-dark;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.5;
+  font-weight: normal;
+  margin: 0;
+
+  a {
+    color: inherit;
+  }
+}
+
+h2 {
+  font-size: 2.25rem; //36px
+  font-family: $lora-regular;
+}
+
+h4 {
+  font-size: 0.75rem;  //12px
+  font-family: $lato-extrabold;
+  letter-spacing: 2px;
+  color: $blue-dark-transp;
+  text-transform: uppercase;
+
+  &.light {
+    color: $white-transp;
+  }
+
+  &.blue {
+    color: $blue-light;
+  }
+
+  &.thin {
+    font-family: $lato-medium;
+    color: $grey-txt;
+  }
+}
+
+p {
+  font-size: 1rem;
+  font-weight: normal;
+}
+
+.stylized {
+  font-family: $lora-regular;
+}
+
+.underlined {
+  text-decoration: underline;
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+
+
+
+@media screen and ($tablet-min) and ($desktop-medium){
+  html {
+    font-size: 14px;
+  }
+}
+
+
+
+
+@media screen and ($mobile){
+  h2 {
+    font-size: 28px;
+  }
+}

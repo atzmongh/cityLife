@@ -1,0 +1,20 @@
+@import "variables";
+
+.vert-align {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.horiz-align {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.vert-horiz-align {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

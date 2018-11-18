@@ -58,7 +58,12 @@
                         @{
                             if (apartmentAndPrice.availability == Availability.AVAILABLE)
                             {
-                                <div class="btn">@tBox.translate("Book now")</div>
+                                @*<a href="/booking?apartment=@apartmentAndPrice.theApartment.number" >Book Now</a>*@
+                        <form method="post" id="@apartmentAndPrice.theApartment.number" action="/booking">
+                            <input type="hidden" name="apartmentId" value="@apartmentAndPrice.theApartment.number" />
+                            <div class="btn" onclick="bookNow(@apartmentAndPrice.theApartment.number)">Book Now</div>
+                        </form>
+                              
                             }
                         }
 
@@ -128,4 +133,10 @@
             @*<p>@tBox.translate("bottom right text") sdf sdf sdf sdf sdf sdf sdf sdf sdf sdf sdf sdf sdf sdf </p>*@
     </div>
 </div>
+<script>
+    function bookNow(apartmentId) {
+        var theForm = document.getElementById(apartmentId);
+        theForm.submit();
+    }
+</script>
 

@@ -1,0 +1,121 @@
+@font-face {
+	font-family: "clife-icons";
+	src: url('../fonts/icons/clife-icons.eot');
+	src: url('../fonts/icons/clife-icons.eot?#iefix') format('eot'),
+	url('../fonts/icons/clife-icons.woff2') format('woff2'),
+	url('../fonts/icons/clife-icons.woff') format('woff'),
+	url('../fonts/icons/clife-icons.ttf') format('truetype'),
+	url('../fonts/icons/clife-icons.svg#clife-icons') format('svg');
+}
+
+@mixin clife-ico-styles {
+	font-family: "clife-icons";
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: normal;
+	text-decoration: none;
+	text-transform: none;
+	font-size: inherit;
+	line-height: 1;
+	display: inline-block;
+}
+
+%clife-ico {
+	@include clife-ico-styles;
+}
+
+@function clife-ico-char($filename) {
+	$char: "";
+	
+	@if $filename == arr-b {
+		$char: \E001;
+	}
+	@if $filename == arr-l {
+		$char: \E002;
+	}
+	@if $filename == arr-r {
+		$char: \E003;
+	}
+	@if $filename == arrow-thin-l {
+		$char: \E004;
+	}
+	@if $filename == arrow-thin-r {
+		$char: \E005;
+	}
+	@if $filename == arrow {
+		$char: \E006;
+	}
+	@if $filename == calendar {
+		$char: \E007;
+	}
+	@if $filename == close {
+		$char: \E008;
+	}
+	@if $filename == location {
+		$char: \E009;
+	}
+	@if $filename == mail {
+		$char: \E00A;
+	}
+	@if $filename == phone {
+		$char: \E00B;
+	}
+	@if $filename == resize {
+		$char: \E00C;
+	}
+
+	@return $char;
+}
+
+@function unicode($str){
+	@return unquote("\"") + $str + unquote("\"");
+}
+
+.clife-ico {
+	@include clife-ico-styles;
+}
+
+@mixin clife-ico($filename, $insert: before, $extend: true) {
+	&:#{$insert} {
+		content: unicode(clife-ico-char($filename));
+	}
+}
+
+.clife-ico-arr-b {
+	@include clife-ico(arr-b);
+}
+.clife-ico-arr-l {
+	@include clife-ico(arr-l);
+}
+.clife-ico-arr-r {
+	@include clife-ico(arr-r);
+}
+.clife-ico-arrow-thin-l {
+	@include clife-ico(arrow-thin-l);
+}
+.clife-ico-arrow-thin-r {
+	@include clife-ico(arrow-thin-r);
+}
+.clife-ico-arrow {
+	@include clife-ico(arrow);
+}
+.clife-ico-calendar {
+	@include clife-ico(calendar);
+}
+.clife-ico-close {
+	@include clife-ico(close);
+}
+.clife-ico-location {
+	@include clife-ico(location);
+}
+.clife-ico-mail {
+	@include clife-ico(mail);
+}
+.clife-ico-phone {
+	@include clife-ico(phone);
+}
+.clife-ico-resize {
+	@include clife-ico(resize);
+}

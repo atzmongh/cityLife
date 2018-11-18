@@ -1,0 +1,336 @@
+@import "variables";
+@import "extend";
+@import "icons";
+
+::-ms-clear {
+  display: none;
+}
+
+::-ms-reveal {
+  display: none;
+}
+
+input, textarea, select{
+  &:-webkit-autofill,
+  &:-webkit-autofill:hover,
+  &:-webkit-autofill:focus{
+    border:none !important;
+    -webkit-text-fill-color: inherit !important;
+    -webkit-box-shadow: 0 0 0 1000px $white inset;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+}
+
+.field-box {
+  width: 100%;
+  position: relative;
+  margin-bottom: 10px;
+
+  input:not([type = submit]),
+  textarea {
+    height: 60px;
+    width: 100%;
+    padding: 30px 10px 10px;
+    font-family: $lato-semibold;
+    font-size: 1.125rem; //18px
+    line-height: 60px;
+    color: $blue-dark;
+    text-align: left;
+    background: transparent;
+    border: 1px solid $grey-txt;
+    border-radius: 0;
+    box-shadow: none;
+    -webkit-appearance: none;
+  }
+
+  label {
+    height: 60px;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    cursor: text;
+  }
+
+  .field-name {
+    position: absolute;
+    top: 20px;
+    left: 10px;
+    font-size: 0.75rem;  //12px
+    font-family: $lato-medium;
+    color: $grey-txt;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+
+  &.error {
+    input:not([type = submit]),
+    textarea {
+      color: red;
+      border-color: red;
+    }
+    .field-name,
+    .field-error {
+      color: red;
+    }
+  }
+
+  &.focus {
+    .field-name {
+      top: 8px;
+      transform: none;
+    }
+  }
+
+  /*---  textarea ----------------------------------*/
+  textarea {
+    height: 130px;
+    line-height: 1.2;
+    resize: none;
+  }
+}
+
+
+/*---  select ------------------------------------*/
+.field-box.select-box {
+  label {
+    pointer-events: none;
+  }
+
+  .field-name {
+    top: 8px;
+    transform: none;
+  }
+}
+
+.select2 {
+  width: 100% !important;
+
+  &.select2-container--open {
+    .select2-selection__arrow {
+      &:before {
+        transform: rotate(180deg);
+        margin-top: -4px;
+        margin-left: -8px;
+      }
+    }
+  }
+}
+
+.select2-container--default {
+  .select2-selection--single {
+    height: 60px;
+    border-radius: 0;
+    border: 1px solid $grey-txt;
+    background: transparent;
+
+    .select2-selection__rendered {
+      padding: 25px 10px 0;
+      font-family: $lato-semibold;
+      font-size: 1.125rem; //18px
+      line-height: 35px;
+    }
+
+    .select2-selection__arrow {
+      height: 59px;
+      width: 60px;
+      border-left: 1px solid $grey-txt;
+
+      &:before {
+        font-family: 'clife-icons';
+        @extend .clife-ico-arrow;
+        @extend .vert-horiz-align;
+        color: $grey-txt;
+        font-size: 0.5rem;
+        line-height: 1;
+      }
+
+      b {
+        display: none;
+      }
+    }
+  }
+
+  .select2-results__option {
+    padding: 10px;
+    font-size: 1rem;
+    line-height: 1.2;
+
+    &[aria-selected="true"] {
+      color: $white;
+      background: $grey-txt;
+    }
+
+    &--highlighted[aria-selected] {
+      color: $white;
+      background: $grey-txt;
+    }
+  }
+}
+
+.select2-dropdown {
+  border: 1px solid $grey-txt;
+}
+
+
+/*--- datepicker ---------------------------------*/
+.field-box.datepicker-box {
+  .calendar-ico {
+    position: absolute;
+    right: 0;
+    width: 60px;
+    height: 100%;
+    border-left: 1px solid $grey-txt;
+    cursor: pointer;
+
+    &:before {
+      font-family: 'clife-icons';
+      @extend .clife-ico-calendar;
+      @extend .vert-horiz-align;
+      color: $grey-txt;
+      font-size: 1.5rem;  //24px;
+      line-height: 1;
+    }
+  }
+}
+
+.ui-datepicker {
+  width: 100%;
+  max-width: 309px;
+  //padding-left: 12px;
+  //padding-right: 12px;
+  z-index: 10 !important;
+  background: $white;
+  border: 1px solid $grey-txt;
+
+  td {
+    padding: 5px;
+
+    span, a {
+      width: 30px;
+      height: 30px;
+      margin: 0 auto;
+      line-height: 24px;
+      text-align: center;
+    }
+  }
+
+  .ui-datepicker-title {
+    font-family: $lato-semibold;
+    font-size: 1.125rem;  //18px
+  }
+
+  .ui-datepicker-prev,
+  .ui-datepicker-next {
+    cursor: pointer;
+
+    &:before {
+      @extend .vert-horiz-align;
+      font-family: 'clife-icons';
+      font-size: 6px;
+      line-height: 1;
+      color: $blue-dark;
+    }
+
+    .ui-icon {
+      display: none;
+    }
+  }
+
+  .ui-datepicker-prev {
+    &:before {
+      @extend .clife-ico-arr-l;
+    }
+  }
+
+  .ui-datepicker-next {
+    &:before {
+      @extend .clife-ico-arr-r;
+    }
+  }
+
+  .ui-datepicker-prev-hover {
+    left: 2px;
+    top: 2px;
+  }
+  .ui-datepicker-next-hover {
+    right: 2px;
+    top: 2px;
+  }
+
+  .ui-datepicker-today {
+    a {
+      border: 1px solid $blue-light;
+    }
+  }
+
+  .ui-datepicker-current-day {
+    a {
+      color: $white;
+      background: $blue-light;
+    }
+  }
+
+  .ui-datepicker-unselectable {
+    color: $grey-txt;
+  }
+}
+
+
+
+
+
+
+@media screen and ($tablet-min) and ($desktop-medium){
+  .field-box {
+    input:not([type = submit]) {
+      height: 50px;
+      line-height: 50px;
+      padding: 25px 10px 7px;
+    }
+
+    label {
+      height: 50px;
+    }
+
+    .field-name {
+      top: 17px;
+    }
+  }
+
+  .select2-container--default {
+    .select2-selection--single {
+      height: 50px;
+
+      .select2-selection__arrow {
+        height: 49px;
+        width: 50px;
+      }
+
+      .select2-selection__rendered {
+        padding: 15px 10px 0;
+      }
+    }
+  }
+
+  .field-box.datepicker-box {
+    .calendar-ico {
+      width: 50px;
+    }
+  }
+
+  .ui-datepicker {
+    max-width: 289px;
+  }
+}
+
+
+
+
+@media screen and ($mobile) {
+  .ui-datepicker {
+    max-width: 280px;
+  }
+}
+

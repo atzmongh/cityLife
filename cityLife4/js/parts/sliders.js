@@ -26,14 +26,36 @@ jQuery(document).ready(function () {
     });
     $('.slider-nav').slick({
         slidesToShow: 6,
-        slidesToScroll: 1,
+        slidesToScroll: 6,
         infinite: true,
         arrows: false,
         dots: false,
         focusOnSelect: true,
         centerMode: true,
+        centerPadding: '0',
         vertical: true,
-        asNavFor: '.slider-for'
+        verticalSwiping: true,
+        asNavFor: '.slider-for',
+        responsive: [
+            {
+                breakpoint: 1367,
+                settings: {
+                    vertical: false,
+                    verticalSwiping: false,
+                    slidesToShow: 5,
+                    slidesToScroll: 5
+                }
+            },
+            {
+                breakpoint: 768,
+                settings: {
+                    vertical: false,
+                    verticalSwiping: false,
+                    slidesToShow: 3,
+                    slidesToScroll: 3
+                }
+            }
+        ]
     });
 
     //mainSliderHeight();

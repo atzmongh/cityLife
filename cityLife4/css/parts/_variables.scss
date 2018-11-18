@@ -1,0 +1,36 @@
+//fonts
+$lato-regular: 'lato-regular', Arial, sans-serif;
+$lato-medium: 'lato-medium', Arial, sans-serif;
+$lato-semibold: 'lato-semibold', Arial, sans-serif;
+$lato-bold: 'lato-bold', Arial, sans-serif;
+$lato-extrabold: 'lato-extrabold', Arial, sans-serif;
+
+$lora-regular: 'lora-regular', 'Times New Roman', sans-serif;
+$lora-italic: 'lora-italic', 'Times New Roman', sans-serif;
+
+//colors
+$white: #ffffff;
+$white-transp: rgba(255, 255, 255, 0.5);
+$black: #000000;
+$grey: #B8CDE5;
+$grey-txt: #A3B6CC;
+$light: #EEF3F7;
+//$blue-dark: #040F27;
+$blue-dark: #011A36;
+$blue-dark-transp: rgba(1, 26, 54, 0.5);
+$blue-light: #00C1E5;
+$blue-hover: #00B7D9;
+
+
+//screens
+$desktop: 'max-width: 1920px';
+$desktop-medium: 'max-width: 1600px';
+$laptop: 'max-width: 1366px';
+$laptop-small: 'max-width: 1280px';
+$tablet: 'max-width: 1024px';
+$mobile: 'max-width: 767px';
+
+$desktop-medium-min: 'min-width: 1600px';
+$tablet-min: 'min-width: 768px';
+
+$max-height: 'max-height: 899px'

@@ -1,0 +1,365 @@
+@import "variables";
+
+aside.main-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  min-height: 900px;
+  width: 420px;
+  flex-shrink: 0;
+  border-right: 1px solid $grey;
+  background: $white;
+  z-index: 5;
+
+  .holder {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    padding: 50px 55px 0;
+  }
+
+  .helper-outer {
+    height: 610px;
+  }
+
+  .logo {
+    display: block;
+    width: 100px;
+    margin: 0 auto 45px;
+    line-height: 1;
+
+    svg {
+      width: 100%;
+    }
+  }
+
+  .main-menu {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 55px;
+    border-bottom: 2px solid $light;
+
+    li {
+      padding: 0 15px;
+      position: relative;
+      display: flex;
+      align-items: center;
+
+      &.active,
+      &:hover {
+        a {
+          color: $blue-light;
+        }
+      }
+
+      &.active {
+        a {
+          padding-top: 14px;
+          font-family: $lato-extrabold;
+        }
+        &:after {
+          content: '';
+          position: absolute;
+          bottom: -2px;
+          left: 0;
+          height: 2px;
+          width: 100%;
+          background: $blue-light;
+        }
+      }
+    }
+
+    a {
+      font-family: $lato-medium;
+      padding: 10px 0 20px;
+      display: block;
+      font-size: 0.75rem; //12px
+      line-height: 1;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-align: center;
+      transition: all 0.2s;
+    }
+  }
+
+  h2 {
+    margin-bottom: 10px;
+  }
+
+  .note {
+    text-align: center;
+  }
+
+  .btn {
+    width: 100%;
+    margin: 30px 0;
+  }
+
+  .lang-wrap {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 15px;
+  }
+
+  .language,
+  .currency {
+    position: relative;
+
+    .dropdown {
+      bottom: 0;
+      padding: 7px 0;
+      border: 1px solid $grey-txt;
+    }
+
+    li a {
+      display: flex;
+      align-items: center;
+      padding: 8px 10px;
+
+      &:hover {
+        color: $white;
+        background: $grey-txt;
+
+        .dscr {
+          color: $white;
+        }
+      }
+    }
+
+    .name {
+      font-size: 0.75rem;  //12px
+      font-family: $lato-medium;
+      line-height: 1;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .dscr {
+      font-size: 0.75rem;  //12px
+      font-family: $lato-medium;
+      line-height: 1;
+      color: $grey-txt;
+      padding-left: 10px;
+    }
+
+    .dropdown-toggle {
+      .name {
+        padding-right: 20px;
+        position: relative;
+        &:before {
+          font-family: 'clife-icons';
+          @extend .clife-ico-arr-b;
+          font-size: 6px;
+          color: $grey-txt;
+          position: absolute;
+          right: 0;
+          top: 5px;
+        }
+      }
+    }
+  }
+}
+
+.mobile-menu-toggle {
+  display: none;
+}
+
+
+
+
+@media screen and ($desktop-medium-min) and ($max-height) {
+  aside.main-sidebar {
+    position: absolute;
+  }
+}
+
+
+
+
+@media screen and ($tablet-min) and ($desktop-medium){
+  aside.main-sidebar {
+    width: 350px;
+    min-height: 680px;
+
+    .holder {
+      padding: 20px 30px 0;
+    }
+
+    .helper-outer {
+      height: 475px;
+    }
+
+    .logo {
+      width: 75px;
+      margin: 0 auto 20px;
+    }
+
+    .main-menu {
+      margin-bottom: 30px;
+    }
+
+    .btn {
+      margin: 12px 0;
+    }
+
+    .note,
+    .phone {
+      margin-bottom: 5px;
+    }
+
+  }
+}
+
+
+
+@media screen and ($tablet) {
+  aside.main-sidebar {
+    opacity: 0;
+    left: 0;
+    min-height: auto;
+    transform: translateX(-100vw);
+    will-change: transform;
+    transition: transform .5s, opacity .5s;
+
+    &.active {
+      transform: translateX(0);
+      opacity: 1;
+    }
+
+    .holder {
+      overflow-y: auto;
+    }
+
+    .helper-outer {
+      height: auto;
+    }
+  }
+
+  .mobile-menu-toggle {
+    display: block;
+    position: absolute;
+    top: 10px;
+    left: 0;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    z-index: 5;
+    overflow: hidden;
+
+    span,
+    &:after,
+    &:before {
+      content: '';
+      display: block;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 30px;
+      height: 2px;
+      background-color: $white;
+      transform: translate(-50%, -50%);
+      transition: transform .3s, background-color .3s;
+      will-change: transform;
+    }
+
+    &:after {
+      top: 12px;
+    }
+
+    &:before {
+      top: 28px;
+    }
+
+    &.active {
+      span,
+      &:after,
+      &:before {
+        background-color: $grey-txt;
+      }
+
+      &:after,
+      &:before {
+        top: 20px;
+        left: 0;
+      }
+
+      &:after {
+        transform: rotate(135deg);
+      }
+
+      &:before {
+        transform: rotate(-135deg);
+      }
+
+      span {
+        transform: translate(-66px, -50%);
+      }
+    }
+  }
+}
+
+
+
+
+@media screen and ($mobile) {
+  aside.main-sidebar {
+    min-height: auto;
+    width: 100%;
+
+    .holder {
+      padding: 15px 20px 0;
+    }
+
+    .logo {
+      width: 60px;
+      margin-bottom: 10px;
+    }
+
+    .main-menu {
+      margin-bottom: 25px;
+      li {
+        padding: 0 12px;
+      }
+    }
+
+    .note {
+      margin-bottom: 15px;
+    }
+
+    .btn {
+      margin-top: 0;
+    }
+
+    .lang-wrap {
+      padding-top: 50px;
+    }
+  }
+
+  .mobile-menu-toggle {
+    top: 0;
+    left: 0;
+    width: 30px;
+
+    span,
+    &:after,
+    &:before {
+      width: 16px;
+    }
+
+    &:after {
+      top: 14px;
+    }
+    &:before {
+      top: 26px;
+    }
+
+    &.active {
+      &:after,
+      &:before {
+        left: 2px;
+      }
+    }
+  }
+}
