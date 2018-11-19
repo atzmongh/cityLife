@@ -2,7 +2,7 @@
 @using System.Data.Entity;
 @using cityLife.Controllers;
 @using cityLife4;
-
+ 
 @*
     Viewbag contains:
     Viewbag.tBox                 (TranslationBox) translation box
@@ -84,15 +84,15 @@
                             </svg>
                         </a>
                         <ul class="main-menu">
-                            <li class="active"><a href="/home">@tBox.translate("Home")</a></li>
-                            <li><a href="/home/apartments">@tBox.translate("Apartments")</a></li>
-                            <li><a href="#">@tBox.translate("Our rules")</a></li>
+                            <li class="active"><a href="/public/p10home">@tBox.translate("Home")</a></li>
+                            <li><a href="/public/p30apartments">@tBox.translate("Apartments")</a></li>
+                            <li><a href="/public/p60ourRules">@tBox.translate("Our rules")</a></li>
                         </ul>
                     </header>
 
                     <div class="form">
                         <h2>@tBox.translate("booking")</h2>
-                        <form method="get" action="@pageURL">
+                        <form method="get" action="/public/p20checkAvailability">
                             <div class="field-box datepicker-box">
                                 <input type="text" id="fromDate" name="fromDate" value="@checkinDate">
                                 <label for="fromDate">

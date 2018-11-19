@@ -22,7 +22,8 @@ namespace cityLife4
             {108,"checkbox name of unit test report has an unexpected format. Actual content:{0}. Expected format:<series>-<number>" },
             {109,"unit test series {0} number {1} was not found in DB" },
             {110,"HTTP exception occured. Code:{0} type:{1} message:{2}" },
-            {111,"the name of each element in the translation form should be of the form XX-NN where XX is the language code and NN is the transaltion key id. Actual format was: {0}" }
+            {111,"the name of each element in the translation form should be of the form XX-NN where XX is the language code and NN is the transaltion key id. Actual format was: {0}" },
+            {112,"the apartment was not found in the List<ApaartmentPrce> collection in the Session variable. Apartment id was:{0}" }
 
         };
         public static bool exists(int code)

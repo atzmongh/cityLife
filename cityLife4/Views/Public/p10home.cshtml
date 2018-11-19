@@ -58,8 +58,11 @@
                         @{
                             if (apartmentAndPrice.availability == Availability.AVAILABLE)
                             {
-                                @*<a href="/booking?apartment=@apartmentAndPrice.theApartment.number" >Book Now</a>*@
-                        <form method="post" id="@apartmentAndPrice.theApartment.number" action="/booking">
+                                @*There is an error when clicking on the picture - coming from somewhere in jquery code. When trying to 
+                                    create a "book now" hyperlink - it did not work. So the following form is used to 
+                                    get over the error. When user clicks on the "book now" button he activates a JS code that
+                                    submits the form. *@
+                        <form method="post" id="@apartmentAndPrice.theApartment.number" action="/public/p40bookingForm">
                             <input type="hidden" name="apartmentId" value="@apartmentAndPrice.theApartment.number" />
                             <div class="btn" onclick="bookNow(@apartmentAndPrice.theApartment.number)">Book Now</div>
                         </form>

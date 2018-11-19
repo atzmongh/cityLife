@@ -39,7 +39,7 @@ namespace cityLife.Controllers
             return checkinDate != null;
         }
     }
-    public class HomeController : Controller
+    public class PublicController : Controller
     {
         /// <summary>
         /// The action calculates all data rquired to display the home screen
@@ -53,24 +53,70 @@ namespace cityLife.Controllers
         /// <param name="childrenCount">number of children</param>
         /// <returns></returns>
         [HttpGet]
-        public ActionResult Index(string language, string currency, DateTime? fromDate, DateTime? toDate, int? adultsCount, int? childrenCount)
+        public ActionResult p10home(string language, string currency, DateTime? fromDate, DateTime? toDate, int? adultsCount, int? childrenCount)
         {
             this.prepareApartmentData(language, currency, fromDate, toDate, adultsCount, childrenCount);
 
-            ViewBag.pageURL = "/home";
+            ViewBag.pageURL = "/public/p10home";
 
-
-            return View();
+            return View("p10home");
         }
 
-        public ActionResult apartments(string language, string currency, DateTime? fromDate, DateTime? toDate, int? adultsCount, int? childrenCount)
+        [HttpGet]
+        public ActionResult p20checkAvailability (string language, string currency, DateTime? fromDate, DateTime? toDate, int? adultsCount, int? childrenCount)
         {
             this.prepareApartmentData(language, currency, fromDate, toDate, adultsCount, childrenCount);
 
-            ViewBag.pageURL = "/home/apartments";
+            ViewBag.pageURL = "/public/p20checkAvailability";
+
+            return View("p10home");  //TBD - temporary - we should return the  p20availableFlats
+        }
+
+        [HttpGet]
+        public ActionResult p30apartments(string language, string currency, DateTime? fromDate, DateTime? toDate, int? adultsCount, int? childrenCount)
+        {
+            this.prepareApartmentData(language, currency, fromDate, toDate, adultsCount, childrenCount);
+
+            ViewBag.pageURL = "/public/p30apartments";
 
 
-            return View("apartments");
+            return View("p30apartments");
+        }
+
+        [HttpPost]
+        public ActionResult p40bookingForm(int apartmentId)
+        {
+            //Look for the apartment for which we need to book
+            ApartmentPrice theApartmentAndPrice;
+            try
+            {
+                List<ApartmentPrice> apartments = (List<ApartmentPrice>)Session["apartments"];
+                string currentLanguage = (string)Session["currentLanguage"];
+                Currency currentCurrency = (Currency)Session["currentCurrency"];
+                BookingRequest theBookingRequest = (BookingRequest)Session["bookingRequest"];
+                theApartmentAndPrice = apartments.Single(a => a.theApartment.Id == apartmentId);
+
+                cityLifeDBContainer1 db = new cityLifeDBContainer1();
+                ViewBag.tBox = this.setTbox(currentLanguage);
+                ViewBag.languages = db.Languages;
+                ViewBag.currentLanguage = currentLanguage;
+                ViewBag.currencies = db.Currencies;
+                ViewBag.currentCurrency = currentCurrency;
+                ViewBag.bookingRequest = theBookingRequest;
+                ViewBag.pageURL = "/public/p40bookingForm";
+                ViewBag.Title = "booking form";
+
+            }
+            catch (Exception e)
+            {
+                //We could not find the requested apartment in the List<apartmentPrice>, although it should have been there.
+                //Write an error to the log and continue
+                AppException.writeException(112, e, e.StackTrace, apartmentId);
+                Server.Transfer("/home");
+            }
+
+
+            return View("p40bookingForm");
         }
 
         private void prepareApartmentData(string language, string currency, DateTime? fromDate, DateTime? toDate, int? adultsCount, int? childrenCount)
@@ -85,7 +131,6 @@ namespace cityLife.Controllers
             //Price can either be:
             //- minimum price per night (if we do not know the dates of stay)
             //- exact price per stay (if we know number of adults, children and dates)
-            //CURRENTLY ONLY MINIMUM PER NIGHT IS CALCULATED
             List<ApartmentPrice> apartmentList = new List<ApartmentPrice>();
             if (theBookingRequest.bookingRequestExists())
             {
@@ -103,11 +148,15 @@ namespace cityLife.Controllers
                     apartmentList.Add(new ApartmentPrice { theApartment = anApartment, minPricePerNight = minPrice, pricePerStay = null, nightCount = 0 });
                 }
             }
+            //Keep the data in the session variable for next iteration
+            Session["apartments"] = apartmentList;
+            Session["currentLanguage"] = tBox.targetLanguage;
+            Session["currentCurrency"] = theCurrency;
+            Session["bookingRequest"] = theBookingRequest;
 
             ViewBag.apartments = apartmentList;
             ViewBag.tBox = tBox;
             ViewBag.languages = db.Languages;
-            ViewBag.pageURL = "/home";
             ViewBag.currentLanguage = tBox.targetLanguage;
             ViewBag.currencies = db.Currencies;
             ViewBag.currentCurrency = theCurrency;
@@ -116,13 +165,16 @@ namespace cityLife.Controllers
         }
 
         /// <summary>
-        /// the action is called when the user entered booking information and pressed the search button.
+        /// the method  is called when the user entered booking information and pressed the search button. 
+        /// The method calculates the price per each apartment and whether it is available and suitable for
+        /// the group size
         /// </summary>
         /// <param name="fromDate">check in date</param>
         /// <param name="toDate">checkout date</param>
         /// <param name="adultsCount">number of adults</param>
         /// <param name="childrenCount">number of children</param>
-        /// <returns></returns>
+        /// <returns>list of apartments. For each apartment - the price per stay (if available)
+        /// and the availability (available, not available, not suitable)</returns>
         public List<ApartmentPrice> calculatePricePerStay(BookingRequest theBookingRequest, Currency theCurrency)
         {
 
@@ -221,7 +273,7 @@ namespace cityLife.Controllers
         /// </summary>
         /// <param name="language">language code, if set by the user</param>
         /// <returns>the translation box</returns>
-        private TranslateBox setTbox(string language)
+        public  TranslateBox setTbox(string language)
         {
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
 

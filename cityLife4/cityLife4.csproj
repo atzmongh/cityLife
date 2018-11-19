@@ -190,7 +190,7 @@
     <Content Include="css\parts\_sliders.scss" />
     <Content Include="css\parts\_ui-styles.scss" />
     <Content Include="css\parts\_variables.scss" />
-    <Content Include="Views\Home\apartments.cshtml" />
+    <Content Include="Views\Public\p30apartments.cshtml" />
     <Content Include="icons\arr-b.svg" />
     <Content Include="icons\arr-l.svg" />
     <Content Include="icons\arr-r.svg" />
@@ -254,8 +254,7 @@
     <Compile Include="classes\Test.cs" />
     <Compile Include="classes\TranslateBox.cs" />
     <Compile Include="Controllers\AdminController.cs" />
-    <Compile Include="Controllers\BookingController.cs" />
-    <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\PublicController.cs" />
     <Compile Include="Currency.cs">
       <DependentUpon>cityLife.tt</DependentUpon>
     </Compile>
@@ -300,9 +299,9 @@
     <Content Include="Views\web.config" />
     <Content Include="packages.config" />
     <Content Include="Views\sharing\_cityLifeLayout.cshtml" />
-    <Content Include="Views\Home\index.cshtml" />
+    <Content Include="Views\Public\p10home.cshtml" />
     <Content Include="Views\sharing\_adminLayout.cshtml" />
-    <Content Include="Views\Booking\Index.cshtml" />
+    <Content Include="Views\Public\p40bookingForm.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
