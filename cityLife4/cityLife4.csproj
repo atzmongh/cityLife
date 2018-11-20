@@ -170,6 +170,7 @@
     <Content Include="images\main_photo_23.JPG" />
     <Content Include="images\main_photo_24.JPG" />
     <Content Include="images\main_photo_24P.jpg" />
+    <Content Include="images\marker.png" />
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="cityLifeDB.csv" />
     <Content Include="cityLifeDB.xlsx" />
@@ -302,6 +303,7 @@
     <Content Include="Views\Public\p10home.cshtml" />
     <Content Include="Views\sharing\_adminLayout.cshtml" />
     <Content Include="Views\Public\p40bookingForm.cshtml" />
+    <Content Include="Views\Public\p20availableAppartments.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

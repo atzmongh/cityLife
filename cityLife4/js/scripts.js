@@ -133,42 +133,23 @@ jQuery(document).ready(function () {
 jQuery(window).on('resize', function () {
     minWrapperHeight();
 });
-// var selector = '.main-slider .slick-slide:not(.slick-cloned)';
-//
-// // Skip cloned elements
-// $().fancybox({
-//     selector : selector,
-//     backFocus : false
-// });
-
-// Attach custom click event on cloned elements,
-// trigger click event on corresponding link
-// $(document).on('click', '.slick-cloned', function(e) {
-//     $(selector)
-//         .eq( ( $(e.currentTarget).attr("data-slick-index") || 0) % $(selector).length )
-//         .trigger("click.fb-start", {
-//             $trigger: $(this)
-//         });
-//
-//     return false;
-// });
-
-var selector = '.main-slider .slick-slide:not(.slick-cloned)';
-
 $('.icon-btn.fancybox').fancybox({
-    selector : selector,
-    backFocus : false,
     loop: true,
-    toolbar: false,
-    buttons: "close",
-    preload: true,
-    arrowLeft:
-        '<button data-fancybox-prev class="fancybox-button fancybox-button--arrow_left" title="{{PREV}}">' +
-        '</button>',
-
-    arrowRight:
-        '<button data-fancybox-next class="fancybox-button fancybox-button--arrow_right" title="{{NEXT}}">' +
-        '</button>',
+    toolbar: true,
+    buttons: [
+        "close"
+    ],
+    btnTpl: {
+        close:
+            '<button data-fancybox-close class="fancybox-button fancybox-button--close" title="{{CLOSE}}"></button>',
+        arrowLeft:
+            '<button data-fancybox-prev class="fancybox-button fancybox-button--arrow_left" title="{{PREV}}"></button>',
+        arrowRight:
+            '<button data-fancybox-next class="fancybox-button fancybox-button--arrow_right" title="{{NEXT}}"></button>'
+    },
+    infobar: false,
+    arrowLeft: '<button data-fancybox-prev class="fancybox-button fancybox-button--arrow_left" title="{{PREV}}">' + '</button>',
+    arrowRight: '<button data-fancybox-next class="fancybox-button fancybox-button--arrow_right" title="{{NEXT}}">' + '</button>'
 });
 $(document).ready(function() {
     $('select').select2({
@@ -191,17 +172,18 @@ jQuery(document).ready(function () {
         autoplay: true
     });
 
-    //vertical slider
-    $('.slider-for').slick({
+    //vertical slider on booking
+    $('.slider-for-simple').slick({
         slidesToShow: 1,
         slidesToScroll: 1,
         infinite: true,
         arrows: true,
         fade: true,
         dots: true,
-        asNavFor: '.slider-nav'
+        swipe: false,
+        asNavFor: '.slider-nav-simple'
     });
-    $('.slider-nav').slick({
+    $('.slider-nav-simple').slick({
         slidesToShow: 6,
         slidesToScroll: 6,
         infinite: true,
@@ -212,7 +194,64 @@ jQuery(document).ready(function () {
         centerPadding: '0',
         vertical: true,
         verticalSwiping: true,
-        asNavFor: '.slider-for',
+        asNavFor: '.slider-for-simple',
+        responsive: [
+            {
+                breakpoint: 1367,
+                settings: {
+                    vertical: false,
+                    verticalSwiping: false,
+                    slidesToShow: 5,
+                    slidesToScroll: 5
+                }
+            },
+            {
+                breakpoint: 768,
+                settings: {
+                    vertical: false,
+                    verticalSwiping: false,
+                    slidesToShow: 3,
+                    slidesToScroll: 3
+                }
+            }
+        ]
+    });
+
+    //vertical slider on flat-description
+    $('.slider-for-has-sub-slider').slick({
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        infinite: true,
+        arrows: false,
+        fade: true,
+        dots: false,
+        swipe: false,
+        asNavFor: '.slider-nav-has-sub-slider'
+    });
+    $('.sub-slider').slick({
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        infinite: true,
+        arrows: true,
+        fade: true,
+        dots: false,
+        swipe: false,
+    });
+    $('.sub-slider').on("mousedown mouseup", function() {
+        $('.slider-for.has-sub-slider').slick("slickGoTo", 1);
+    });
+    $('.slider-nav-has-sub-slider').slick({
+        slidesToShow: 6,
+        slidesToScroll: 6,
+        infinite: true,
+        arrows: false,
+        dots: false,
+        focusOnSelect: true,
+        centerMode: true,
+        centerPadding: '0',
+        vertical: true,
+        verticalSwiping: true,
+        asNavFor: '.slider-for-has-sub-slider',
         responsive: [
             {
                 breakpoint: 1367,

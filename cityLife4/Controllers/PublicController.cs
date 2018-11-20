@@ -69,7 +69,7 @@ namespace cityLife.Controllers
 
             ViewBag.pageURL = "/public/p20checkAvailability";
 
-            return View("p10home");  //TBD - temporary - we should return the  p20availableFlats
+            return View("p20availableAppartments");  
         }
 
         [HttpGet]

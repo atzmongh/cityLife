@@ -7,7 +7,6 @@
     Viewbag contains:
           ViewBag.apartments = apartmentList;  //list<ApartmentPrice>
           ViewBag.tBox = tBox;                 //translation box
-          ViewBag.currentCurrency               (Currency)the currency selected by the user, or the default currency
           ViewBag.bookingRequest     //(BookingRequest)
 *@
 
@@ -18,7 +17,6 @@
     TranslateBox tBox = ViewBag.tBox;
     ViewBag.Title = tBox.translate("home");
     IEnumerable<ApartmentPrice> apartments = ViewBag.apartments;
-    Currency currentCurrency = ViewBag.currentCurrency;
 
 
 
@@ -110,17 +108,9 @@
                             }
                             @priceText
                         </div>
-
-
                     </div>
-
-
                 </div>
-
-
             </div>
-
-
         </div>
     }
 </div>

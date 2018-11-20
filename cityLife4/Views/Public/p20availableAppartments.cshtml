@@ -1,0 +1,505 @@
+﻿
+@using cityLife.Controllers;
+@using cityLife4;
+@{
+    ViewBag.Title = "p20availableAppartments";
+    Layout = "~/Views/sharing/_cityLifeLayout.cshtml";
+
+
+    //Viewbag contains:
+    //ViewBag.apartments = apartmentList;
+    //ViewBag.tBox = tBox;
+    //ViewBag.bookingRequest = theBookingRequest;
+
+    List<ApartmentPrice> apartments = ViewBag.apartments;
+    TranslateBox tBox = ViewBag.tBox;
+    BookingRequest theBookingRequest = ViewBag.bookingRequest;
+
+    string checkinDate = "";
+    string checkoutDate = "";
+    if (theBookingRequest.checkinDate != null)
+    {
+        checkinDate = ((DateTime)theBookingRequest.checkinDate).ToShortDateString();
+    }
+    if (theBookingRequest.checkoutDate != null)
+    {
+        checkoutDate = ((DateTime)theBookingRequest.checkoutDate).ToShortDateString();
+    }
+
+    //Check if at least one apartment is available for the desired booking request
+    bool isAvailable = (from anApartment in apartments
+                        where anApartment.availability == Availability.AVAILABLE
+                        select anApartment).Count() > 0;
+
+    var apartmentsByAvail = from anApartment in apartments
+                            orderby anApartment.availability ascending
+                            select anApartment;
+
+}
+
+<div class="wrapper">
+    <div class="flats-list-container">
+        <h4>
+            <span>@checkinDate</span> — <span>@checkoutDate</span>
+        </h4>
+        <h2>
+            @{
+                if (isAvailable)
+                {
+                    @Html.Raw(tBox.translate("Availability"));
+                }
+                else
+                {
+                    @Html.Raw(tBox.translate("No rooms are available for the selected dates"));
+                }
+        }
+    </h2>
+        <ul class="flat-list">
+            @foreach (var anApartment in apartmentsByAvail)
+            {
+                string priceLabel = "";
+                string price = "";
+                if (anApartment.availability == Availability.AVAILABLE)
+                {
+                    priceLabel = tBox.translate("Price");
+                    price = anApartment.pricePerStay.toMoneyString();
+                }
+                <li>
+                    <div class="photo" style="background-image: url(@anApartment.theApartment.MainPhotoLandscape().filePath);"></div>
+                    <div class="slide-dscr">
+                        <div class="col">
+                            <h4 class="light">@tBox.translate(anApartment.theApartment.nameKey)</h4>
+                            <h2 class="light">@tBox.translate(anApartment.theApartment.addressKey)</h2>
+                        </div>
+                        <div class="col">
+                            <h4 class="light">@priceLabel</h4>
+                            <div class="price light">@price</div>
+                        </div>
+                    </div>
+                </li>
+            }
+            <li>
+                <div class="photo" style="background-image: url(/images/main_photo_05.JPG);"></div>
+                <div class="slide-dscr">
+                    <div class="col">
+                        <h4 class="light">Apartment 1</h4>
+                        <h2 class="light">Poltavski Shlach, 19</h2>
+                    </div>
+                    <div class="col">
+                        <h4 class="light">Price</h4>
+                        <div class="price light">$150/night</div>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="photo" style="background-image: url(/images/main_photo_14.JPG);"></div>
+                <div class="slide-dscr">
+                    <div class="col">
+                        <h4 class="light">Apartment 1</h4>
+                        <h2 class="light">Poltavski Shlach, 19</h2>
+                    </div>
+                    <div class="col">
+                        <h4 class="light">Price</h4>
+                        <div class="price light">$150/night</div>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="photo" style="background-image: url(/images/main_photo_22.jpg);"></div>
+                <div class="slide-dscr">
+                    <div class="col">
+                        <h4 class="light">Apartment 1</h4>
+                        <h2 class="light">Poltavski Shlach, 19</h2>
+                    </div>
+                    <div class="col">
+                        <h4 class="light">Price</h4>
+                        <div class="price light">$150/night</div>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="photo" style="background-image: url(/images/main_photo_23.JPG);"></div>
+                <div class="slide-dscr">
+                    <div class="col">
+                        <h4 class="light">Apartment 1</h4>
+                        <h2 class="light">Poltavski Shlach, 19</h2>
+                    </div>
+                    <div class="col">
+                        <h4 class="light">Price</h4>
+                        <div class="price light">$150/night</div>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="photo" style="background-image: url(/images/main_photo_24.JPG);"></div>
+                <div class="slide-dscr">
+                    <div class="col">
+                        <h4 class="light">Apartment 1</h4>
+                        <h2 class="light">Poltavski Shlach, 19</h2>
+                    </div>
+                    <div class="col">
+                        <h4 class="light">Price</h4>
+                        <div class="price light">$150/night</div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+</div>
+<div class="sidebar map-wrap">
+    <div id="map" class="map"></div>
+</div>
+</div>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA9ZXW_xxCYbGV5hAN13jO2yquESD3MY10&callback=initMap" async defer></script>
+<script type="application/javascript">
+    function initMap() {
+                        var map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 14,
+            center: {lat: 49.985709, lng: 36.192231},
+            styles: [
+                {
+                            "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#f1f2f8"
+                        }
+                    ]
+                },
+                {
+                    "elementType": "labels.icon",
+                    "stylers": [
+                        {
+                            "visibility": "off"
+                        }
+                    ]
+                },
+                {
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#616161"
+                        }
+                    ]
+                },
+                {
+                    "elementType": "labels.text.stroke",
+                    "stylers": [
+                        {
+                            "color": "#f5f5f5"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "administrative.land_parcel",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#bdbdbd"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "poi",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#eeeeee"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "poi",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#757575"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "poi.park",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#e5e5e5"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "poi.park",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#9e9e9e"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#ffffff"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road.arterial",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#757575"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road.highway",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#dadada"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road.highway",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#616161"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road.local",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#9e9e9e"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "transit.line",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#e5e5e5"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "transit.station",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#eeeeee"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#c9c9c9"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#9e9e9e"
+                        }
+                    ]
+                }
+            ]
+        });
+
+        setMarkers(map);
+    }
+
+    //Currently all flats are in a single location, so I reduced the array to size 1.
+    var flats = [
+        ['Our Appartments', 49.985709, 36.192231, 1],   //TBD needs to be transalted
+      //  ['flat 1', 49.985342, 36.205614, 1]
+    ];
+
+            function setMarkers(map) {
+                var image = '/images/marker.png';
+
+                for (var i = 0; i < flats.length; i++) {
+                    var flat = flats[i];
+                    var marker = new google.maps.Marker({
+                position: {lat: flat[1], lng: flat[2]},
+                map: map,
+                icon: image,
+                title: flat[0],
+                zIndex: flat[3]
+                        /*styles: [
+                    {
+                        "elementType": "geometry",
+                        "stylers": [
+                            {
+                                "color": "#f1f2f8"
+                            }
+                        ]
+                    },
+                    {
+                        "elementType": "labels.icon",
+                        "stylers": [
+                            {
+                                "visibility": "off"
+                            }
+                        ]
+                    },
+                    {
+                        "elementType": "labels.text.fill",
+                        "stylers": [
+                            {
+                                "color": "#616161"
+                            }
+                        ]
+                    },
+                    {
+                        "elementType": "labels.text.stroke",
+                        "stylers": [
+                            {
+                                "color": "#f5f5f5"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "administrative.land_parcel",
+                        "elementType": "labels.text.fill",
+                        "stylers": [
+                            {
+                                "color": "#bdbdbd"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "poi",
+                        "elementType": "geometry",
+                        "stylers": [
+                            {
+                                "color": "#eeeeee"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "poi",
+                        "elementType": "labels.text.fill",
+                        "stylers": [
+                            {
+                                "color": "#757575"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "poi.park",
+                        "elementType": "geometry",
+                        "stylers": [
+                            {
+                                "color": "#e5e5e5"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "poi.park",
+                        "elementType": "labels.text.fill",
+                        "stylers": [
+                            {
+                                "color": "#9e9e9e"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "road",
+                        "elementType": "geometry",
+                        "stylers": [
+                            {
+                                "color": "#ffffff"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "road.arterial",
+                        "elementType": "labels.text.fill",
+                        "stylers": [
+                            {
+                                "color": "#757575"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "road.highway",
+                        "elementType": "geometry",
+                        "stylers": [
+                            {
+                                "color": "#dadada"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "road.highway",
+                        "elementType": "labels.text.fill",
+                        "stylers": [
+                            {
+                                "color": "#616161"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "road.local",
+                        "elementType": "labels.text.fill",
+                        "stylers": [
+                            {
+                                "color": "#9e9e9e"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "transit.line",
+                        "elementType": "geometry",
+                        "stylers": [
+                            {
+                                "color": "#e5e5e5"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "transit.station",
+                        "elementType": "geometry",
+                        "stylers": [
+                            {
+                                "color": "#eeeeee"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "water",
+                        "elementType": "geometry",
+                        "stylers": [
+                            {
+                                "color": "#c9c9c9"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "water",
+                        "elementType": "labels.text.fill",
+                        "stylers": [
+                            {
+                                "color": "#9e9e9e"
+                            }
+                        ]
+                    }
+                ]*/
+            });
+            }
+        }
+</script>
+
