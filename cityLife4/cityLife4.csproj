@@ -304,6 +304,7 @@
     <Content Include="Views\sharing\_adminLayout.cshtml" />
     <Content Include="Views\Public\p40bookingForm.cshtml" />
     <Content Include="Views\Public\p20availableAppartments.cshtml" />
+    <Content Include="Views\Public\p25apartmentDetails.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

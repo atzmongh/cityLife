@@ -73,6 +73,40 @@ namespace cityLife.Controllers
         }
 
         [HttpGet]
+        public ActionResult p25apartmentDetails(int apartmentId)
+        {
+            //Look for the apartment for which we need to book
+            ApartmentPrice theApartmentAndPrice;
+            try
+            {
+                List<ApartmentPrice> apartments = (List<ApartmentPrice>)Session["apartments"];
+                string currentLanguage = (string)Session["currentLanguage"];
+                Currency currentCurrency = (Currency)Session["currentCurrency"];
+                BookingRequest theBookingRequest = (BookingRequest)Session["bookingRequest"];
+                theApartmentAndPrice = apartments.Single(a => a.theApartment.Id == apartmentId);
+
+                cityLifeDBContainer1 db = new cityLifeDBContainer1();
+                ViewBag.tBox = this.setTbox(currentLanguage);
+                ViewBag.languages = db.Languages;
+                ViewBag.currentLanguage = currentLanguage;
+                ViewBag.currencies = db.Currencies;
+                ViewBag.currentCurrency = currentCurrency;
+                ViewBag.bookingRequest = theBookingRequest;
+                ViewBag.pageURL = "/public/p25apartmentDetails";
+                ViewBag.Title = "apartment details";
+
+            }
+            catch (Exception e)
+            {
+                //We could not find the requested apartment in the List<apartmentPrice>, although it should have been there.
+                //Write an error to the log and continue
+                AppException.writeException(112, e, e.StackTrace, apartmentId);
+                Server.Transfer("/home");
+            }
+
+            return View("p25apartmentDetails");
+        }
+        [HttpGet]
         public ActionResult p30apartments(string language, string currency, DateTime? fromDate, DateTime? toDate, int? adultsCount, int? childrenCount)
         {
             this.prepareApartmentData(language, currency, fromDate, toDate, adultsCount, childrenCount);
@@ -308,6 +342,7 @@ namespace cityLife.Controllers
         /// <returns>the currency currency object</returns>
         private Currency setCurrency(string currency) 
         {
+
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
 
             if (currency == null && Session["currency"] == null)

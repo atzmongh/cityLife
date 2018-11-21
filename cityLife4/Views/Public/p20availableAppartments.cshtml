@@ -27,9 +27,9 @@
     }
 
     //Check if at least one apartment is available for the desired booking request
-    bool isAvailable = (from anApartment in apartments
+    int AvailableCount = (from anApartment in apartments
                         where anApartment.availability == Availability.AVAILABLE
-                        select anApartment).Count() > 0;
+                        select anApartment).Count();
 
     var apartmentsByAvail = from anApartment in apartments
                             orderby anApartment.availability ascending
@@ -44,16 +44,20 @@
         </h4>
         <h2>
             @{
-                if (isAvailable)
+                if (AvailableCount == 0)
                 {
-                    @Html.Raw(tBox.translate("Availability"));
+                    @Html.Raw(tBox.translate("We have no available apartments for the selected dates"));
+                }
+                else if (AvailableCount == 1)
+                {
+                    @Html.Raw(tBox.translate("We have 1 available apartment for the selected dates"));
                 }
                 else
                 {
-                    @Html.Raw(tBox.translate("No rooms are available for the selected dates"));
+                    @Html.Raw(tBox.translate("We have ")+AvailableCount+ " "+tBox.translate("available apartments for the selected dates"));
                 }
-        }
-    </h2>
+            }
+        </h2>
         <ul class="flat-list">
             @foreach (var anApartment in apartmentsByAvail)
             {
@@ -64,85 +68,26 @@
                     priceLabel = tBox.translate("Price");
                     price = anApartment.pricePerStay.toMoneyString();
                 }
+                else
+                {
+                    price = tBox.translate("Not Available");
+                }
                 <li>
-                    <div class="photo" style="background-image: url(@anApartment.theApartment.MainPhotoLandscape().filePath);"></div>
-                    <div class="slide-dscr">
-                        <div class="col">
-                            <h4 class="light">@tBox.translate(anApartment.theApartment.nameKey)</h4>
-                            <h2 class="light">@tBox.translate(anApartment.theApartment.addressKey)</h2>
+                    <a href="/public/p25apartmentDetails?apartmentId=@anApartment.theApartment.Id">
+                        <div class="photo" style="background-image: url(@anApartment.theApartment.MainPhotoLandscape().filePath);"></div>
+                        <div class="slide-dscr">
+                            <div class="col">
+                                <h4 class="light" style="font-size:1rem">@tBox.translate("Apartment") @anApartment.theApartment.number</h4>
+                                <h2 class="light">@tBox.translate(anApartment.theApartment.addressKey)</h2>
+                            </div>
+                            <div class="col">
+                                <h4 class="light">@priceLabel</h4>
+                                <div class="price light">@price</div>
+                            </div>
                         </div>
-                        <div class="col">
-                            <h4 class="light">@priceLabel</h4>
-                            <div class="price light">@price</div>
-                        </div>
-                    </div>
+                    </a>
                 </li>
             }
-            <li>
-                <div class="photo" style="background-image: url(/images/main_photo_05.JPG);"></div>
-                <div class="slide-dscr">
-                    <div class="col">
-                        <h4 class="light">Apartment 1</h4>
-                        <h2 class="light">Poltavski Shlach, 19</h2>
-                    </div>
-                    <div class="col">
-                        <h4 class="light">Price</h4>
-                        <div class="price light">$150/night</div>
-                    </div>
-                </div>
-            </li>
-            <li>
-                <div class="photo" style="background-image: url(/images/main_photo_14.JPG);"></div>
-                <div class="slide-dscr">
-                    <div class="col">
-                        <h4 class="light">Apartment 1</h4>
-                        <h2 class="light">Poltavski Shlach, 19</h2>
-                    </div>
-                    <div class="col">
-                        <h4 class="light">Price</h4>
-                        <div class="price light">$150/night</div>
-                    </div>
-                </div>
-            </li>
-            <li>
-                <div class="photo" style="background-image: url(/images/main_photo_22.jpg);"></div>
-                <div class="slide-dscr">
-                    <div class="col">
-                        <h4 class="light">Apartment 1</h4>
-                        <h2 class="light">Poltavski Shlach, 19</h2>
-                    </div>
-                    <div class="col">
-                        <h4 class="light">Price</h4>
-                        <div class="price light">$150/night</div>
-                    </div>
-                </div>
-            </li>
-            <li>
-                <div class="photo" style="background-image: url(/images/main_photo_23.JPG);"></div>
-                <div class="slide-dscr">
-                    <div class="col">
-                        <h4 class="light">Apartment 1</h4>
-                        <h2 class="light">Poltavski Shlach, 19</h2>
-                    </div>
-                    <div class="col">
-                        <h4 class="light">Price</h4>
-                        <div class="price light">$150/night</div>
-                    </div>
-                </div>
-            </li>
-            <li>
-                <div class="photo" style="background-image: url(/images/main_photo_24.JPG);"></div>
-                <div class="slide-dscr">
-                    <div class="col">
-                        <h4 class="light">Apartment 1</h4>
-                        <h2 class="light">Poltavski Shlach, 19</h2>
-                    </div>
-                    <div class="col">
-                        <h4 class="light">Price</h4>
-                        <div class="price light">$150/night</div>
-                    </div>
-                </div>
-            </li>
         </ul>
 </div>
 <div class="sidebar map-wrap">
@@ -155,7 +100,7 @@
     function initMap() {
                         var map = new google.maps.Map(document.getElementById('map'), {
             zoom: 14,
-            center: {lat: 49.985709, lng: 36.192231},
+            center: {lat:49.988216 , lng:36.219336 }, 
             styles: [
                 {
                             "elementType": "geometry",
@@ -323,8 +268,8 @@
 
     //Currently all flats are in a single location, so I reduced the array to size 1.
     var flats = [
-        ['Our Appartments', 49.985709, 36.192231, 1],   //TBD needs to be transalted
-      //  ['flat 1', 49.985342, 36.205614, 1]
+        ['Our Appartments', 49.988216, 36.219336, 1],   //TBD needs to be transalted
+      //  ['flat 1', 49.988216, 36.219336, 1]
     ];
 
             function setMarkers(map) {
