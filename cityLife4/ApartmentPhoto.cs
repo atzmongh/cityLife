@@ -21,6 +21,7 @@ namespace cityLife4
         public Nullable<int> width { get; set; }
         public Nullable<int> height { get; set; }
         public short sortOrder { get; set; }
+        public string thumbnailPath { get; set; }
     
         public virtual Apartment Apartment { get; set; }
     }

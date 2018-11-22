@@ -82,6 +82,7 @@
     <Property Name="width" Type="int" Nullable="true" />
     <Property Name="height" Type="int" Nullable="true" />
     <Property Name="sortOrder" Type="smallint" Nullable="false" />
+    <Property Name="thumbnailPath" Type="nvarchar(max)" Nullable="true" />
     <Property Name="Apartment_Id" Type="int" Nullable="false" />
   </EntityType>
   <EntityType Name="Pricings">
@@ -391,6 +392,11 @@
           <Property Name="height" Type="Int32" Nullable="true" />
           <Property Name="sortOrder" Type="Int16" Nullable="false" />
           <NavigationProperty Name="Apartment" Relationship="cityLifeDB.ApartmentApartmentPhoto" FromRole="ApartmentPhoto" ToRole="Apartment" />
+          <Property Name="thumbnailPath" Type="String" Nullable="true" >
+            <Documentation>
+              <Summary>file path of the thumbnail version of this photo. If null - thumbnail for this photo does not exist</Summary>
+            </Documentation>
+          </Property>
         </EntityType>
         <EnumType Name="PhotoType" UnderlyingType="Int16">
           <Member Name="Main" />
@@ -614,6 +620,7 @@
           <ScalarProperty Name="width" ColumnName="width" />
           <ScalarProperty Name="height" ColumnName="height" />
           <ScalarProperty Name="sortOrder" ColumnName="sortOrder" />
+          <ScalarProperty Name="thumbnailPath" ColumnName="thumbnailPath" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>

@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 11/16/2018 22:30:44
+-- Date Created: 11/22/2018 23:14:26
 -- Generated from EDMX file: C:\software\cityLife\cityLife4\cityLifeDB.edmx
 -- --------------------------------------------------
 
@@ -114,6 +114,7 @@ CREATE TABLE [dbo].[ApartmentPhotoes] (
     [width] int  NULL,
     [height] int  NULL,
     [sortOrder] smallint  NOT NULL,
+    [thumbnailPath] nvarchar(max)  NULL,
     [Apartment_Id] int  NOT NULL
 );
 --GO
