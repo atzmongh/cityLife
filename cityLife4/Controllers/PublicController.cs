@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Configuration;
 using cityLife4;
+using System.IO;
 
 namespace cityLife.Controllers
 {
@@ -38,6 +39,21 @@ namespace cityLife.Controllers
         {
             return checkinDate != null;
         }
+
+        public string checkInOutDates()
+        {
+            string checkInOut = "";
+            if (checkinDate != null)
+            {
+                checkInOut = ((DateTime)checkinDate).ToShortDateString();
+            }
+            checkInOut += '-';
+            if (checkoutDate != null)
+            {
+                checkInOut += ((DateTime)checkoutDate).ToShortDateString();
+            }
+            return checkInOut;
+        }
     }
     public class PublicController : Controller
     {
@@ -58,6 +74,7 @@ namespace cityLife.Controllers
             this.prepareApartmentData(language, currency, fromDate, toDate, adultsCount, childrenCount);
 
             ViewBag.pageURL = "/public/p10home";
+            ViewBag.preferredDevice = this.preferredDevice();
 
             return View("p10home");
         }
@@ -75,6 +92,18 @@ namespace cityLife.Controllers
         [HttpGet]
         public ActionResult p25apartmentDetails(int apartmentId)
         {
+            //get country list
+            string filePath = Server.MapPath("/App_Data/countryList.txt");
+            StreamReader reader = new StreamReader(filePath);
+            List<string> countryList = new List<string>();
+
+            while (!reader.EndOfStream)
+            {
+                string aCountry = reader.ReadLine();
+                countryList.Add(aCountry);
+            }
+            
+
             //Look for the apartment for which we need to book
             ApartmentPrice theApartmentAndPrice;
             try
@@ -86,6 +115,7 @@ namespace cityLife.Controllers
                 theApartmentAndPrice = apartments.Single(a => a.theApartment.Id == apartmentId);
 
                 cityLifeDBContainer1 db = new cityLifeDBContainer1();
+                ViewBag.apartmentAndPrice = theApartmentAndPrice;
                 ViewBag.tBox = this.setTbox(currentLanguage);
                 ViewBag.languages = db.Languages;
                 ViewBag.currentLanguage = currentLanguage;
@@ -94,6 +124,8 @@ namespace cityLife.Controllers
                 ViewBag.bookingRequest = theBookingRequest;
                 ViewBag.pageURL = "/public/p25apartmentDetails";
                 ViewBag.Title = "apartment details";
+                ViewBag.preferredDevice = this.preferredDevice();
+                ViewBag.countryList = countryList;
 
             }
             catch (Exception e)
@@ -407,6 +439,18 @@ namespace cityLife.Controllers
                 Session["bookingRequest"] = theBookingRequest;
             }
             return theBookingRequest;
+        }
+
+        private DisplayDevice preferredDevice()
+        {
+            if (Request.Browser.IsMobileDevice)
+            {
+                return DisplayDevice.MOBILE;
+            }
+            else
+            {
+                return DisplayDevice.DESKTOP;
+            }
         }
 
     }

@@ -179,7 +179,7 @@ jQuery(document).ready(function () {
         infinite: true,
         arrows: true,
         fade: true,
-        dots: true,
+        dots: false,
         swipe: false,
         asNavFor: '.slider-nav-simple'
     });

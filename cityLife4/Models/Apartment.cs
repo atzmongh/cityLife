@@ -5,6 +5,12 @@ using System.Web;
 
 namespace cityLife4
 {
+    public enum DisplayDevice
+    {
+        MOBILE,
+        DESKTOP,
+        ANY
+    }
     public partial class Apartment
     {
         /// <summary>
@@ -48,16 +54,17 @@ namespace cityLife4
         /// <summary>
         /// Calculates the exact price to be paid for the stay in the apartment. It takes into account:
         /// number of adults, children, start date, end date, weekdays/weekends and discounts.
+        /// OBSOLETE???
         /// </summary>
         /// <param name="thePricing">the pricing record by which to claculate the price (based on number of adults and children)</param>
         /// <param name="currencyCode">currency by which to show the price</param>
         /// <param name="fromDate">date of entrance</param>
         /// <param name="toDate">date of exit</param>
         /// <returns></returns>
-        public int pricePerStay(Pricing thePricing, string currencyCode, DateTime fromDate, DateTime toDate)
-        {
-            return 0;//TBD
-        }
+        //public int pricePerStay(Pricing thePricing, string currencyCode, DateTime fromDate, DateTime toDate)
+        //{
+        //    return 0;//TBD
+        //}
 
         /// <summary>
         /// The method returns the main landscape photo of the apartment, if such exists, and null if none. If more than one photo is tagged
@@ -66,9 +73,9 @@ namespace cityLife4
         /// <returns>apartment main photo or null if nont exists</returns>
         public ApartmentPhoto MainPhotoLandscape()
         {
-                ApartmentPhoto theMainPhoto = this.ApartmentPhotoes.FirstOrDefault(aPhoto => aPhoto.type == PhotoType.Main && 
-                                                                                   aPhoto.orientation == OrientationType.Landscape);
-                return theMainPhoto;
+            ApartmentPhoto theMainPhoto = this.ApartmentPhotoes.FirstOrDefault(aPhoto => aPhoto.type == PhotoType.Main &&
+                                                                               aPhoto.orientation == OrientationType.Landscape);
+            return theMainPhoto;
         }
         /// <summary>
         /// The method returns the main portrait photo of the apartment, if such exists, and null if none. If more than one photo is tagged
@@ -80,6 +87,79 @@ namespace cityLife4
             ApartmentPhoto theMainPhoto = this.ApartmentPhotoes.FirstOrDefault(aPhoto => aPhoto.type == PhotoType.Main &&
                                                                                aPhoto.orientation == OrientationType.Portrait);
             return theMainPhoto;
+        }
+        public ApartmentPhoto mainPhoto(DisplayDevice preferredDevice = DisplayDevice.ANY)
+        {
+            ApartmentPhoto theMainPhoto;
+            if (preferredDevice == DisplayDevice.ANY)
+            {
+                //Find any main photo, regardless of device
+                theMainPhoto = this.ApartmentPhotoes.FirstOrDefault(aPhoto => aPhoto.type == PhotoType.Main);
+
+            }
+            else
+            {
+                //Find main photo for the preferred device
+                if (preferredDevice == DisplayDevice.DESKTOP)
+                {
+                    theMainPhoto = this.ApartmentPhotoes.FirstOrDefault(aPhoto => aPhoto.type == PhotoType.Main &&
+                                                                                 aPhoto.forDesktop == true);
+                }
+                else
+                {
+                    //Find preferred main photo for mobile
+                    theMainPhoto = this.ApartmentPhotoes.FirstOrDefault(aPhoto => aPhoto.type == PhotoType.Main &&
+                                                                                 aPhoto.forMobile == true);
+                }
+                
+            }
+           
+            return theMainPhoto;
+        }
+        /// <summary>
+        /// The method returns all photos (including the main photo for that apartment. If the preferred deivce is set - 
+        /// will return only photos which are adequate for this device.
+        /// </summary>
+        /// <param name="prefferedDevice">MOBILE/DESKTOP/ANY</param>
+        /// <returns></returns>
+        public IEnumerable<ApartmentPhoto> galleryPhotos(DisplayDevice prefferedDevice = DisplayDevice.ANY)
+        {
+            IEnumerable<ApartmentPhoto> thePhotos;
+            if (prefferedDevice == DisplayDevice.ANY)
+            {
+                thePhotos = this.ApartmentPhotoes;
+            }
+            else if (prefferedDevice == DisplayDevice.MOBILE)
+            {
+                thePhotos = this.ApartmentPhotoes.Where(aPhoto => aPhoto.forMobile == true);
+            }
+            else
+            {
+                thePhotos = this.ApartmentPhotoes.Where(aPhoto => aPhoto.forDesktop == true);
+            }
+            return thePhotos;
+        }
+
+        /// <summary>
+        /// Returns a list of features (actually feature keys, as they need to go through translation).
+        /// It extracts the data from the featureKey field which contains all features separated by ;
+        /// </summary>
+        /// <returns></returns>
+        public List<string> featureKeyList()
+        {
+            List<string> featureList = this.featuresKeys.Split(';').ToList();
+            return featureList;
+        }
+
+        /// <summary>
+        /// returns a list of description keys. Each one will be translated into a single paragraph of description 
+        /// Taken from the description field which contains: apartment 5 paragraph 1;apartment 5 paragraph 2;...
+        /// </summary>
+        /// <returns></returns>
+        public List<string> descriptionKeyList()
+        {
+            List<string> descriptionList = this.descriptionKey.Split(';').ToList();
+            return descriptionList;
         }
     }
 }

@@ -21,7 +21,7 @@ jQuery(document).ready(function () {
         infinite: true,
         arrows: true,
         fade: true,
-        dots: true,
+        dots: false,
         asNavFor: '.slider-nav'
     });
     $('.slider-nav').slick({

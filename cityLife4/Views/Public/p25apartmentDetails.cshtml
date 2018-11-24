@@ -1,191 +1,164 @@
 ﻿
+@using cityLife4;
+@using cityLife.Controllers;
 @{
-    ViewBag.Title = "p25apartmentDetails";
     Layout = "~/Views/sharing/_cityLifeLayout.cshtml";
+
+    //ViewBag.apartmentAndPrice = theApartmentAndPrice;
+    //ViewBag.tBox = this.setTbox(currentLanguage);
+    //ViewBag.pageURL = "/public/p25apartmentDetails";
+    //ViewBag.Title = "apartment details";
+    //ViewBag.preferredDevice = this.preferredDevice();
+    //ViewBag.bookingRequest = theBookingRequest;
+    //ViewBag.countryList = countryList;
+
+    ApartmentPrice theApartmentAndPrice = ViewBag.apartmentAndPrice;
+    Apartment theApartment = theApartmentAndPrice.theApartment;
+    string price = "";
+    if (theApartmentAndPrice.pricePerStay != null)
+    {
+        price = theApartmentAndPrice.pricePerStay.toMoneyString();
+    }
+
+    TranslateBox tBox = ViewBag.tBox;
+    DisplayDevice preferredDevice = ViewBag.preferredDevice;
+    BookingRequest theBookingRequest = ViewBag.bookingRequest;
+    List<string> countryList = ViewBag.countryList;
 }
 
 <div class="wrapper">
     <div class="slider slider-nav slider-nav-simple ">
-        <div>
-            <div class="slide">
-                <div class="image" style="background-image: url('/images/main_photo_14.jpg');"></div>
-                <div class="slide-dscr">
-                    <h4>Apartment 1</h4>
+        @{
+            var photos = theApartmentAndPrice.theApartment.galleryPhotos(preferredDevice);
+        }
+        @foreach (var aPhoto in photos)
+        {
+            <div>
+                <div class="slide">
+                    <div class="image" style="background-image: url('@aPhoto.thumbnailOrFilePath');"></div>
                 </div>
             </div>
-        </div>
-        <div>
-            <div class="slide">
-                <div class="image" style="background-image: url('/images/main_photo_22.jpg');"></div>
-                <div class="slide-dscr">
-                    <h4>Apartment 2</h4>
-                </div>
-            </div>
-        </div>
-        <div>
-            <div class="slide">
-                <div class="image" style="background-image: url('/images/main_photo_14.jpg');"></div>
-                <div class="slide-dscr">
-                    <h4>Apartment 3</h4>
-                </div>
-            </div>
-        </div>
-        <div>
-            <div class="slide">
-                <div class="image" style="background-image: url('/images/main_photo_22.jpg');"></div>
-                <div class="slide-dscr">
-                    <h4>Apartment 4</h4>
-                </div>
-            </div>
-        </div>
-        <div>
-            <div class="slide">
-                <div class="image" style="background-image: url('/images/main_photo_14.jpg');"></div>
-                <div class="slide-dscr">
-                    <h4>Apartment 5</h4>
-                </div>
-            </div>
-        </div>
-        <div>
-            <div class="slide">
-                <div class="image" style="background-image: url('/images/main_photo_22.jpg');"></div>
-                <div class="slide-dscr">
-                    <h4>Apartment 6</h4>
-                </div>
-            </div>
-        </div>
-        <div>
-            <div class="slide">
-                <div class="image" style="background-image: url('/images/main_photo_14.jpg');"></div>
-                <div class="slide-dscr">
-                    <h4>Apartment 7</h4>
-                </div>
-            </div>
-        </div>
+        }
     </div>
 
     <div class="slider slider-for slider-for-simple ">
-        <div>
-            <div class="slide">
-                <a href="#" class="icon-btn location"></a>
-                <a href="/images/main_photo_14.jpg" class="icon-btn resize fancybox" data-fancybox="gallery"></a>
-                <div class="image" style="background-image: url('/images/main_photo_14.jpg');"></div>
-                <div class="slide-dscr visible-on-mobile">
-                    <h4 class="light">Apartment 1</h4>
-                    <h2 class="underlined"><a href="#">Poltavski Shlach, 19</a></h2>
-                    <div class="price light">$150/night</div>
+        @foreach (var aPhoto in theApartmentAndPrice.theApartment.galleryPhotos(preferredDevice))
+        {
+            <div>
+                <div class="slide">
+                    <a href="#" class="icon-btn location"></a>
+                    <a href="@aPhoto.filePath" class="icon-btn resize fancybox" data-fancybox="gallery"></a>
+                    <div class="image" style="background-image: url('@aPhoto.filePath');"></div>
+                    <div class="slide-dscr visible-on-mobile">
+                        <h4 class="light">@tBox.translate("Apartment") @theApartment.number</h4>
+                        <h2 class="underlined"><a href="#">@tBox.translate(theApartment.nameKey)</a></h2>
+                        <div class="price light">@price</div>
+                    </div>
                 </div>
             </div>
+        }
+    </div>
+
+    <div class="sidebar" id="apartmentData">
+        <div class="hidden-on-mobile">
+            <h4>@tBox.translate("Apartment") @theApartment.number</h4>
+            <h2 class="underlined"><a href="#">@tBox.translate(theApartment.nameKey)</a></h2>
+            <div class="price">@price</div>
         </div>
-        <div>
-            <div class="slide">
-                <a href="#" class="icon-btn location"></a>
-                <a href="/images/main_photo_22.jpg" class="icon-btn resize fancybox" data-fancybox="gallery"></a>
-                <div class="image" style="background-image: url('/images/main_photo_22.jpg');"></div>
-                <div class="slide-dscr visible-on-mobile">
-                    <h4 class="light">Apartment 2</h4>
-                    <h2 class="underlined"><a href="#">Poltavski Shlach, 19</a></h2>
-                    <div class="price light">$150/night</div>
-                </div>
-            </div>
-        </div>
-        <div>
-            <div class="slide">
-                <a href="#" class="icon-btn location"></a>
-                <a href="/images/main_photo_14.jpg" class="icon-btn resize fancybox" data-fancybox="gallery"></a>
-                <div class="image" style="background-image: url('/images/main_photo_14.jpg');"></div>
-                <div class="slide-dscr visible-on-mobile">
-                    <h4 class="light">Apartment 3</h4>
-                    <h2 class="underlined"><a href="#">Poltavski Shlach, 19</a></h2>
-                    <div class="price light">$150/night</div>
-                </div>
-            </div>
-        </div>
-        <div>
-            <div class="slide">
-                <a href="#" class="icon-btn location"></a>
-                <a href="/images/main_photo_22.jpg" class="icon-btn resize fancybox" data-fancybox="gallery"></a>
-                <div class="image" style="background-image: url('/images/main_photo_22.jpg');"></div>
-                <div class="slide-dscr visible-on-mobile">
-                    <h4 class="light">Apartment 4</h4>
-                    <h2 class="underlined"><a href="#">Poltavski Shlach, 19</a></h2>
-                    <div class="price light">$150/night</div>
-                </div>
-            </div>
-        </div>
-        <div>
-            <div class="slide">
-                <a href="#" class="icon-btn location"></a>
-                <a href="/images/main_photo_14.jpg" class="icon-btn resize fancybox" data-fancybox="gallery"></a>
-                <div class="image" style="background-image: url('/images/main_photo_14.jpg');"></div>
-                <div class="slide-dscr visible-on-mobile">
-                    <h4 class="light">Apartment 5</h4>
-                    <h2 class="underlined"><a href="#">Poltavski Shlach, 19</a></h2>
-                    <div class="price light">$150/night</div>
-                </div>
-            </div>
-        </div>
-        <div>
-            <div class="slide">
-                <a href="#" class="icon-btn location"></a>
-                <a href="/images/main_photo_22.jpg" class="icon-btn resize fancybox" data-fancybox="gallery"></a>
-                <div class="image" style="background-image: url('/images/main_photo_22.jpg');"></div>
-                <div class="slide-dscr visible-on-mobile">
-                    <h4 class="light">Apartment 6</h4>
-                    <h2 class="underlined"><a href="#">Poltavski Shlach, 19</a></h2>
-                    <div class="price light">$150/night</div>
-                </div>
-            </div>
-        </div>
-        <div>
-            <div class="slide">
-                <a href="#" class="icon-btn location"></a>
-                <a href="/images/main_photo_14.jpg" class="icon-btn resize fancybox" data-fancybox="gallery"></a>
-                <div class="image" style="background-image: url('/images/main_photo_14.jpg');"></div>
-                <div class="slide-dscr visible-on-mobile">
-                    <h4 class="light">Apartment 7</h4>
-                    <h2 class="underlined"><a href="#">Poltavski Shlach, 19</a></h2>
-                    <div class="price light">$150/night</div>
-                </div>
-            </div>
+        <ul class="dscr-list">
+            @foreach (var aFeatureKey in theApartment.featureKeyList())
+            {
+                <li>@tBox.translate(aFeatureKey)</li>
+            }
+        </ul>
+        @{
+            string disabledOrNot = "disabled";
+            if (theApartmentAndPrice.availability == Availability.AVAILABLE)
+            {
+                disabledOrNot = "";
+            }
+        }
+        <button class="btn" onclick="showBookingForm()" @disabledOrNot>@tBox.translate("Book Now")</button>
+
+        <p class="note blue">@tBox.translate("No credit card needed you can cancel any time")</p>
+        <div class="description">
+            @foreach (var descriptionKey in theApartment.descriptionKeyList())
+            {
+                <p>@tBox.translate(descriptionKey)</p>
+            }
         </div>
     </div>
 
-    <div class="sidebar">
-        <div class="hidden-on-mobile">
-            <h4>Apartment 1</h4>
-            <h2 class="underlined"><a href="#">Poltavski Shlach, 19</a></h2>
-            <div class="price">$150/night</div>
+    <div class="sidebar booking-form" id="bookingForm" style="display:none">
+        <div class="helper">
+            <h4>@tBox.translate("Apartment") @theApartment.number</h4>
+            <h2 class="underlined"><a href="#">@theBookingRequest.checkInOutDates()</a></h2>
+            <div class="form">
+                <form>
+                    @*when an element has eror - add the calss "error to its div and write error message in field-error*@
+                    <div class="field-box">
+                        <input type="text" id="name">
+                        <label for="name">
+                            <span class="field-name"> @tBox.translate("Name")</span>
+                        </label>
+                        <span class="field-error"></span>
+                    </div>
+                    <div class="field-box select-box error">
+                        <input list="countryList" name="country" />
+                        <datalist id="countryList">
+                            @foreach (var aCountry in countryList)
+                            {
+                                <option value="@aCountry" />
+                            }
+                        </datalist>
+                        <label>
+                            <span class="field-name">@tBox.translate("Country")</span>
+                        </label>
+                        <span class="field-error"></span>
+                    </div>
+                    <div class="field-box">
+                        <input type="email" id="email">
+                        <label for="email">
+                            <span class="field-name">@tBox.translate("Email")</span>
+                        </label>
+                        <span class="field-error"></span>
+                    </div>
+                    <div class="field-box">
+                        <input type="tel" id="phone">
+                        <label for="phone">
+                            <span class="field-name">@tBox.translate("Phone")</span>
+                        </label>
+                        <span class="field-error"></span>
+                    </div>
+                    <div class="field-box">
+                        <input type="text" id="arrival">
+                        <label for="arrival">
+                            <span class="field-name">@tBox.translate("expected arrival time")</span>
+                        </label>
+                        <span class="field-error"></span>
+                    </div>
+                    <div class="field-box">
+                        <textarea id="message"></textarea>
+                        <label for="message">
+                            <span class="field-name">@tBox.translate("special request")</span>
+                        </label>
+                        <span class="field-error"></span>
+                    </div>
+                </form>
+            </div>
         </div>
-        <ul class="dscr-list">
-            <li>Telephone</li>
-            <li>Air conditioning</li>
-            <li>Balcony</li>
-            <li>Refrigerator</li>
-            <li>Seating Area</li>
-            <li>Toilet</li>
-            <li>Microwave</li>
-            <li>Washing Machine</li>
-            <li>Private bathroom</li>
-            <li>Heating</li>
-            <li>Kitchen</li>
-            <li>Hardwood/Parquet floors</li>
-            <li>Dining area</li>
-            <li>Electric kettle</li>
-            <li>Kitchenware</li>
-            <li>Towels</li>
-            <li>Linen</li>
-            <li>Free WiFi!</li>
-        </ul>
-        <a href="#" class="btn">Book now</a>
-        <p class="note blue">No credit card needed you can cancel any time</p>
-        <div class="description">
-            <p>Free Wi-Fi and a fully equipped kitchen with dining  area are offered at these air-conditioned apartments. City Life Apartments are situated in various locations in the centre of Kharkov.</p>
-            <p>Free Wi-Fi and a fully equipped kitchen with dining  area are offered at these air-conditioned apartments. City Life Apartments are situated in various locations in the centre of Kharkov.</p>
-            <p>Free Wi-Fi and a fully equipped kitchen with dining  area are offered at these air-conditioned apartments. City Life Apartments are situated in various locations in the centre of Kharkov.</p>
-            <p>Free Wi-Fi and a fully equipped kitchen with dining  area are offered at these air-conditioned apartments. City Life Apartments are situated in various locations in the centre of Kharkov.</p>
-            <p>Free Wi-Fi and a fully equipped kitchen with dining  area are offered at these air-conditioned apartments. City Life Apartments are situated in various locations in the centre of Kharkov.</p>
-            <p>Free Wi-Fi and a fully equipped kitchen with dining  area are offered at these air-conditioned apartments. City Life Apartments are situated in various locations in the centre of Kharkov.</p>
+        <div class="helper">
+            <div class="total-sum">
+                Total:
+                <span>@price</span>
+            </div>
+            <input type="submit" class="btn" value="Book now">
         </div>
     </div>
 </div>
+<script>
+    function showBookingForm() {
+        $("#apartmentData").hide();
+        $("#bookingForm").show();
+    }
+</script>

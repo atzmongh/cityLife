@@ -8,6 +8,7 @@
           ViewBag.apartments = apartmentList;  //list<ApartmentPrice>
           ViewBag.tBox = tBox;                 //translation box
           ViewBag.bookingRequest     //(BookingRequest)
+          ViewBag.preferredDevice = this.preferredDevice();
 *@
 
 
@@ -17,6 +18,7 @@
     TranslateBox tBox = ViewBag.tBox;
     ViewBag.Title = tBox.translate("home");
     IEnumerable<ApartmentPrice> apartments = ViewBag.apartments;
+    DisplayDevice preferredDevice = ViewBag.preferredDevice;
 
 
 
@@ -26,15 +28,8 @@
 
     @foreach (var apartmentAndPrice in apartments)
     {
-        ApartmentPhoto mainPhoto;
-        if (Request.Browser.IsMobileDevice)
-        {
-            mainPhoto = apartmentAndPrice.theApartment.MainPhotoPortrait();
-        }
-        else
-        {
-            mainPhoto = apartmentAndPrice.theApartment.MainPhotoLandscape();
-        }
+        ApartmentPhoto mainPhoto = apartmentAndPrice.theApartment.mainPhoto(preferredDevice);
+
         string filePath;
         if (mainPhoto == null)
         {
@@ -56,15 +51,15 @@
                         @{
                             if (apartmentAndPrice.availability == Availability.AVAILABLE)
                             {
-                                @*There is an error when clicking on the picture - coming from somewhere in jquery code. When trying to 
-                                    create a "book now" hyperlink - it did not work. So the following form is used to 
+                                @*There is an error when clicking on the picture - coming from somewhere in jquery code. When trying to
+                                    create a "book now" hyperlink - it did not work. So the following form is used to
                                     get over the error. When user clicks on the "book now" button he activates a JS code that
                                     submits the form. *@
-                        <form method="post" id="@apartmentAndPrice.theApartment.number" action="/public/p40bookingForm">
-                            <input type="hidden" name="apartmentId" value="@apartmentAndPrice.theApartment.number" />
-                            <div class="btn" onclick="bookNow(@apartmentAndPrice.theApartment.number)">Book Now</div>
-                        </form>
-                              
+                                <form method="post" id="@apartmentAndPrice.theApartment.number" action="/public/p40bookingForm">
+                                    <input type="hidden" name="apartmentId" value="@apartmentAndPrice.theApartment.number" />
+                                    <div class="btn" onclick="bookNow(@apartmentAndPrice.theApartment.number)">Book Now</div>
+                                </form>
+
                             }
                         }
 
@@ -93,10 +88,10 @@
                                     priceText = apartmentAndPrice.pricePerStay.toMoneyString() + " " +
                                         tBox.translate("for") + " " + apartmentAndPrice.nightCount + " " + tBox.translate(night_s);
                                 }
-                                else 
+                                else
                                 {
                                     //display a "not available" message and the reason
-                                    if(apartmentAndPrice.availability == Availability.OCCUPIED)
+                                    if (apartmentAndPrice.availability == Availability.OCCUPIED)
                                     {
                                         priceText = tBox.translate("Apartment booked for these dates");
                                     }

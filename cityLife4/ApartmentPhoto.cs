@@ -14,6 +14,13 @@ namespace cityLife4
     
     public partial class ApartmentPhoto
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public ApartmentPhoto()
+        {
+            this.forDesktop = true;
+            this.forMobile = true;
+        }
+    
         public int Id { get; set; }
         public string filePath { get; set; }
         public PhotoType type { get; set; }
@@ -22,6 +29,8 @@ namespace cityLife4
         public Nullable<int> height { get; set; }
         public short sortOrder { get; set; }
         public string thumbnailPath { get; set; }
+        public bool forDesktop { get; set; }
+        public bool forMobile { get; set; }
     
         public virtual Apartment Apartment { get; set; }
     }

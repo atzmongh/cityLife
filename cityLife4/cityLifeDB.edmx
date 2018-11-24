@@ -83,6 +83,8 @@
     <Property Name="height" Type="int" Nullable="true" />
     <Property Name="sortOrder" Type="smallint" Nullable="false" />
     <Property Name="thumbnailPath" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="forDesktop" Type="bit" Nullable="false" DefaultValue="true" />
+    <Property Name="forMobile" Type="bit" Nullable="false" DefaultValue="true" />
     <Property Name="Apartment_Id" Type="int" Nullable="false" />
   </EntityType>
   <EntityType Name="Pricings">
@@ -397,6 +399,8 @@
               <Summary>file path of the thumbnail version of this photo. If null - thumbnail for this photo does not exist</Summary>
             </Documentation>
           </Property>
+          <Property Name="forDesktop" Type="Boolean" Nullable="false" DefaultValue="true" />
+          <Property Name="forMobile" Type="Boolean" Nullable="false" DefaultValue="true" />
         </EntityType>
         <EnumType Name="PhotoType" UnderlyingType="Int16">
           <Member Name="Main" />
@@ -621,6 +625,8 @@
           <ScalarProperty Name="height" ColumnName="height" />
           <ScalarProperty Name="sortOrder" ColumnName="sortOrder" />
           <ScalarProperty Name="thumbnailPath" ColumnName="thumbnailPath" />
+          <ScalarProperty Name="forDesktop" ColumnName="forDesktop" />
+          <ScalarProperty Name="forMobile" ColumnName="forMobile" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
