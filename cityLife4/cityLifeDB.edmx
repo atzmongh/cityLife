@@ -18,6 +18,8 @@
     <EntitySet Name="unitTests" EntityType="cityLifeDB.Store.unitTests" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="ErrorCodes" EntityType="cityLifeDB.Store.ErrorCodes" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="ErrorMessages" EntityType="cityLifeDB.Store.ErrorMessages" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Orders" EntityType="cityLifeDB.Store.Orders" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Guests" EntityType="cityLifeDB.Store.Guests" store:Type="Tables" Schema="dbo" />
     <AssociationSet Name="ApartmentApartmentPhoto" Association="cityLifeDB.Store.ApartmentApartmentPhoto">
       <End Role="Apartment" EntitySet="Apartments" />
       <End Role="ApartmentPhoto" EntitySet="ApartmentPhotoes" />
@@ -57,6 +59,22 @@
     <AssociationSet Name="ErrorCodeErrorMessage" Association="cityLifeDB.Store.ErrorCodeErrorMessage">
       <End Role="ErrorCode" EntitySet="ErrorCodes" />
       <End Role="ErrorMessage" EntitySet="ErrorMessages" />
+    </AssociationSet>
+    <AssociationSet Name="CurrencyOrder" Association="cityLifeDB.Store.CurrencyOrder">
+      <End Role="Currency" EntitySet="Currencies" />
+      <End Role="Order" EntitySet="Orders" />
+    </AssociationSet>
+    <AssociationSet Name="OrderApartmentDay" Association="cityLifeDB.Store.OrderApartmentDay">
+      <End Role="Order" EntitySet="Orders" />
+      <End Role="ApartmentDay" EntitySet="ApartmentDays" />
+    </AssociationSet>
+    <AssociationSet Name="ApartmentOrder" Association="cityLifeDB.Store.ApartmentOrder">
+      <End Role="Apartment" EntitySet="Apartments" />
+      <End Role="Order" EntitySet="Orders" />
+    </AssociationSet>
+    <AssociationSet Name="GuestOrder" Association="cityLifeDB.Store.GuestOrder">
+      <End Role="Guest" EntitySet="Guests" />
+      <End Role="Order" EntitySet="Orders" />
     </AssociationSet>
   </EntityContainer>
   <EntityType Name="Apartments">
@@ -156,6 +174,7 @@
     <Property Name="priceFactor" Type="decimal" Nullable="false" DefaultValue="1" Precision="10" Scale="4" />
     <Property Name="Currency_currencyCode" Type="nchar" MaxLength="3" Nullable="true" />
     <Property Name="Apartment_Id" Type="int" Nullable="false" />
+    <Property Name="Order_Id" Type="int" Nullable="false" />
   </EntityType>
   <EntityType Name="unitTests">
     <Key>
@@ -188,6 +207,38 @@
     <Property Name="lastOccurenceDate" Type="datetime" Nullable="false" />
     <Property Name="occurenceCount" Type="int" Nullable="false" DefaultValue="1" />
     <Property Name="ErrorCode_code" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Orders">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="checkinDate" Type="datetime" Nullable="false" />
+    <Property Name="checkoutDate" Type="datetime" Nullable="false" />
+    <Property Name="dayCount" Type="int" Nullable="false" />
+    <Property Name="adultCount" Type="int" Nullable="false" />
+    <Property Name="childrenCount" Type="int" Nullable="false" DefaultValue="0" />
+    <Property Name="expectedArrival" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="specialRequest" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="status" Type="int" Nullable="false" />
+    <Property Name="confirmationNumber" Type="nvarchar(max)" Nullable="false" DefaultValue="0" />
+    <Property Name="cancellationNumber" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="price" Type="int" Nullable="false" />
+    <Property Name="amountPaid" Type="int" Nullable="false" />
+    <Property Name="bookedBy" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="Currency_currencyCode" Type="nchar" MaxLength="3" Nullable="false" />
+    <Property Name="Apartment_Id" Type="int" Nullable="false" />
+    <Property Name="Guest_Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Guests">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="name" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="phone" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="email" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="country" Type="nvarchar(max)" Nullable="false" />
   </EntityType>
   <Association Name="ApartmentApartmentPhoto">
     <End Role="Apartment" Type="cityLifeDB.Store.Apartments" Multiplicity="1" />
@@ -309,6 +360,54 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
+  <Association Name="CurrencyOrder">
+    <End Role="Currency" Type="cityLifeDB.Store.Currencies" Multiplicity="1" />
+    <End Role="Order" Type="cityLifeDB.Store.Orders" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Currency">
+        <PropertyRef Name="currencyCode" />
+      </Principal>
+      <Dependent Role="Order">
+        <PropertyRef Name="Currency_currencyCode" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="OrderApartmentDay">
+    <End Role="Order" Type="cityLifeDB.Store.Orders" Multiplicity="1" />
+    <End Role="ApartmentDay" Type="cityLifeDB.Store.ApartmentDays" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Order">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="ApartmentDay">
+        <PropertyRef Name="Order_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="ApartmentOrder">
+    <End Role="Apartment" Type="cityLifeDB.Store.Apartments" Multiplicity="1" />
+    <End Role="Order" Type="cityLifeDB.Store.Orders" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Apartment">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Order">
+        <PropertyRef Name="Apartment_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="GuestOrder">
+    <End Role="Guest" Type="cityLifeDB.Store.Guests" Multiplicity="1" />
+    <End Role="Order" Type="cityLifeDB.Store.Orders" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Guest">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Order">
+        <PropertyRef Name="Guest_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
 </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
@@ -366,6 +465,24 @@
             <End Role="ErrorCode" EntitySet="ErrorCodes" />
             <End Role="ErrorMessage" EntitySet="ErrorMessages" />
           </AssociationSet>
+          <EntitySet Name="Orders" EntityType="cityLifeDB.Order" />
+          <AssociationSet Name="CurrencyOrder" Association="cityLifeDB.CurrencyOrder">
+            <End Role="Currency" EntitySet="Currencies" />
+            <End Role="Order" EntitySet="Orders" />
+          </AssociationSet>
+          <AssociationSet Name="OrderApartmentDay" Association="cityLifeDB.OrderApartmentDay">
+            <End Role="Order" EntitySet="Orders" />
+            <End Role="ApartmentDay" EntitySet="ApartmentDays" />
+          </AssociationSet>
+          <AssociationSet Name="ApartmentOrder" Association="cityLifeDB.ApartmentOrder">
+            <End Role="Apartment" EntitySet="Apartments" />
+            <End Role="Order" EntitySet="Orders" />
+          </AssociationSet>
+          <EntitySet Name="Guests" EntityType="cityLifeDB.Guest" />
+          <AssociationSet Name="GuestOrder" Association="cityLifeDB.GuestOrder">
+            <End Role="Guest" EntitySet="Guests" />
+            <End Role="Order" EntitySet="Orders" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="Apartment">
           <Key>
@@ -381,6 +498,7 @@
           <NavigationProperty Name="ApartmentPhotoes" Relationship="cityLifeDB.ApartmentApartmentPhoto" FromRole="Apartment" ToRole="ApartmentPhoto" />
           <NavigationProperty Name="Pricings" Relationship="cityLifeDB.ApartmentPricing" FromRole="Apartment" ToRole="Pricing" />
           <NavigationProperty Name="ApartmentDays" Relationship="cityLifeDB.ApartmentApartmentDay" FromRole="Apartment" ToRole="ApartmentDay" />
+          <NavigationProperty Name="Orders" Relationship="cityLifeDB.ApartmentOrder" FromRole="Apartment" ToRole="Order" />
         </EntityType>
         <EntityType Name="ApartmentPhoto">
           <Key>
@@ -504,6 +622,7 @@
           <NavigationProperty Name="FromCurrencyExchanges" Relationship="cityLifeDB.CurrencyCurrencyExchangeFrom" FromRole="Currency" ToRole="CurrencyExchange" />
           <NavigationProperty Name="ToCurrencyExchanges" Relationship="cityLifeDB.CurrencyCurrencyExchangeTo" FromRole="Currency" ToRole="CurrencyExchange" />
           <NavigationProperty Name="ApartmentDays" Relationship="cityLifeDB.CurrencyApartmentDay" FromRole="Currency" ToRole="ApartmentDay" />
+          <NavigationProperty Name="Orders" Relationship="cityLifeDB.CurrencyOrder" FromRole="Currency" ToRole="Order" />
         </EntityType>
         <Association Name="CurrencyPricing">
           <End Type="cityLifeDB.Currency" Role="Currency" Multiplicity="1" />
@@ -544,6 +663,7 @@
               <LongDescription>example: if the price is $100, and the factor is 0.9, then the price will be $90. If the factor is 1.1, then the price will be $110</LongDescription>
             </Documentation>
           </Property>
+          <NavigationProperty Name="Order" Relationship="cityLifeDB.OrderApartmentDay" FromRole="ApartmentDay" ToRole="Order" />
         </EntityType>
         <EnumType Name="ApartOccuStatus">
           <Member Name="Free" />
@@ -594,6 +714,70 @@
         <Association Name="ErrorCodeErrorMessage">
           <End Type="cityLifeDB.ErrorCode" Role="ErrorCode" Multiplicity="1" />
           <End Type="cityLifeDB.ErrorMessage" Role="ErrorMessage" Multiplicity="*" />
+        </Association>
+        <EntityType Name="Order">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="checkinDate" Type="DateTime" Nullable="false" />
+          <Property Name="checkoutDate" Type="DateTime" Nullable="false" />
+          <Property Name="dayCount" Type="Int32" Nullable="false" />
+          <Property Name="adultCount" Type="Int32" Nullable="false" />
+          <Property Name="childrenCount" Type="Int32" Nullable="false" DefaultValue="0" />
+          <Property Name="expectedArrival" Type="String" Nullable="true" />
+          <Property Name="specialRequest" Type="String" Nullable="true" />
+          <Property Name="status" Type="cityLifeDB.OrderStatus" Nullable="false" />
+          <Property Name="confirmationNumber" Type="String" Nullable="false" DefaultValue="0" />
+          <Property Name="cancellationNumber" Type="String" Nullable="true" />
+          <Property Name="price" Type="Int32" Nullable="false" >
+            <Documentation>
+              <Summary>holds the price in cents</Summary>
+            </Documentation>
+          </Property>
+          <Property Name="amountPaid" Type="Int32" Nullable="false" >
+            <Documentation>
+              <Summary>amount paid in cents</Summary>
+            </Documentation>
+          </Property>
+          <NavigationProperty Name="Currency" Relationship="cityLifeDB.CurrencyOrder" FromRole="Order" ToRole="Currency" />
+          <Property Name="bookedBy" Type="String" Nullable="true" />
+          <NavigationProperty Name="ApartmentDays" Relationship="cityLifeDB.OrderApartmentDay" FromRole="Order" ToRole="ApartmentDay" />
+          <NavigationProperty Name="Apartment" Relationship="cityLifeDB.ApartmentOrder" FromRole="Order" ToRole="Apartment" />
+          <NavigationProperty Name="Guest" Relationship="cityLifeDB.GuestOrder" FromRole="Order" ToRole="Guest" />
+        </EntityType>
+        <EnumType Name="OrderStatus">
+          <Member Name="Created" />
+          <Member Name="CheckedIn" />
+          <Member Name="CheckedOut" />
+          <Member Name="Cancelled" />
+        </EnumType>
+        <Association Name="CurrencyOrder">
+          <End Type="cityLifeDB.Currency" Role="Currency" Multiplicity="1" />
+          <End Type="cityLifeDB.Order" Role="Order" Multiplicity="*" />
+        </Association>
+        <Association Name="OrderApartmentDay">
+          <End Type="cityLifeDB.Order" Role="Order" Multiplicity="1" />
+          <End Type="cityLifeDB.ApartmentDay" Role="ApartmentDay" Multiplicity="*" />
+        </Association>
+        <Association Name="ApartmentOrder">
+          <End Type="cityLifeDB.Apartment" Role="Apartment" Multiplicity="1" />
+          <End Type="cityLifeDB.Order" Role="Order" Multiplicity="*" />
+        </Association>
+        <EntityType Name="Guest">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" Nullable="false" />
+          <Property Name="phone" Type="String" Nullable="false" />
+          <Property Name="email" Type="String" Nullable="false" />
+          <Property Name="country" Type="String" Nullable="false" />
+          <NavigationProperty Name="Orders" Relationship="cityLifeDB.GuestOrder" FromRole="Guest" ToRole="Order" />
+        </EntityType>
+        <Association Name="GuestOrder">
+          <End Type="cityLifeDB.Guest" Role="Guest" Multiplicity="1" />
+          <End Type="cityLifeDB.Order" Role="Order" Multiplicity="*" />
         </Association>
       </Schema>
     </edmx:ConceptualModels>
@@ -732,6 +916,37 @@
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
+    <EntitySetMapping Name="Orders">
+      <EntityTypeMapping TypeName="IsTypeOf(cityLifeDB.Order)">
+        <MappingFragment StoreEntitySet="Orders">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="checkinDate" ColumnName="checkinDate" />
+          <ScalarProperty Name="checkoutDate" ColumnName="checkoutDate" />
+          <ScalarProperty Name="dayCount" ColumnName="dayCount" />
+          <ScalarProperty Name="adultCount" ColumnName="adultCount" />
+          <ScalarProperty Name="childrenCount" ColumnName="childrenCount" />
+          <ScalarProperty Name="expectedArrival" ColumnName="expectedArrival" />
+          <ScalarProperty Name="specialRequest" ColumnName="specialRequest" />
+          <ScalarProperty Name="status" ColumnName="status" />
+          <ScalarProperty Name="confirmationNumber" ColumnName="confirmationNumber" />
+          <ScalarProperty Name="cancellationNumber" ColumnName="cancellationNumber" />
+          <ScalarProperty Name="price" ColumnName="price" />
+          <ScalarProperty Name="amountPaid" ColumnName="amountPaid" />
+          <ScalarProperty Name="bookedBy" ColumnName="bookedBy" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Guests">
+      <EntityTypeMapping TypeName="IsTypeOf(cityLifeDB.Guest)">
+        <MappingFragment StoreEntitySet="Guests">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="name" ColumnName="name" />
+          <ScalarProperty Name="phone" ColumnName="phone" />
+          <ScalarProperty Name="email" ColumnName="email" />
+          <ScalarProperty Name="country" ColumnName="country" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
     <AssociationSetMapping Name="ApartmentApartmentPhoto" TypeName="cityLifeDB.ApartmentApartmentPhoto" StoreEntitySet="ApartmentPhotoes">
       <EndProperty Name="Apartment">
         <ScalarProperty Name="Id" ColumnName="Apartment_Id" />
@@ -810,6 +1025,38 @@
         <ScalarProperty Name="code" ColumnName="ErrorCode_code" />
       </EndProperty>
       <EndProperty Name="ErrorMessage">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="CurrencyOrder" TypeName="cityLifeDB.CurrencyOrder" StoreEntitySet="Orders">
+      <EndProperty Name="Currency">
+        <ScalarProperty Name="currencyCode" ColumnName="Currency_currencyCode" />
+      </EndProperty>
+      <EndProperty Name="Order">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="OrderApartmentDay" TypeName="cityLifeDB.OrderApartmentDay" StoreEntitySet="ApartmentDays">
+      <EndProperty Name="Order">
+        <ScalarProperty Name="Id" ColumnName="Order_Id" />
+      </EndProperty>
+      <EndProperty Name="ApartmentDay">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="ApartmentOrder" TypeName="cityLifeDB.ApartmentOrder" StoreEntitySet="Orders">
+      <EndProperty Name="Apartment">
+        <ScalarProperty Name="Id" ColumnName="Apartment_Id" />
+      </EndProperty>
+      <EndProperty Name="Order">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="GuestOrder" TypeName="cityLifeDB.GuestOrder" StoreEntitySet="Orders">
+      <EndProperty Name="Guest">
+        <ScalarProperty Name="Id" ColumnName="Guest_Id" />
+      </EndProperty>
+      <EndProperty Name="Order">
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
     </AssociationSetMapping>

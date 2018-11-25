@@ -41,6 +41,12 @@ namespace cityLife4
             Money result = new Money(m1.amount * m2.amount, m1.currencyCode);
             return result;
         }
+        public static Money operator /(Money m1, int divider)
+        {
+            
+            Money result = new Money(m1.amount / divider, m1.currencyCode);
+            return result;
+        }
         public static Money operator +(Money m1, Money m2)
         {
             if (m1.currencyCode != m2.currencyCode)
@@ -159,6 +165,16 @@ namespace cityLife4
                 }
                 return new Money(result, newCurrencyCode);
             }
+        }
+
+        public int toCents()
+        {
+            return (int)(amount * 100);
+        }
+
+        public string currency
+        {
+            get { return currencyCode; }
         }
     }
 }

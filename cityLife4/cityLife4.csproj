@@ -272,12 +272,21 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Guest.cs">
+      <DependentUpon>cityLife.tt</DependentUpon>
+    </Compile>
     <Compile Include="Language.cs">
       <DependentUpon>cityLife.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Apartment.cs" />
     <Compile Include="Models\ApartmentPhoto.cs" />
     <Compile Include="Models\Pricing.cs" />
+    <Compile Include="Order.cs">
+      <DependentUpon>cityLife.tt</DependentUpon>
+    </Compile>
+    <Compile Include="OrderStatus.cs">
+      <DependentUpon>cityLife.tt</DependentUpon>
+    </Compile>
     <Compile Include="OrientationType.cs">
       <DependentUpon>cityLife.tt</DependentUpon>
     </Compile>
@@ -309,6 +318,7 @@
     <Content Include="Views\Public\p25apartmentDetails.cshtml" />
     <Content Include="Views\Public\p26bookingForm.cshtml" />
     <Content Include="Views\Public\p27bookingFailure.cshtml" />
+    <Content Include="Views\Public\p28bookingSuccess.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

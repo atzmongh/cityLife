@@ -217,7 +217,7 @@ namespace cityLife.Controllers
                 Currency currentCurrency = (Currency)Session["currentCurrency"];
                 ApartmentPrice apartmentAndPrice = this.calculatePricePerStayForApartment(theAparatment, db, theBookingRequest, currentCurrency);
 
-                if (apartmentAndPrice.availability != Availability.AVAILABLE)  ///TBD for testing
+                if (apartmentAndPrice.availability != Availability.AVAILABLE)  
                 {
                     //the apartment is not available, although it seemed to be available. Perhaps it was taken in the last minutes
                     return PartialView("p27bookingFailure");
@@ -225,7 +225,80 @@ namespace cityLife.Controllers
                 else
                 {
                     //Complete the booking
-                    return PartialView("p27bookingFailure");
+                    DateTime checkIn = (DateTime)theBookingRequest.checkinDate;
+                    DateTime checkOut = (DateTime)theBookingRequest.checkoutDate;
+                    var dayCount = (checkOut - checkIn).Days;
+                    Currency theCurrency = db.Currencies.Single(a => a.currencyCode == apartmentAndPrice.pricePerStay.currency);
+
+                    Guest theGuest = new Guest()
+                    {
+                         name = name,
+                         phone = phone,
+                         email = email,
+                         country = country
+                    };
+                    db.Guests.Add(theGuest);
+
+                    Order theOrder = new Order()
+                    {
+                        adultCount = (int)theBookingRequest.adults,
+                        amountPaid = 0,
+                        Apartment = theAparatment,
+                        bookedBy = name,
+                        checkinDate = (DateTime)theBookingRequest.checkinDate,
+                        checkoutDate = (DateTime)theBookingRequest.checkoutDate,
+                        childrenCount = theBookingRequest.children??0,
+                        confirmationNumber = "0",
+                        expectedArrival = arrivalTime,
+                        specialRequest = specialRequest,
+                        status = OrderStatus.Created,
+                        dayCount = dayCount,
+                        price = apartmentAndPrice.pricePerStay.toCents(),
+                        Guest = theGuest,
+                        Currency = theCurrency
+                    };
+                    db.Orders.Add(theOrder);
+                   
+
+                    for(var aDay = checkIn;aDay < checkOut; aDay = aDay.AddDays(1))
+                    {
+                        ApartmentDay anApartmentDay = db.ApartmentDays.SingleOrDefault(a => a.date == aDay && a.Apartment.Id == theAparatment.Id);
+                        if (anApartmentDay == null)
+                        {
+                            anApartmentDay = new ApartmentDay()
+                            {
+                                 Order = theOrder,
+                                 date = aDay,
+                                 Apartment = theAparatment,
+                                 Currency = theCurrency,
+                                 priceFactor = 1.0m,
+                                 isCleaned = false,
+                                 revenue = (apartmentAndPrice.pricePerStay / dayCount).toCents(),
+                                 status = ApartOccuStatus.Reserved
+                            };
+                            db.ApartmentDays.Add(anApartmentDay);
+                        }
+                        else
+                        {
+                            //a apartment day record exists.
+                            if (anApartmentDay.status == ApartOccuStatus.Free)
+                            {
+                                anApartmentDay.Order = theOrder;
+                                anApartmentDay.Apartment = theAparatment;
+                                anApartmentDay.Currency = theCurrency;
+                                anApartmentDay.revenue = (apartmentAndPrice.pricePerStay / dayCount).toCents();
+                                anApartmentDay.status = ApartOccuStatus.Reserved;
+                            }
+                            else
+                            {
+                                //The record exists but it is not free - raise an exception
+                                throw new AppException(113, null, theAparatment.number, aDay.ToShortDateString(), theGuest.name);
+                            }
+                        }
+                    }
+                    db.SaveChanges();
+
+                    return PartialView("p28bookingSuccess");
                 }
 
                 

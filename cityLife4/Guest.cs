@@ -12,25 +12,21 @@ namespace cityLife4
     using System;
     using System.Collections.Generic;
     
-    public partial class ApartmentDay
+    public partial class Guest
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public ApartmentDay()
+        public Guest()
         {
-            this.isCleaned = false;
-            this.revenue = 0;
-            this.priceFactor = 1m;
+            this.Orders = new HashSet<Order>();
         }
     
         public int Id { get; set; }
-        public ApartOccuStatus status { get; set; }
-        public bool isCleaned { get; set; }
-        public int revenue { get; set; }
-        public System.DateTime date { get; set; }
-        public decimal priceFactor { get; set; }
+        public string name { get; set; }
+        public string phone { get; set; }
+        public string email { get; set; }
+        public string country { get; set; }
     
-        public virtual Currency Currency { get; set; }
-        public virtual Apartment Apartment { get; set; }
-        public virtual Order Order { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Order> Orders { get; set; }
     }
 }

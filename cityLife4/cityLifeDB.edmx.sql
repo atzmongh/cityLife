@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 11/24/2018 10:57:35
+-- Date Created: 11/25/2018 16:52:25
 -- Generated from EDMX file: C:\software\cityLife\cityLife4\cityLifeDB.edmx
 -- --------------------------------------------------
 
@@ -47,6 +47,18 @@ IF OBJECT_ID(N'[dbo].[FK_ApartmentApartmentDay]', 'F') IS NOT NULL
 IF OBJECT_ID(N'[dbo].[FK_ErrorCodeErrorMessage]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[ErrorMessages] DROP CONSTRAINT [FK_ErrorCodeErrorMessage];
 --GO
+IF OBJECT_ID(N'[dbo].[FK_CurrencyOrder]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[Orders] DROP CONSTRAINT [FK_CurrencyOrder];
+--GO
+IF OBJECT_ID(N'[dbo].[FK_OrderApartmentDay]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[ApartmentDays] DROP CONSTRAINT [FK_OrderApartmentDay];
+--GO
+IF OBJECT_ID(N'[dbo].[FK_ApartmentOrder]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[Orders] DROP CONSTRAINT [FK_ApartmentOrder];
+--GO
+IF OBJECT_ID(N'[dbo].[FK_GuestOrder]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[Orders] DROP CONSTRAINT [FK_GuestOrder];
+--GO
 
 -- --------------------------------------------------
 -- Dropping existing tables
@@ -87,6 +99,12 @@ IF OBJECT_ID(N'[dbo].[ErrorCodes]', 'U') IS NOT NULL
 --GO
 IF OBJECT_ID(N'[dbo].[ErrorMessages]', 'U') IS NOT NULL
     DROP TABLE [dbo].[ErrorMessages];
+--GO
+IF OBJECT_ID(N'[dbo].[Orders]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Orders];
+--GO
+IF OBJECT_ID(N'[dbo].[Guests]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Guests];
 --GO
 
 -- --------------------------------------------------
@@ -187,7 +205,8 @@ CREATE TABLE [dbo].[ApartmentDays] (
     [date] datetime  NOT NULL,
     [priceFactor] decimal(10,4)  NOT NULL,
     [Currency_currencyCode] nchar(3)  NULL,
-    [Apartment_Id] int  NOT NULL
+    [Apartment_Id] int  NOT NULL,
+    [Order_Id] int  NOT NULL
 );
 --GO
 
@@ -219,6 +238,38 @@ CREATE TABLE [dbo].[ErrorMessages] (
     [lastOccurenceDate] datetime  NOT NULL,
     [occurenceCount] int  NOT NULL,
     [ErrorCode_code] int  NOT NULL
+);
+--GO
+
+-- Creating table 'Orders'
+CREATE TABLE [dbo].[Orders] (
+    [Id] int IDENTITY(1,1) NOT NULL,
+    [checkinDate] datetime  NOT NULL,
+    [checkoutDate] datetime  NOT NULL,
+    [dayCount] int  NOT NULL,
+    [adultCount] int  NOT NULL,
+    [childrenCount] int  NOT NULL,
+    [expectedArrival] nvarchar(max)  NULL,
+    [specialRequest] nvarchar(max)  NULL,
+    [status] int  NOT NULL,
+    [confirmationNumber] nvarchar(max)  NOT NULL,
+    [cancellationNumber] nvarchar(max)  NULL,
+    [price] int  NOT NULL,
+    [amountPaid] int  NOT NULL,
+    [bookedBy] nvarchar(max)  NULL,
+    [Currency_currencyCode] nchar(3)  NOT NULL,
+    [Apartment_Id] int  NOT NULL,
+    [Guest_Id] int  NOT NULL
+);
+--GO
+
+-- Creating table 'Guests'
+CREATE TABLE [dbo].[Guests] (
+    [Id] int IDENTITY(1,1) NOT NULL,
+    [name] nvarchar(max)  NOT NULL,
+    [phone] nvarchar(max)  NOT NULL,
+    [email] nvarchar(max)  NOT NULL,
+    [country] nvarchar(max)  NOT NULL
 );
 --GO
 
@@ -295,6 +346,18 @@ ADD CONSTRAINT [PK_ErrorCodes]
 -- Creating primary key on [Id] in table 'ErrorMessages'
 ALTER TABLE [dbo].[ErrorMessages]
 ADD CONSTRAINT [PK_ErrorMessages]
+    PRIMARY KEY CLUSTERED ([Id] ASC);
+--GO
+
+-- Creating primary key on [Id] in table 'Orders'
+ALTER TABLE [dbo].[Orders]
+ADD CONSTRAINT [PK_Orders]
+    PRIMARY KEY CLUSTERED ([Id] ASC);
+--GO
+
+-- Creating primary key on [Id] in table 'Guests'
+ALTER TABLE [dbo].[Guests]
+ADD CONSTRAINT [PK_Guests]
     PRIMARY KEY CLUSTERED ([Id] ASC);
 --GO
 
@@ -450,6 +513,66 @@ ADD CONSTRAINT [FK_ErrorCodeErrorMessage]
 CREATE INDEX [IX_FK_ErrorCodeErrorMessage]
 ON [dbo].[ErrorMessages]
     ([ErrorCode_code]);
+--GO
+
+-- Creating foreign key on [Currency_currencyCode] in table 'Orders'
+ALTER TABLE [dbo].[Orders]
+ADD CONSTRAINT [FK_CurrencyOrder]
+    FOREIGN KEY ([Currency_currencyCode])
+    REFERENCES [dbo].[Currencies]
+        ([currencyCode])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+--GO
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_CurrencyOrder'
+CREATE INDEX [IX_FK_CurrencyOrder]
+ON [dbo].[Orders]
+    ([Currency_currencyCode]);
+--GO
+
+-- Creating foreign key on [Order_Id] in table 'ApartmentDays'
+ALTER TABLE [dbo].[ApartmentDays]
+ADD CONSTRAINT [FK_OrderApartmentDay]
+    FOREIGN KEY ([Order_Id])
+    REFERENCES [dbo].[Orders]
+        ([Id])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+--GO
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_OrderApartmentDay'
+CREATE INDEX [IX_FK_OrderApartmentDay]
+ON [dbo].[ApartmentDays]
+    ([Order_Id]);
+--GO
+
+-- Creating foreign key on [Apartment_Id] in table 'Orders'
+ALTER TABLE [dbo].[Orders]
+ADD CONSTRAINT [FK_ApartmentOrder]
+    FOREIGN KEY ([Apartment_Id])
+    REFERENCES [dbo].[Apartments]
+        ([Id])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+--GO
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_ApartmentOrder'
+CREATE INDEX [IX_FK_ApartmentOrder]
+ON [dbo].[Orders]
+    ([Apartment_Id]);
+--GO
+
+-- Creating foreign key on [Guest_Id] in table 'Orders'
+ALTER TABLE [dbo].[Orders]
+ADD CONSTRAINT [FK_GuestOrder]
+    FOREIGN KEY ([Guest_Id])
+    REFERENCES [dbo].[Guests]
+        ([Id])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+--GO
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_GuestOrder'
+CREATE INDEX [IX_FK_GuestOrder]
+ON [dbo].[Orders]
+    ([Guest_Id]);
 --GO
 
 -- --------------------------------------------------

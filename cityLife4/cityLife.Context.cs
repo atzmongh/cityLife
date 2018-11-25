@@ -37,5 +37,7 @@ namespace cityLife4
         public virtual DbSet<unitTest> unitTests { get; set; }
         public virtual DbSet<ErrorCode> ErrorCodes { get; set; }
         public virtual DbSet<ErrorMessage> ErrorMessages { get; set; }
+        public virtual DbSet<Order> Orders { get; set; }
+        public virtual DbSet<Guest> Guests { get; set; }
     }
 }
