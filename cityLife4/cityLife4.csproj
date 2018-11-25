@@ -307,6 +307,8 @@
     <Content Include="Views\Public\p40bookingForm.cshtml" />
     <Content Include="Views\Public\p20availableAppartments.cshtml" />
     <Content Include="Views\Public\p25apartmentDetails.cshtml" />
+    <Content Include="Views\Public\p26bookingForm.cshtml" />
+    <Content Include="Views\Public\p27bookingFailure.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

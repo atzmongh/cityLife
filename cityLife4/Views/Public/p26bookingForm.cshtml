@@ -1,0 +1,88 @@
+﻿@using cityLife4;
+@using cityLife.Controllers;
+@{ 
+    //viewBag.apartmentAndPrice
+    //ViewBag.tBox
+    //ViewBag.bookingRequest
+    //ViewBag.countryList
+    //viewBag.bookingFormData
+
+    ApartmentPrice theApartmentAndPrice = ViewBag.apartmentAndPrice;
+    Apartment theApartment = theApartmentAndPrice.theApartment;
+    string price = "";
+    if (theApartmentAndPrice.pricePerStay != null)
+    {
+        price = theApartmentAndPrice.pricePerStay.toMoneyString();
+    }
+
+    TranslateBox tBox = ViewBag.tBox;
+    BookingRequest theBookingRequest = ViewBag.bookingRequest;
+    List<string> countryList = ViewBag.countryList;
+    BookingFormData theBookingFormData = ViewBag.bookingFormData;
+
+}
+<div class="sidebar booking-form" id="bookingFormWrapper" >
+    <div class="helper">
+        <h4>@tBox.translate("Apartment") @theApartment.number</h4>
+        <h3>@tBox.translate("Dates") @theBookingRequest.checkInOutDates()</h3>
+        <div class="form">
+            <form id="bookingForm">
+                <input type="hidden" name="apartmentId" value="@theApartment.Id" />
+                @*when an element has eror - add the calss "error to its div and write error message in field-error*@
+                <div class="field-box @theBookingFormData.name.errorOrNot" >
+                    <input type="text" id="name" name="name" value="@theBookingFormData.name.content">
+                    <label for="name">
+                        <span class="field-name"> @tBox.translate("Name")</span>
+                    </label>
+                    <span class="field-error" id="nameError">@tBox.translate(theBookingFormData.name.errorMessage)</span>
+                </div>
+                <div class="field-box select-box @theBookingFormData.country.errorOrNot">
+                    <input list="countryList" name="country" id="country" value="@theBookingFormData.country.content" />
+                    <datalist id="countryList">
+                        @foreach (var aCountry in countryList)
+                        {
+                            <option value="@aCountry" />
+                        }
+                    </datalist>
+                    <label for="country">
+                        <span class="field-name">@tBox.translate("Country")</span>
+                    </label>
+                    <span class="field-error" id="countryError">@tBox.translate(theBookingFormData.country.errorMessage)</span>
+                </div>
+                <div class="field-box @theBookingFormData.email.errorOrNot">
+                    <input type="email" id="email" name="email" value="@theBookingFormData.email.content">
+                    <label for="email">
+                        <span class="field-name">@tBox.translate("Email")</span>
+                    </label>
+                    <span class="field-error">@tBox.translate(theBookingFormData.email.errorMessage)</span>
+                </div>
+                <div class="field-box @theBookingFormData.phone.errorOrNot">
+                    <input type="tel" id="phone" name="phone" value="@theBookingFormData.phone.content">
+                    <label for="phone">
+                        <span class="field-name">@tBox.translate("Phone")</span>
+                    </label>
+                    <span class="field-error">@tBox.translate(theBookingFormData.phone.errorMessage)</span>
+                </div>
+                <div class="field-box">
+                    <input type="text" id="arrivalTime" name="arrivalTime" value="@theBookingFormData.arrivalTime.content">
+                    <label for="arrivalTime">
+                        <span class="field-name">@tBox.translate("expected arrival time")</span>
+                    </label>
+                    <span class="field-error"></span>
+                </div>
+                <div class="field-box">
+                    <textarea id="specialRequest" name="specialRequest" >@theBookingFormData.specialRequest.content</textarea>
+                    <label for="specialRequest">
+                        <span class="field-name">@tBox.translate("special request")</span>
+                    </label>
+                    <span class="field-error"></span>
+                </div>
+                <div class="total-sum">
+                    Total:
+                    <span>@price</span>
+                </div>
+                <input type="button" class="btn" value="Book now" onclick="sendBookingData()">  @*function defined in p25apartmentDetails.cshtml*@
+            </form>
+        </div>
+    </div>
+</div>

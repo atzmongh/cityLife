@@ -1,0 +1,21 @@
+﻿@using cityLife.Controllers;
+@using cityLife4;
+@{ 
+    //ViewBag.tBox
+    //ViewBag.apartmentAndPrice
+    //ViewBag.bookingRequest    
+
+    TranslateBox tBox = ViewBag.tBox;
+    ApartmentPrice theApartmentAndPrice = ViewBag.apartmentAndPrice;
+    Apartment theApartment = theApartmentAndPrice.theApartment;
+    BookingRequest theBookingRequest = ViewBag.bookingRequest;
+}
+<div class="sidebar booking-form" id="bookingFormWrapper">
+    <div class="helper">
+        <h4>@tBox.translate("Apartment") @theApartment.number</h4>
+        <h3>@tBox.translate("Dates") @theBookingRequest.checkInOutDates()</h3>
+        <br />
+        <h3>@tBox.translate("We are sorry, the apartment has just been booked. Please check if another apartment is available")</h3>
+       
+    </div>
+</div>

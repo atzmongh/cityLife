@@ -7,6 +7,7 @@ using System.Web.Mvc;
 using System.Web.Configuration;
 using cityLife4;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace cityLife.Controllers
 {
@@ -55,6 +56,43 @@ namespace cityLife.Controllers
             return checkInOut;
         }
     }
+
+    public class FieldData
+    {
+        public string content="";
+        public string errorMessage = "";
+        public string errorOrNot
+        {
+            get
+            {
+                return errorMessage != "" ? "error" : "";
+            }
+        }
+       
+    }
+        
+    public class BookingFormData
+    {
+        public FieldData name = new FieldData();
+        public FieldData country = new FieldData();
+        public FieldData email = new FieldData();
+        public FieldData phone = new FieldData();
+        public FieldData arrivalTime = new FieldData();
+        public FieldData specialRequest = new FieldData();
+
+        public bool errorExists()
+        {
+            if (name.errorMessage != "" ||
+                country.errorMessage != "" ||
+                email.errorMessage != "" ||
+                phone.errorMessage != "" ||
+                arrivalTime.errorMessage != "" ||
+                specialRequest.errorMessage != "")
+                return true;
+            else return false;
+        }
+    }
+   
     public class PublicController : Controller
     {
         /// <summary>
@@ -92,18 +130,6 @@ namespace cityLife.Controllers
         [HttpGet]
         public ActionResult p25apartmentDetails(int apartmentId)
         {
-            //get country list
-            string filePath = Server.MapPath("/App_Data/countryList.txt");
-            StreamReader reader = new StreamReader(filePath);
-            List<string> countryList = new List<string>();
-
-            while (!reader.EndOfStream)
-            {
-                string aCountry = reader.ReadLine();
-                countryList.Add(aCountry);
-            }
-            
-
             //Look for the apartment for which we need to book
             ApartmentPrice theApartmentAndPrice;
             try
@@ -125,7 +151,6 @@ namespace cityLife.Controllers
                 ViewBag.pageURL = "/public/p25apartmentDetails";
                 ViewBag.Title = "apartment details";
                 ViewBag.preferredDevice = this.preferredDevice();
-                ViewBag.countryList = countryList;
 
             }
             catch (Exception e)
@@ -139,6 +164,78 @@ namespace cityLife.Controllers
             return View("p25apartmentDetails");
         }
         [HttpGet]
+        public PartialViewResult p26bookingForm(int apartmentId)
+        {
+            this.prepareDataForp26p27(apartmentId);
+            ViewBag.bookingFormData = new BookingFormData();   //Empty booking form data, as this is a new form with no data
+
+
+            return PartialView("p26bookingForm");
+
+        }
+      
+
+        [HttpPost]
+        public PartialViewResult p27bookingOrder(int apartmentId, string name, string country, string email, string phone, string arrivalTime, string specialRequest)
+        {
+            prepareDataForp26p27(apartmentId);
+
+            //perform validity chekcs on the input
+            BookingFormData theBookingFormData = new BookingFormData();
+            theBookingFormData.name.content = name;
+            if (name == "")
+            {
+                theBookingFormData.name.errorMessage = "Please enter your name";
+            }
+            theBookingFormData.country.content = country;
+            if (country == "")
+                theBookingFormData.country.errorMessage = "Please enter your country name";
+            theBookingFormData.email.content = email;
+            if (!this.IsValidEmail(email))
+                theBookingFormData.email.errorMessage = "Please enter a valid email address";
+            theBookingFormData.phone.content = phone;
+            if (!Regex.Match(phone, @"^(\+?[0-9]{10,13})$").Success)
+                theBookingFormData.phone.errorMessage = "Please enter a valid phone number";
+
+            theBookingFormData.arrivalTime.content = arrivalTime;
+            theBookingFormData.specialRequest.content = specialRequest;
+
+            ViewBag.bookingFormData = theBookingFormData;
+            if (theBookingFormData.errorExists())
+            {
+                return PartialView("p26bookingForm");
+            }
+            else
+            {
+                //The form is valid - create the booking order
+                //Check if the booking request is still valid.
+               
+               
+                cityLifeDBContainer1 db = new cityLifeDBContainer1();
+                Apartment theAparatment = db.Apartments.Single(anApartment => anApartment.Id == apartmentId);
+                BookingRequest theBookingRequest = (BookingRequest)Session["bookingRequest"];
+                Currency currentCurrency = (Currency)Session["currentCurrency"];
+                ApartmentPrice apartmentAndPrice = this.calculatePricePerStayForApartment(theAparatment, db, theBookingRequest, currentCurrency);
+
+                if (apartmentAndPrice.availability != Availability.AVAILABLE)  ///TBD for testing
+                {
+                    //the apartment is not available, although it seemed to be available. Perhaps it was taken in the last minutes
+                    return PartialView("p27bookingFailure");
+                }
+                else
+                {
+                    //Complete the booking
+                    return PartialView("p27bookingFailure");
+                }
+
+                
+                
+
+            }
+           
+        }
+
+        [HttpGet]
         public ActionResult p30apartments(string language, string currency, DateTime? fromDate, DateTime? toDate, int? adultsCount, int? childrenCount)
         {
             this.prepareApartmentData(language, currency, fromDate, toDate, adultsCount, childrenCount);
@@ -148,43 +245,6 @@ namespace cityLife.Controllers
 
             return View("p30apartments");
         }
-
-        [HttpPost]
-        public ActionResult p40bookingForm(int apartmentId)
-        {
-            //Look for the apartment for which we need to book
-            ApartmentPrice theApartmentAndPrice;
-            try
-            {
-                List<ApartmentPrice> apartments = (List<ApartmentPrice>)Session["apartments"];
-                string currentLanguage = (string)Session["currentLanguage"];
-                Currency currentCurrency = (Currency)Session["currentCurrency"];
-                BookingRequest theBookingRequest = (BookingRequest)Session["bookingRequest"];
-                theApartmentAndPrice = apartments.Single(a => a.theApartment.Id == apartmentId);
-
-                cityLifeDBContainer1 db = new cityLifeDBContainer1();
-                ViewBag.tBox = this.setTbox(currentLanguage);
-                ViewBag.languages = db.Languages;
-                ViewBag.currentLanguage = currentLanguage;
-                ViewBag.currencies = db.Currencies;
-                ViewBag.currentCurrency = currentCurrency;
-                ViewBag.bookingRequest = theBookingRequest;
-                ViewBag.pageURL = "/public/p40bookingForm";
-                ViewBag.Title = "booking form";
-
-            }
-            catch (Exception e)
-            {
-                //We could not find the requested apartment in the List<apartmentPrice>, although it should have been there.
-                //Write an error to the log and continue
-                AppException.writeException(112, e, e.StackTrace, apartmentId);
-                Server.Transfer("/home");
-            }
-
-
-            return View("p40bookingForm");
-        }
-
         private void prepareApartmentData(string language, string currency, DateTime? fromDate, DateTime? toDate, int? adultsCount, int? childrenCount)
         {
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
@@ -230,6 +290,30 @@ namespace cityLife.Controllers
 
         }
 
+        private void prepareDataForp26p27(int apartmentId)
+        {
+            ApartmentPrice theApartmentAndPrice;
+            try
+            {
+                List<ApartmentPrice> apartments = (List<ApartmentPrice>)Session["apartments"];
+                BookingRequest theBookingRequest = (BookingRequest)Session["bookingRequest"];
+                theApartmentAndPrice = apartments.Single(a => a.theApartment.Id == apartmentId);
+                string currentLanguage = (string)Session["currentLanguage"];
+
+                cityLifeDBContainer1 db = new cityLifeDBContainer1();
+                ViewBag.apartmentAndPrice = theApartmentAndPrice;
+                ViewBag.tBox = this.setTbox(currentLanguage);
+                ViewBag.bookingRequest = theBookingRequest;
+                ViewBag.countryList = this.countryList();
+            }
+            catch (Exception e)
+            {
+                //We could not find the requested apartment in the List<apartmentPrice>, although it should have been there.
+                //Write an error to the log and continue
+                AppException.writeException(112, e, e.StackTrace, apartmentId);
+                Server.Transfer("/home");
+            }
+        }
         /// <summary>
         /// the method  is called when the user entered booking information and pressed the search button. 
         /// The method calculates the price per each apartment and whether it is available and suitable for
@@ -250,88 +334,103 @@ namespace cityLife.Controllers
             //Check apartment availability for the given dates and for the given occupation
             foreach (var anApartment in db.Apartments)
             {
-                var apartmentDays = from anApartmentDay in db.ApartmentDays
-                                    where anApartmentDay.Apartment.Id == anApartment.Id &&
-                                    anApartmentDay.date >= theBookingRequest.checkinDate && 
-                                    anApartmentDay.date < theBookingRequest.checkoutDate
-                                    select anApartmentDay;
+                ApartmentPrice apartmentAndPrice = this.calculatePricePerStayForApartment(anApartment, db, theBookingRequest, theCurrency);
+                apartmentList.Add(apartmentAndPrice);
+            }
 
-                var nonFreeDays = from anApartmentDay in apartmentDays
-                                  where anApartmentDay.status != ApartOccuStatus.Free
-                                  select anApartmentDay;
-                if (nonFreeDays.Count() == 0) 
+            //At this point the apartment list contains the list of apartments plus the price per stay for each and whether it is suitable or not
+            return apartmentList;
+        }
+
+        /// <summary>
+        /// the method calculates the availability and price per stay for a specific apartment
+        /// </summary>
+        /// <param name="anApartment">the apartment for which we need to calculate availability</param>
+        /// <param name="db"></param>
+        /// <param name="theBookingRequest"></param>
+        /// <param name="theCurrency"></param>
+        /// <returns>apartment availability and price information</returns>
+        private ApartmentPrice calculatePricePerStayForApartment(Apartment anApartment, cityLifeDBContainer1 db, BookingRequest theBookingRequest, Currency theCurrency)
+        {
+            ApartmentPrice apartmentAndPrice;
+            var apartmentDays = from anApartmentDay in db.ApartmentDays
+                                where anApartmentDay.Apartment.Id == anApartment.Id &&
+                                anApartmentDay.date >= theBookingRequest.checkinDate &&
+                                anApartmentDay.date < theBookingRequest.checkoutDate
+                                select anApartmentDay;
+
+            var nonFreeDays = from anApartmentDay in apartmentDays
+                              where anApartmentDay.status != ApartOccuStatus.Free
+                              select anApartmentDay;
+            if (nonFreeDays.Count() == 0)
+            {
+                //The apartment is free for the requested period - check number of adults and children
+                var pricing = from aPricing in db.Pricings
+                              where aPricing.Apartment.Id == anApartment.Id &&
+                                    aPricing.adults == theBookingRequest.adults &&
+                                    aPricing.children == theBookingRequest.children
+                              select aPricing;
+                if (pricing.Count() > 0)
                 {
-                    //The apartment is free for the requested period - check number of adults and children
-                    var pricing = from aPricing in db.Pricings
-                                  where aPricing.Apartment.Id == anApartment.Id &&
-                                        aPricing.adults == theBookingRequest.adults &&
-                                        aPricing.children == theBookingRequest.children
-                                  select aPricing;
-                    if (pricing.Count() > 0)
-                    {
-                        //The apartment is suitable for that number of people. Calculate the price per stay and
-                        //add the apartment to the list of available apartments
-                        Pricing thePricing = pricing.First();  //Anyway we assume that only a single record will be found.
+                    //The apartment is suitable for that number of people. Calculate the price per stay and
+                    //add the apartment to the list of available apartments
+                    Pricing thePricing = pricing.First();  //Anyway we assume that only a single record will be found.
 
-                        Money pricePerDay;
-                        Money pricePerStay = new Money(0M, thePricing.Currency.currencyCode);
-                        for (DateTime aDate = (DateTime)theBookingRequest.checkinDate; aDate < theBookingRequest.checkoutDate; aDate = aDate.AddDays(1))
-                        {
-                            if (aDate.IsWeekend())
-                            {
-                                pricePerDay = new Money(thePricing.priceWeekendAsMoney());
-                            }
-                            else
-                            {
-                                pricePerDay = new Money(thePricing.priceWeekdayAsMoney());
-                            }
-                            //Check if there is a discount for that day
-                            ApartmentDay anApartmentDay = apartmentDays.SingleOrDefault(record => record.date == aDate);
-                            if (anApartmentDay != null)
-                            {
-                                //There is an apartmentDay record for that day - it should contain a price factor. 
-                                pricePerDay *= anApartmentDay.priceFactor;
-                            }
-                            pricePerStay += pricePerDay;
-                        }
-                        //At this point pricePerStay contains the total price for staying in the apartment. 
-                        //COnvert it to the target currency
-                        Money pricePerStayTargetCurrency = pricePerStay.converTo(theCurrency.currencyCode, FakeDateTime.Now);
-                        int nightCount = ((TimeSpan)(theBookingRequest.checkoutDate - theBookingRequest.checkinDate)).Days;
-                        ApartmentPrice apartmentAndPrice = new ApartmentPrice()
-                        {
-                            theApartment = anApartment,
-                            pricePerStay = pricePerStayTargetCurrency,
-                            minPricePerNight = null,
-                            nightCount = nightCount,
-                            availability = Availability.AVAILABLE
-                        };
-                        apartmentList.Add(apartmentAndPrice);
-                    }
-                    else
+                    Money pricePerDay;
+                    Money pricePerStay = new Money(0M, thePricing.Currency.currencyCode);
+                    for (DateTime aDate = (DateTime)theBookingRequest.checkinDate; aDate < theBookingRequest.checkoutDate; aDate = aDate.AddDays(1))
                     {
-                        //The apartment is not available because of number of people
-                        ApartmentPrice apartmentAndPrice = new ApartmentPrice()
+                        if (aDate.IsWeekend())
                         {
-                            theApartment = anApartment, availability = Availability.NOT_SUITABLE
-                        };
-                        apartmentList.Add(apartmentAndPrice);
+                            pricePerDay = new Money(thePricing.priceWeekendAsMoney());
+                        }
+                        else
+                        {
+                            pricePerDay = new Money(thePricing.priceWeekdayAsMoney());
+                        }
+                        //Check if there is a discount for that day
+                        ApartmentDay anApartmentDay = apartmentDays.SingleOrDefault(record => record.date == aDate);
+                        if (anApartmentDay != null)
+                        {
+                            //There is an apartmentDay record for that day - it should contain a price factor. 
+                            pricePerDay *= anApartmentDay.priceFactor;
+                        }
+                        pricePerStay += pricePerDay;
                     }
+                    //At this point pricePerStay contains the total price for staying in the apartment. 
+                    //COnvert it to the target currency
+                    Money pricePerStayTargetCurrency = pricePerStay.converTo(theCurrency.currencyCode, FakeDateTime.Now);
+                    int nightCount = ((TimeSpan)(theBookingRequest.checkoutDate - theBookingRequest.checkinDate)).Days;
+                    apartmentAndPrice = new ApartmentPrice()
+                    {
+                        theApartment = anApartment,
+                        pricePerStay = pricePerStayTargetCurrency,
+                        minPricePerNight = null,
+                        nightCount = nightCount,
+                        availability = Availability.AVAILABLE
+                    };
                 }
                 else
                 {
-                    //The apartment is not free at that period
-                    ApartmentPrice apartmentAndPrice = new ApartmentPrice()
+                    //The apartment is not available because of number of people
+                    apartmentAndPrice = new ApartmentPrice()
                     {
                         theApartment = anApartment,
-                        availability = Availability.OCCUPIED
+                        availability = Availability.NOT_SUITABLE
                     };
-                    apartmentList.Add(apartmentAndPrice);
-
                 }
             }
-            //At this point the apartment list contains the list of apartments plus the price per stay for each and whether it is suitable or not
-            return apartmentList;
+            else
+            {
+                //The apartment is not free at that period
+                apartmentAndPrice = new ApartmentPrice()
+                {
+                    theApartment = anApartment,
+                    availability = Availability.OCCUPIED
+                };
+            }
+            return apartmentAndPrice;
+
         }
 
         /// <summary>
@@ -450,6 +549,33 @@ namespace cityLife.Controllers
             else
             {
                 return DisplayDevice.DESKTOP;
+            }
+        }
+
+        private List<string> countryList()
+        {
+            string filePath = Server.MapPath("/App_Data/countryList.txt");
+            StreamReader reader = new StreamReader(filePath);
+            List<string> countryList = new List<string>();
+
+            while (!reader.EndOfStream)
+            {
+                string aCountry = reader.ReadLine();
+                countryList.Add(aCountry);
+            }
+            return countryList;
+        }
+
+        private bool IsValidEmail(string email)
+        {
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
             }
         }
 

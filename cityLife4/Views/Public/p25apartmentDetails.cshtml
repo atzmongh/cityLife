@@ -10,7 +10,7 @@
     //ViewBag.Title = "apartment details";
     //ViewBag.preferredDevice = this.preferredDevice();
     //ViewBag.bookingRequest = theBookingRequest;
-    //ViewBag.countryList = countryList;
+  
 
     ApartmentPrice theApartmentAndPrice = ViewBag.apartmentAndPrice;
     Apartment theApartment = theApartmentAndPrice.theApartment;
@@ -23,7 +23,6 @@
     TranslateBox tBox = ViewBag.tBox;
     DisplayDevice preferredDevice = ViewBag.preferredDevice;
     BookingRequest theBookingRequest = ViewBag.bookingRequest;
-    List<string> countryList = ViewBag.countryList;
 }
 
 <div class="wrapper">
@@ -59,106 +58,59 @@
         }
     </div>
 
-    <div class="sidebar" id="apartmentData">
-        <div class="hidden-on-mobile">
-            <h4>@tBox.translate("Apartment") @theApartment.number</h4>
-            <h2 class="underlined"><a href="#">@tBox.translate(theApartment.nameKey)</a></h2>
-            <div class="price">@price</div>
-        </div>
-        <ul class="dscr-list">
-            @foreach (var aFeatureKey in theApartment.featureKeyList())
-            {
-                <li>@tBox.translate(aFeatureKey)</li>
-            }
-        </ul>
-        @{
-            string disabledOrNot = "disabled";
-            if (theApartmentAndPrice.availability == Availability.AVAILABLE)
-            {
-                disabledOrNot = "";
-            }
-        }
-        <button class="btn" onclick="showBookingForm()" @disabledOrNot>@tBox.translate("Book Now")</button>
-
-        <p class="note blue">@tBox.translate("No credit card needed you can cancel any time")</p>
-        <div class="description">
-            @foreach (var descriptionKey in theApartment.descriptionKeyList())
-            {
-                <p>@tBox.translate(descriptionKey)</p>
-            }
-        </div>
-    </div>
-
-    <div class="sidebar booking-form" id="bookingForm" style="display:none">
-        <div class="helper">
-            <h4>@tBox.translate("Apartment") @theApartment.number</h4>
-            <h2 class="underlined"><a href="#">@theBookingRequest.checkInOutDates()</a></h2>
-            <div class="form">
-                <form>
-                    @*when an element has eror - add the calss "error to its div and write error message in field-error*@
-                    <div class="field-box">
-                        <input type="text" id="name">
-                        <label for="name">
-                            <span class="field-name"> @tBox.translate("Name")</span>
-                        </label>
-                        <span class="field-error"></span>
-                    </div>
-                    <div class="field-box select-box error">
-                        <input list="countryList" name="country" />
-                        <datalist id="countryList">
-                            @foreach (var aCountry in countryList)
-                            {
-                                <option value="@aCountry" />
-                            }
-                        </datalist>
-                        <label>
-                            <span class="field-name">@tBox.translate("Country")</span>
-                        </label>
-                        <span class="field-error"></span>
-                    </div>
-                    <div class="field-box">
-                        <input type="email" id="email">
-                        <label for="email">
-                            <span class="field-name">@tBox.translate("Email")</span>
-                        </label>
-                        <span class="field-error"></span>
-                    </div>
-                    <div class="field-box">
-                        <input type="tel" id="phone">
-                        <label for="phone">
-                            <span class="field-name">@tBox.translate("Phone")</span>
-                        </label>
-                        <span class="field-error"></span>
-                    </div>
-                    <div class="field-box">
-                        <input type="text" id="arrival">
-                        <label for="arrival">
-                            <span class="field-name">@tBox.translate("expected arrival time")</span>
-                        </label>
-                        <span class="field-error"></span>
-                    </div>
-                    <div class="field-box">
-                        <textarea id="message"></textarea>
-                        <label for="message">
-                            <span class="field-name">@tBox.translate("special request")</span>
-                        </label>
-                        <span class="field-error"></span>
-                    </div>
-                </form>
+    <div id="rightPane">
+        <div class="sidebar" id="apartmentData">
+            <div class="hidden-on-mobile">
+                <h4>@tBox.translate("Apartment") @theApartment.number</h4>
+                <h2 class="underlined"><a href="#">@tBox.translate(theApartment.nameKey)</a></h2>
+                <div class="price">@price</div>
             </div>
-        </div>
-        <div class="helper">
-            <div class="total-sum">
-                Total:
-                <span>@price</span>
+            <ul class="dscr-list">
+                @foreach (var aFeatureKey in theApartment.featureKeyList())
+                {
+                    <li>@tBox.translate(aFeatureKey)</li>
+                }
+            </ul>
+            @{
+                string disabledOrNot = "disabled";
+                if (theApartmentAndPrice.availability == Availability.AVAILABLE)
+                {
+                    disabledOrNot = "";
+                }
+            }
+            <button class="btn" onclick="getBookingForm(@theApartment.Id)" @disabledOrNot>@tBox.translate("Book Now")</button>
+
+            <p class="note blue">@tBox.translate("No credit card needed you can cancel any time")</p>
+            <div class="description">
+                @foreach (var descriptionKey in theApartment.descriptionKeyList())
+                {
+                    <p>@tBox.translate(descriptionKey)</p>
+                }
             </div>
-            <input type="submit" class="btn" value="Book now">
         </div>
     </div>
 </div>
 <script>
-    function showBookingForm() {
-        $("#apartmentData").hide();
-        $("#bookingForm").show();
+    function getBookingForm(apartmentId) {
+        var theApartment = {};
+        theApartment.apartmentId = apartmentId;
+        $.get("/public/p26bookingForm", theApartment).done(displayBookingForm);
+    }
+
+    function displayBookingForm(bookingFormHtml) {
+        $("#rightPane").empty();
+        $("#rightPane").append(bookingFormHtml);
+        focusAnim();  //
+    }
+    function sendBookingData() {
+        var theForm = $("#bookingForm");
+        var bookingFormParameters = theForm.serializeArray();
+        $.post("/public/p27bookingOrder", bookingFormParameters).done(displayBookingResult);
+    }
+    function displayBookingResult(bookingResultHtml) {
+        $("#rightPane").empty();
+        $("#rightPane").append(bookingResultHtml);
+        focusAnim();
     }
 </script>
+ 
