@@ -34,7 +34,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <LangVersion>6</LangVersion>
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -43,7 +43,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <LangVersion>7.2</LangVersion>
+    <LangVersion>6</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
@@ -162,14 +162,89 @@
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>cityLifeDB.Designer.cs</LastGenOutput>
     </EntityDeploy>
+    <Content Include="images\apartment 05\IMG_0357.JPG" />
+    <Content Include="images\apartment 05\IMG_0357_tn.jpg" />
+    <Content Include="images\apartment 05\IMG_0361.JPG" />
+    <Content Include="images\apartment 05\IMG_0361_tn.jpg" />
+    <Content Include="images\apartment 05\IMG_0362.JPG" />
+    <Content Include="images\apartment 05\IMG_0362_tn.jpg" />
+    <Content Include="images\apartment 05\IMG_0363.JPG" />
+    <Content Include="images\apartment 05\IMG_0363_tn.jpg" />
+    <Content Include="images\apartment 05\IMG_0366.JPG" />
+    <Content Include="images\apartment 05\IMG_0366_tn.jpg" />
+    <Content Include="images\apartment 05\IMG_0369.JPG" />
+    <Content Include="images\apartment 05\IMG_0369_tn.jpg" />
+    <Content Include="images\apartment 05\IMG_0381.JPG" />
+    <Content Include="images\apartment 05\IMG_0381_tn.jpg" />
+    <Content Include="images\apartment 05\IMG_0382.JPG" />
+    <Content Include="images\apartment 05\IMG_0382_tn.jpg" />
+    <Content Include="images\apartment 05\IMG_0383.JPG" />
+    <Content Include="images\apartment 05\IMG_0383_tn.jpg" />
+    <Content Include="images\apartment 05\IMG_0387.JPG" />
+    <Content Include="images\apartment 05\IMG_0387_tn.jpg" />
+    <Content Include="images\apartment 05\IMG_0390.JPG" />
+    <Content Include="images\apartment 05\IMG_0390_tn.jpg" />
+    <Content Include="images\apartment 05\IMG_0395.JPG" />
+    <Content Include="images\apartment 05\IMG_0395_tn.jpg" />
+    <Content Include="images\apartment 05\IMG_0399.JPG" />
+    <Content Include="images\apartment 05\IMG_0399_tn.jpg" />
+    <Content Include="images\apartment 05\IMG_0403.JPG" />
+    <Content Include="images\apartment 05\IMG_0403_tn.jpg" />
+    <Content Include="images\apartment 05\IMG_0405.JPG" />
+    <Content Include="images\apartment 05\IMG_0405_tn.jpg" />
+    <Content Include="images\apartment 05\IMG_0414.JPG" />
+    <Content Include="images\apartment 05\IMG_0414_tn.jpg" />
+    <Content Include="images\apartment 05\IMG_0418.JPG" />
+    <Content Include="images\apartment 05\IMG_0418_tn.jpg" />
+    <Content Include="images\apartment 05\IMG_0419.JPG" />
+    <Content Include="images\apartment 05\IMG_0419_tn.jpg" />
+    <Content Include="images\apartment 05\main_photo_05.JPG" />
+    <Content Include="images\apartment 05\main_photo_05_tn.jpg" />
+    <Content Include="images\apartment 14\20170819_192705.jpg" />
+    <Content Include="images\apartment 14\20170819_192705_tn.jpg" />
+    <Content Include="images\apartment 14\20170819_192723.jpg" />
+    <Content Include="images\apartment 14\20170819_192723_tn.jpg" />
+    <Content Include="images\apartment 14\20170819_192738.jpg" />
+    <Content Include="images\apartment 14\20170819_192738_tn.jpg" />
+    <Content Include="images\apartment 14\20170819_192808.jpg" />
+    <Content Include="images\apartment 14\20170819_192808_tn.jpg" />
+    <Content Include="images\apartment 14\20170819_192837.jpg" />
+    <Content Include="images\apartment 14\20170819_192837_tn.jpg" />
+    <Content Include="images\apartment 14\20170819_192844.jpg" />
+    <Content Include="images\apartment 14\20170819_192844_tn.jpg" />
+    <Content Include="images\apartment 14\20170819_192853.jpg" />
+    <Content Include="images\apartment 14\20170819_192853_tn.jpg" />
+    <Content Include="images\apartment 14\20170819_192901.jpg" />
+    <Content Include="images\apartment 14\20170819_192901_tn.jpg" />
+    <Content Include="images\apartment 14\20170819_192913.jpg" />
+    <Content Include="images\apartment 14\20170819_192913_tn.jpg" />
+    <Content Include="images\apartment 14\20170819_192943.jpg" />
+    <Content Include="images\apartment 14\20170819_192943_tn.jpg" />
+    <Content Include="images\apartment 14\20170819_192957.jpg" />
+    <Content Include="images\apartment 14\20170819_192957_tn.jpg" />
+    <Content Include="images\apartment 14\20170819_193010.jpg" />
+    <Content Include="images\apartment 14\20170819_193010_tn.jpg" />
+    <Content Include="images\apartment 14\20170819_193026.jpg" />
+    <Content Include="images\apartment 14\20170819_193026_tn.jpg" />
+    <Content Include="images\apartment 14\20170819_193033.jpg" />
+    <Content Include="images\apartment 14\20170819_193033_tn.jpg" />
+    <Content Include="images\apartment 14\20170819_193050.jpg" />
+    <Content Include="images\apartment 14\20170819_193050_tn.jpg" />
+    <Content Include="images\apartment 14\20170819_193127.jpg" />
+    <Content Include="images\apartment 14\20170819_193127_tn.jpg" />
+    <Content Include="images\apartment 14\20170819_193235.jpg" />
+    <Content Include="images\apartment 14\20170819_193235_tn.jpg" />
+    <Content Include="images\apartment 14\20170819_193301.jpg" />
+    <Content Include="images\apartment 14\20170819_193301_tn.jpg" />
+    <Content Include="images\apartment 14\20170819_193359.jpg" />
+    <Content Include="images\apartment 14\20170819_193359_tn.jpg" />
+    <Content Include="images\apartment 14\main_photo_14.JPG" />
+    <Content Include="images\apartment 14\main_photo_14P.jpg" />
+    <Content Include="images\apartment 22\main_photo_22.jpg" />
+    <Content Include="images\apartment 23\main_photo_23.JPG" />
+    <Content Include="images\apartment 24\main_photo_24.JPG" />
+    <Content Include="images\apartment 24\main_photo_24P.jpg" />
     <Content Include="images\defaultLandscape.jpg" />
-    <Content Include="images\main_photo_05.JPG" />
-    <Content Include="images\main_photo_14.JPG" />
-    <Content Include="images\main_photo_14P.jpg" />
-    <Content Include="images\main_photo_22.jpg" />
-    <Content Include="images\main_photo_23.JPG" />
-    <Content Include="images\main_photo_24.JPG" />
-    <Content Include="images\main_photo_24P.jpg" />
     <Content Include="images\marker.png" />
     <Content Include="App_Data\countryList.txt" />
     <Content Include="Views\Admin\Index.cshtml" />
@@ -319,8 +394,12 @@
     <Content Include="Views\Public\p26bookingForm.cshtml" />
     <Content Include="Views\Public\p27bookingFailure.cshtml" />
     <Content Include="Views\Public\p28bookingSuccess.cshtml" />
+    <None Include="Properties\PublishProfiles\cityLife4 - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\cityLife4 - Web Deploy1.pubxml" />
+    <None Include="Properties\PublishProfiles\cityLife4VM - Web Deploy.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
+      <SubType>Designer</SubType>
     </None>
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>

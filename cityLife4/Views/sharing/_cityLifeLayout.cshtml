@@ -238,6 +238,14 @@
             </div>
         </footer>
     </main>
+    <script>
+        @{ 
+            var yearNow = FakeDateTime.Now.Year;
+            var monthNow = FakeDateTime.Now.Month-1;
+            var dayNow = FakeDateTime.Now.Day;
+        }
+        var timeNow = new Date(@yearNow,@monthNow,@dayNow);
+    </script>
     <script src="/js/libs.js"></script>
     <script src="/js/scripts.js"></script>
 </body>

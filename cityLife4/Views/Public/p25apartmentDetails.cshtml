@@ -10,7 +10,7 @@
     //ViewBag.Title = "apartment details";
     //ViewBag.preferredDevice = this.preferredDevice();
     //ViewBag.bookingRequest = theBookingRequest;
-  
+
 
     ApartmentPrice theApartmentAndPrice = ViewBag.apartmentAndPrice;
     Apartment theApartment = theApartmentAndPrice.theApartment;
@@ -72,13 +72,30 @@
                 }
             </ul>
             @{
-                string disabledOrNot = "disabled";
-                if (theApartmentAndPrice.availability == Availability.AVAILABLE)
+                string disabledOrNot = "";
+                string buttonText = "";
+
+                switch (theApartmentAndPrice.availability)
                 {
-                    disabledOrNot = "";
+                    case Availability.AVAILABLE:
+                        buttonText = tBox.translate("Book Now");
+                        disabledOrNot = "";
+                        break;
+                    case Availability.NOT_SUITABLE:
+                        buttonText = tBox.translate("Not Suitable");
+                        disabledOrNot = "disabled";
+                        break;
+                    case Availability.OCCUPIED:
+                        buttonText = tBox.translate("Not Available");
+                        disabledOrNot = "disabled";
+                        break;
+                    case Availability.UNKNOWN:
+                        buttonText = tBox.translate("Check Availability");
+                        disabledOrNot = "disabled";
+                        break;
                 }
             }
-            <button class="btn" onclick="getBookingForm(@theApartment.Id)" @disabledOrNot>@tBox.translate("Book Now")</button>
+            <button class="btn" onclick="getBookingForm(@theApartment.Id)" @disabledOrNot>@buttonText</button>
 
             <p class="note blue">@tBox.translate("No credit card needed you can cancel any time")</p>
             <div class="description">
@@ -113,4 +130,3 @@
         focusAnim();
     }
 </script>
- 

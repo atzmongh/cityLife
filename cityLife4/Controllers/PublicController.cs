@@ -209,8 +209,6 @@ namespace cityLife.Controllers
             {
                 //The form is valid - create the booking order
                 //Check if the booking request is still valid.
-               
-               
                 cityLifeDBContainer1 db = new cityLifeDBContainer1();
                 Apartment theAparatment = db.Apartments.Single(anApartment => anApartment.Id == apartmentId);
                 BookingRequest theBookingRequest = (BookingRequest)Session["bookingRequest"];
@@ -230,14 +228,21 @@ namespace cityLife.Controllers
                     var dayCount = (checkOut - checkIn).Days;
                     Currency theCurrency = db.Currencies.Single(a => a.currencyCode == apartmentAndPrice.pricePerStay.currency);
 
-                    Guest theGuest = new Guest()
+                    Guest theGuest = db.Guests.FirstOrDefault
+                        (aGuest=> aGuest.email == email && aGuest.name == name && aGuest.phone == phone && aGuest.country == country);
+
+                    if (theGuest == null)
                     {
-                         name = name,
-                         phone = phone,
-                         email = email,
-                         country = country
-                    };
-                    db.Guests.Add(theGuest);
+                        //there is no such guest - create new
+                        theGuest = new Guest()
+                        {
+                            name = name,
+                            phone = phone,
+                            email = email,
+                            country = country
+                        };
+                        db.Guests.Add(theGuest);
+                    }
 
                     Order theOrder = new Order()
                     {
@@ -258,13 +263,15 @@ namespace cityLife.Controllers
                         Currency = theCurrency
                     };
                     db.Orders.Add(theOrder);
-                   
 
-                    for(var aDay = checkIn;aDay < checkOut; aDay = aDay.AddDays(1))
+
+                    //Create or update the apartment day records (a record for each apartment-day)
+                    for (var aDay = checkIn;aDay < checkOut; aDay = aDay.AddDays(1))
                     {
                         ApartmentDay anApartmentDay = db.ApartmentDays.SingleOrDefault(a => a.date == aDay && a.Apartment.Id == theAparatment.Id);
                         if (anApartmentDay == null)
                         {
+                            //record does not exist - create it
                             anApartmentDay = new ApartmentDay()
                             {
                                  Order = theOrder,
@@ -300,14 +307,27 @@ namespace cityLife.Controllers
 
                     return PartialView("p28bookingSuccess");
                 }
-
-                
-                
-
             }
-           
         }
 
+        public JsonResult p29checkEmailExists(string email)
+        {
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+            var theGuests = from aGuest in db.Guests
+                                           where aGuest.email == email
+                                           select new {aGuest.name, aGuest.phone, aGuest.country};
+            JsonResult jResult;
+            if (theGuests.Count() == 1)
+            {
+                //There is exactly 1 guest with that email - send his personal details as default
+                jResult = Json(theGuests.First(), JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                jResult = Json(new { name = "",phone="",country="" }, JsonRequestBehavior.AllowGet);
+            }
+            return jResult;
+        }
         [HttpGet]
         public ActionResult p30apartments(string language, string currency, DateTime? fromDate, DateTime? toDate, int? adultsCount, int? childrenCount)
         {

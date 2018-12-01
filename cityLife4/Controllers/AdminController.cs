@@ -38,6 +38,8 @@ namespace cityLife.Controllers
         [HttpGet]
         public ActionResult uploadDB()
         {
+            var connectionString = ConfigurationManager.ConnectionStrings["cityLifeDBContainer1"];
+            ViewBag.connectionString = connectionString.ConnectionString;
             return View();
         }
         [HttpPost]
@@ -54,6 +56,7 @@ namespace cityLife.Controllers
 
             PopulateDB(db, csvFileStream);
 
+          
 
             return View("uploadDB");
         }
