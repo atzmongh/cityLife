@@ -251,6 +251,10 @@ namespace cityLife.Controllers
                 string[] lineFields = parser.ReadFields();
                 int columnCount = 0;
                 string setIdentityOn = "";
+                bool idExists = false;
+                int firstColumn= -1;  //This is the first "real" column, not including table name and id, if exists (id must be the first data column)
+                Dictionary<string, int> symbolicIdList = new Dictionary<string, int>();
+
                 while (lineFields != null)
                 {
                     if (lineFields[0] != "")
@@ -259,20 +263,24 @@ namespace cityLife.Controllers
                         tableName = lineFields[0];
                         columnNames.Clear();
                         columnNames = new List<string>();
-
-                        //copy all column names to the columnNames list - if the first column is "id" - generate a "set identity_insert on command"
-                        //so that we can insert ids explicitly
+                       
+                        
+                        //copy all column names to the columnNames list - if the first column is "id" - skip it
                         if (lineFields[1] == "id")
                         {
-                            setIdentityOn = "SET IDENTITY_INSERT " + tableName + " ON;";
+                            //setIdentityOn = "SET IDENTITY_INSERT " + tableName + " ON;";  //We changed the logic, so that we always use auto increment
+                            //and support symbolic values for ids and foreign keys in the form of *<name>
+                            idExists = true;
+                            firstColumn = 2;
                         }
                         else
                         {
-                            setIdentityOn = "";
+                            idExists = false;
+                            firstColumn = 1;
                         }
 
                         int i;
-                        for (i = 1; i < lineFields.Count(); i++)
+                        for (i = firstColumn; i < lineFields.Count(); i++)
                         {
                             if (lineFields[i] == "")
                             {
@@ -291,44 +299,81 @@ namespace cityLife.Controllers
                     else
                     {
                         //this is a data line - create an insert command to insert it into the DB
-                        //Copy all value names into the valueName list
+                        //Copy all value names into the column value list
                         columnValues.Clear();
 
                         bool valuesExist = false;
-                        for (int i = 1; i < columnCount; i++)
+                        string symbolicId = "";
+                        if (idExists && lineFields[1].StartsWith("*"))
+                        {
+                            //The first column is id, and it is a symbolic value - keep it for later.
+                            symbolicId = lineFields[1];
+                        }
+                        for (int i = firstColumn; i < columnCount; i++)
                         {
                             if (lineFields[i] != "")
                             {
                                 valuesExist = true;
                             }
-                            columnValues.Add(lineFields[i]);
+                            
+                            if (lineFields[i].StartsWith("*"))
+                            {
+                                //The column contains a symbolic reference (a foreign key) to a previously defined ID
+                                try
+                                {
+                                    int foreignKey = symbolicIdList[lineFields[i]];
+                                    columnValues.Add(foreignKey.ToString());  //add the foreign key, instead of the symbolic reference
+                                }
+                                catch(Exception e)
+                                {
+                                    throw new AppException(114, null, lineFields[i], tableName);
+                                }
+                               
+                            }
+                            else
+                            {
+                                //This is a simple value - enter it into the column value list.
+                                columnValues.Add(lineFields[i]);
+                            }
+                            
                         }
                         //At this point we have all column names in columnName list and valus in columnValues list
+                        //If the line starts with an ID - this column does not exist in either list. However, if the ID column
+                        //contains a symbolic value (*<name>) - then it will be kept.
+                        //If any column contains a symbolic refernece to an ID (a foreign key) - the foreign key has already been replaced instead 
+                        //of the symbolic reference
                         if (valuesExist == false)
                         {
                             //This is an empty line - skip it
                             lineFields = parser.ReadFields();
                             continue;
                         }
-                        StringBuilder insertCommand = new StringBuilder(setIdentityOn + "  INSERT INTO ");
+                        //Create the SQL command to insert that record
+                        StringBuilder insertCommand = new StringBuilder("INSERT INTO ");
                         insertCommand.Append(tableName);                   //INSERT INTO apartment
                         insertCommand.Append("(");                         //INSERT INTO apartment(
-                        insertCommand.Append(columnNames[0]);              //INSERT INTO apartment(id
+                        insertCommand.Append(columnNames[0]);              //INSERT INTO apartment(number
                         for (int i = 1; i < columnNames.Count(); i++)
                         {
-                            insertCommand.Append(",");                     //INSERT INTO apartment(id,
-                            insertCommand.Append(columnNames[i]);          //INSERT INTO apartment(id,name
+                            insertCommand.Append(",");                     //INSERT INTO apartment(number,
+                            insertCommand.Append(columnNames[i]);          //INSERT INTO apartment(number,name
                         }
-                        insertCommand.Append(") VALUES (");                //INSERT INTO apartment(id,name,description) VALUES (
-                        insertCommand.Append("N'" + columnValues[0] + "'");     //INSERT INTO apartment(id,name,description) VALUES (N'123'
+                        insertCommand.Append(") VALUES (");                //INSERT INTO apartment(number,name,description) VALUES (
+                        insertCommand.Append("N'" + columnValues[0] + "'");     //INSERT INTO apartment(number,name,description) VALUES (N'123'
                         for (int i = 1; i < columnValues.Count(); i++)
                         {
-                            insertCommand.Append(",");                     //INSERT INTO apartment(id,name,description) VALUES (N'123',
-                            insertCommand.Append("N'" + columnValues[i] + "'"); //INSERT INTO apartment(id,name,description) VALUES (N'123',N'nice'
+                            insertCommand.Append(",");                     //INSERT INTO apartment(number,name,description) VALUES (N'123',
+                            insertCommand.Append("N'" + columnValues[i] + "'"); //INSERT INTO apartment(number,name,description) VALUES (N'123',N'nice'
                         }
                         insertCommand.Append(")");
                         string insertCommandSt = insertCommand.ToString();
                         db.Database.ExecuteSqlCommand(insertCommandSt);
+                        if (symbolicId != "")
+                        {
+                            //The ID column contains a symbolic name - keep the ID in a dictionary of (<symbolicID>,<id>) pair
+                            int identity = (db.Database.SqlQuery<int>("SELECT MAX(id) from "+tableName)).First();
+                            symbolicIdList.Add(symbolicId, identity);
+                        }
                     }
                     lineFields = parser.ReadFields();
                 }
