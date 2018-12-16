@@ -55,9 +55,9 @@
                                     create a "book now" hyperlink - it did not work. So the following form is used to
                                     get over the error. When user clicks on the "book now" button he activates a JS code that
                                     submits the form. *@
-                                <form method="post" id="@apartmentAndPrice.theApartment.number" action="/public/p40bookingForm">
-                                    <input type="hidden" name="apartmentId" value="@apartmentAndPrice.theApartment.number" />
-                                    <div class="btn" onclick="bookNow(@apartmentAndPrice.theApartment.number)">Book Now</div>
+                                <form method="get" id="@apartmentAndPrice.theApartment.number" action="/public/p25apartmentDetails">
+                                    <input type="hidden" name="apartmentId" value="@apartmentAndPrice.theApartment.Id" />
+                                    <div class="btn" onclick="bookNow(@apartmentAndPrice.theApartment.number)">@tBox.translate("Book Now")</div>
                                 </form>
 
                             }
@@ -70,14 +70,14 @@
                         </h4>
                         <div class="price light">
                             @{
-                                //Display either the minimum price per night, or the price per stay
+                                //Display either the minimum price per night, price per stay, booked or not suitable
                                 string priceText = "";
-                                if (apartmentAndPrice.minPricePerNight != null)
+                                if (apartmentAndPrice.availability == Availability.UNKNOWN)
                                 {
                                     //We should display: from $20/night (because the length of stay is not known)
                                     priceText = tBox.translate("from") + " " + apartmentAndPrice.minPricePerNight.toMoneyString() + "/" + tBox.translate("night");
                                 }
-                                else if (apartmentAndPrice.pricePerStay != null)
+                                else if (apartmentAndPrice.availability == Availability.AVAILABLE)
                                 {
                                     //We should display: $100 for 4 nights
                                     string night_s = "night";     //signular or plural "night" or "nights"
@@ -88,17 +88,15 @@
                                     priceText = apartmentAndPrice.pricePerStay.toMoneyString() + " " +
                                         tBox.translate("for") + " " + apartmentAndPrice.nightCount + " " + tBox.translate(night_s);
                                 }
-                                else
+                                else if (apartmentAndPrice.availability == Availability.OCCUPIED)
                                 {
                                     //display a "not available" message and the reason
-                                    if (apartmentAndPrice.availability == Availability.OCCUPIED)
-                                    {
-                                        priceText = tBox.translate("Apartment booked for these dates");
-                                    }
-                                    if (apartmentAndPrice.availability == Availability.NOT_SUITABLE)
-                                    {
-                                        priceText = tBox.translate("Not suitable for this group size");
-                                    }
+                                    priceText = tBox.translate("Apartment booked for these dates");
+                                }
+                                else if (apartmentAndPrice.availability == Availability.NOT_SUITABLE)
+                                {
+                                    //Display a "not suitable" message
+                                    priceText = tBox.translate("Not suitable for this group size");
                                 }
                             }
                             @priceText

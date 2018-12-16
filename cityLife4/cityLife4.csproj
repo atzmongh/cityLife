@@ -397,6 +397,7 @@
     <None Include="Properties\PublishProfiles\cityLife4 - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\cityLife4 - Web Deploy1.pubxml" />
     <None Include="Properties\PublishProfiles\cityLife4VM - Web Deploy.pubxml" />
+    <Content Include="Views\Public\p50OurRulesEnglish.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
       <SubType>Designer</SubType>

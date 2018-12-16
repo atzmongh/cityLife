@@ -44,7 +44,12 @@
         </h4>
         <h2>
             @{
-                if (AvailableCount == 0)
+                if (checkinDate == "")
+                {
+                    //There is no checkin date - we cannot know if apartments are available or not.
+                    @Html.Raw(tBox.translate("Our apartments"));
+                }
+                else if (AvailableCount == 0)
                 {
                     @Html.Raw(tBox.translate("We have no available apartments for the selected dates"));
                 }
@@ -54,7 +59,7 @@
                 }
                 else
                 {
-                    @Html.Raw(tBox.translate("We have ")+AvailableCount+ " "+tBox.translate("available apartments for the selected dates"));
+                    @Html.Raw(tBox.translate("We have ") + AvailableCount + " " + tBox.translate("available apartments for the selected dates"));
                 }
             }
         </h2>
@@ -68,9 +73,18 @@
                     priceLabel = tBox.translate("Price");
                     price = anApartment.pricePerStay.toMoneyString();
                 }
-                else
+                else if (anApartment.availability == Availability.OCCUPIED)
                 {
                     price = tBox.translate("Not Available");
+                }
+                else if (anApartment.availability == Availability.NOT_SUITABLE)
+                {
+                    price = tBox.translate("Not suitable for this group size");
+                }
+                else if (anApartment.availability == Availability.UNKNOWN)
+                {
+                    priceLabel = tBox.translate("Starting from");
+                    price = anApartment.minPricePerNight.toMoneyString() + "/" + tBox.translate("night");
                 }
                 <li>
                     <a href="/public/p25apartmentDetails?apartmentId=@anApartment.theApartment.Id">

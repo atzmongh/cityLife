@@ -34,6 +34,9 @@
     }
     int adults = theBookingRequest.adults ?? 2;
     int children = theBookingRequest.children ?? 0;
+    string p10HomeActive = pageURL.Contains("p10home") ? "active" : "";
+    string p30apartmentsActive = pageURL.Contains("p20check") ? "active" : "";
+    string p50ourRulesActive = pageURL.Contains("p50ourRules") ? "active" : "";
 
 
 }
@@ -84,9 +87,9 @@
                             </svg>
                         </a>
                         <ul class="main-menu">
-                            <li class="active"><a href="/public/p10home">@tBox.translate("Home")</a></li>
-                            <li><a href="/public/p30apartments">@tBox.translate("Apartments")</a></li>
-                            <li><a href="/public/p60ourRules">@tBox.translate("Our rules")</a></li>
+                            <li class="@p10HomeActive"><a href="/public/p10home">@tBox.translate("Home")</a></li>
+                            <li class="@p30apartmentsActive"><a href="/public/p20checkAvailability">@tBox.translate("Apartments")</a></li>
+                            <li class="@p50ourRulesActive"><a href="/public/p50ourRules">@tBox.translate("Our rules")</a></li>
                         </ul>
                     </header>
 
@@ -94,7 +97,7 @@
                         <h2>@tBox.translate("booking")</h2>
                         <form method="get" action="/public/p20checkAvailability">
                             <div class="field-box datepicker-box">
-                                <input type="text" id="fromDate" name="fromDate" value="@checkinDate">
+                                <input type="text" id="fromDate" name="fromDate" value="@checkinDate" onchange="enableAvailabilityButton()">
                                 <label for="fromDate">
                                     <span class="field-name">@tBox.translate("Check in date")</span>
                                     <span class="calendar-ico"></span>
@@ -102,7 +105,7 @@
                                 <span class="field-error"></span>
                             </div>
                             <div class="field-box datepicker-box">
-                                <input type="text" id="toDate" name="toDate" value="@checkoutDate">
+                                <input type="text" id="toDate" name="toDate" value="@checkoutDate" onchange="enableAvailabilityButton()">
                                 <label for="toDate">
                                     <span class="field-name">@tBox.translate("Check out date")</span>
                                     <span class="calendar-ico"></span>
@@ -137,18 +140,34 @@
                                 </div>
                                 <div class="field-box select-box">
                                     <select name="childrenCount">
-                                        <option>0</option>
-                                        <option>1</option>
-                                        <option>2</option>
-                                        <option>3</option>
-                                        <option>4</option>
+                                        @{
+                                            for (int i = 0; i <= 4; i++)
+                                            {
+                                                if (children == i)
+                                                {
+                                                    <option selected>@i</option>
+                                                }
+                                                else
+                                                {
+                                                    <option>@i</option>
+                                                }
+                                            }
+                                        }
                                     </select>
                                     <label>
                                         <span class="field-name">@tBox.translate("Children")</span>
                                     </label>
                                 </div>
                             </div>
-                            <button class="btn" type="submit">@tBox.translate("check availability")</button>
+                            @{ 
+                                //Check if we have checkin and checkout dates to determine if the button should be enabled
+                                string disabled = "";
+                                if (checkinDate == "" || checkoutDate == "")
+                                {
+                                    disabled = "disabled";
+                                }
+                            }
+                            <button id ="checkAvailability" class="btn" type="submit" @disabled>@tBox.translate("check availability")</button>
                         </form>
 
                     </div>
@@ -245,6 +264,13 @@
             var dayNow = FakeDateTime.Now.Day;
         }
         var timeNow = new Date(@yearNow,@monthNow,@dayNow);
+
+        function enableAvailabilityButton() {
+            if ($("#fromDate").val() != "" && $("#toDate").val() != "") {
+                //User entered data for both checkin and checkout dates - enable the "check availability" button
+                $("#checkAvailability").prop("disabled", false);
+            }
+        }
     </script>
     <script src="/js/libs.js"></script>
     <script src="/js/scripts.js"></script>

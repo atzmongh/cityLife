@@ -117,6 +117,18 @@ namespace cityLife.Controllers
             return View("p10home");
         }
 
+        /// <summary>
+        /// Displays the list of apartments and their availability, if known. If not known (because the user did not enter checkin-checkout
+        /// information - show just a list of apartments. This controller is also used for the "apartment" option in the main menu
+        /// where it will show the list of apartments and minimum price per night for each
+        /// </summary>
+        /// <param name="language"></param>
+        /// <param name="currency"></param>
+        /// <param name="fromDate"></param>
+        /// <param name="toDate"></param>
+        /// <param name="adultsCount"></param>
+        /// <param name="childrenCount"></param>
+        /// <returns></returns>
         [HttpGet]
         public ActionResult p20checkAvailability (string language, string currency, DateTime? fromDate, DateTime? toDate, int? adultsCount, int? childrenCount)
         {
@@ -304,7 +316,8 @@ namespace cityLife.Controllers
                         }
                     }
                     db.SaveChanges();
-
+                    ViewBag.theOrder = theOrder;
+                    ViewBag.apartmentAndPrice = apartmentAndPrice;
                     return PartialView("p28bookingSuccess");
                 }
             }
@@ -338,6 +351,16 @@ namespace cityLife.Controllers
 
             return View("p30apartments");
         }
+
+        [HttpGet]
+        public ActionResult p50OurRules(string language, string currency, DateTime? fromDate, DateTime? toDate, int? adultsCount, int? childrenCount)
+        {
+            this.prepareApartmentData(language, currency, fromDate, toDate, adultsCount, childrenCount);
+
+            ViewBag.pageURL = "/public/p50ourRules";
+            ViewBag.preferredDevice = this.preferredDevice();
+            return View("p50ourRulesEnglish");
+        }
         private void prepareApartmentData(string language, string currency, DateTime? fromDate, DateTime? toDate, int? adultsCount, int? childrenCount)
         {
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
@@ -364,7 +387,7 @@ namespace cityLife.Controllers
                 foreach (var anApartment in db.Apartments)
                 {
                     Money minPrice = anApartment.PricePerNight(adults: 1, children: 0, weekend: false, currencyCode: theCurrency.currencyCode, atDate: FakeDateTime.Now);
-                    apartmentList.Add(new ApartmentPrice { theApartment = anApartment, minPricePerNight = minPrice, pricePerStay = null, nightCount = 0 });
+                    apartmentList.Add(new ApartmentPrice { theApartment = anApartment, availability = Availability.UNKNOWN, minPricePerNight = minPrice, pricePerStay = null, nightCount = 0 });
                 }
             }
             //Keep the data in the session variable for next iteration
