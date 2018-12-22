@@ -8,6 +8,8 @@ using System.Web.Configuration;
 using cityLife4;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Net.Mail;
+using System.Net;
 
 namespace cityLife.Controllers
 {
@@ -316,10 +318,52 @@ namespace cityLife.Controllers
                         }
                     }
                     db.SaveChanges();
+                    TranslateBox tBox = ViewBag.tBox;
                     ViewBag.theOrder = theOrder;
                     ViewBag.apartmentAndPrice = apartmentAndPrice;
+
+                   // string theEmail = this.RenderViewToString(this.ControllerContext, "t10welcomeMail");
+
+                  
+                    
+                    
+                    EmailMessage mailToCustomer = new EmailMessage(
+                        to: theOrder.Guest.email,
+                        subject: tBox.translate("Welcome to Kharkov Apartments City Life"),
+                        mailName: "t10welcomeMail",
+                        theController:this
+                        );
+                   
+                   
+                    
+                    mailToCustomer.send();
+                   // this.sendMail(theOrder, apartmentAndPrice);
                     return PartialView("p28bookingSuccess");
                 }
+            }
+        }
+
+        private void sendMail(Order theOrder, ApartmentPrice apartmentAndPrice)
+        {
+            var message = new MailMessage();
+            message.To.Add(new MailAddress(theOrder.Guest.email));  // replace with valid value 
+            message.From = new MailAddress("apart.citylife@gmail.com");  // replace with valid value
+            message.Subject = "Your email subject";
+            message.Body = "hello world";
+            message.IsBodyHtml = true;
+
+            using (var smtp = new SmtpClient())
+            {
+                var credential = new NetworkCredential
+                {
+                    UserName = "apart.citylife@gmail.com",  // replace with valid value
+                    Password = "456ertksenia"  // replace with valid value
+                };
+                smtp.Credentials = credential;
+                smtp.Host = "smtp.gmail.com";
+                smtp.Port = 587;
+                smtp.EnableSsl = true;
+                smtp.Send(message);
             }
         }
 
@@ -694,6 +738,23 @@ namespace cityLife.Controllers
                 return false;
             }
         }
+
+        
+
+            public  String RenderViewToString(ControllerContext context, String viewPath, object model = null)
+            {
+                context.Controller.ViewData.Model = model;
+                using (var sw = new StringWriter())
+                {
+                    var viewResult = ViewEngines.Engines.FindView(context, viewPath, null);
+                    var viewContext = new ViewContext(context, viewResult.View, context.Controller.ViewData, context.Controller.TempData, sw);
+                    viewResult.View.Render(viewContext, sw);
+                    viewResult.ViewEngine.ReleaseView(context, viewResult.View);
+                    return sw.GetStringBuilder().ToString();
+                }
+            }
+       
+        
 
     }
 }

@@ -1,0 +1,5 @@
+﻿this is a test message that contains [[  open brackets and
+]close brackets.
+Only when the system sees something like this [name] it should respond 
+and substitute name to the content.
+Even this should work [name][desc].

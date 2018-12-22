@@ -103,6 +103,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Data\testMessage1.txt" />
+    <Content Include="App_Data\testMessage2.txt" />
+    <Content Include="App_Data\testMessage3.txt" />
+    <Content Include="App_Data\welcomeMail.html" />
     <Content Include="cityLife.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>cityLife.Context.cs</LastGenOutput>
@@ -244,9 +248,11 @@
     <Content Include="images\apartment 23\main_photo_23.JPG" />
     <Content Include="images\apartment 24\main_photo_24.JPG" />
     <Content Include="images\apartment 24\main_photo_24P.jpg" />
+    <Content Include="images\CL_logo_cropped.jpg" />
     <Content Include="images\defaultLandscape.jpg" />
     <Content Include="images\marker.png" />
     <Content Include="App_Data\countryList.txt" />
+    <Content Include="messages\m010NewOrder.html" />
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="cityLifeDB.csv" />
     <Content Include="cityLifeDB.xlsx" />
@@ -327,6 +333,7 @@
     <Compile Include="classes\AppException.cs" />
     <Compile Include="classes\ExtensionMethods.cs" />
     <Compile Include="classes\FakeDateTime.cs" />
+    <Compile Include="classes\Message.cs" />
     <Compile Include="classes\Money.cs" />
     <Compile Include="classes\Test.cs" />
     <Compile Include="classes\TranslateBox.cs" />
@@ -398,6 +405,7 @@
     <None Include="Properties\PublishProfiles\cityLife4 - Web Deploy1.pubxml" />
     <None Include="Properties\PublishProfiles\cityLife4VM - Web Deploy.pubxml" />
     <Content Include="Views\Public\p50OurRulesEnglish.cshtml" />
+    <Content Include="Views\Public\t10welcomeMail.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
       <SubType>Designer</SubType>

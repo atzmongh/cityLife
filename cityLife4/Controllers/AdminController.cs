@@ -239,7 +239,6 @@ namespace cityLife.Controllers
         /// </summary>
         private void PopulateDB(cityLifeDBContainer1 db, Stream csvFileStream)
         {
-            //string CSVFilePath = Server.MapPath("/cityLifeDB.csv");
             using (TextFieldParser parser = new TextFieldParser(csvFileStream))
             {
                 parser.Delimiters = new string[] { "," };
@@ -350,22 +349,22 @@ namespace cityLife.Controllers
                         }
                         //Create the SQL command to insert that record
                         StringBuilder insertCommand = new StringBuilder("INSERT INTO ");
-                        insertCommand.Append(tableName);                   //INSERT INTO apartment
-                        insertCommand.Append("(");                         //INSERT INTO apartment(
-                        insertCommand.Append(columnNames[0]);              //INSERT INTO apartment(number
+                        insertCommand.Append(tableName);                       //INSERT INTO apartment
+                        insertCommand.Append("(");                             //INSERT INTO apartment(
+                        insertCommand.Append(columnNames[0]);                  //INSERT INTO apartment(number
                         for (int i = 1; i < columnNames.Count(); i++)
                         {
-                            insertCommand.Append(",");                     //INSERT INTO apartment(number,
-                            insertCommand.Append(columnNames[i]);          //INSERT INTO apartment(number,name
+                            insertCommand.Append(",");                          //INSERT INTO apartment(number,
+                            insertCommand.Append(columnNames[i]);               //INSERT INTO apartment(number,name
                         }
-                        insertCommand.Append(") VALUES (");                //INSERT INTO apartment(number,name,description) VALUES (
+                        insertCommand.Append(") VALUES (");                     //INSERT INTO apartment(number,name,description) VALUES (
                         insertCommand.Append("N'" + columnValues[0] + "'");     //INSERT INTO apartment(number,name,description) VALUES (N'123'
                         for (int i = 1; i < columnValues.Count(); i++)
                         {
-                            insertCommand.Append(",");                     //INSERT INTO apartment(number,name,description) VALUES (N'123',
+                            insertCommand.Append(",");                          //INSERT INTO apartment(number,name,description) VALUES (N'123',
                             insertCommand.Append("N'" + columnValues[i] + "'"); //INSERT INTO apartment(number,name,description) VALUES (N'123',N'nice'
                         }
-                        insertCommand.Append(")");
+                        insertCommand.Append(")");                              //INSERT INTO apartment(number,name,description) VALUES (N'123',N'nice')
                         string insertCommandSt = insertCommand.ToString();
                         db.Database.ExecuteSqlCommand(insertCommandSt);
                         if (symbolicId != "")
@@ -384,11 +383,9 @@ namespace cityLife.Controllers
         private DateTime runTests()
         {
             DateTime testTime = Test.startTestCycle();
-            Test.startTestSeries("stam");
-            Test.check(1, "kuku the great");
-            Test.check(2, "muku the great");
             moneyTests();
             TranslateBoxTest();
+            MessageTest();
             return testTime;
         }
         private void moneyTests()
@@ -451,6 +448,38 @@ namespace cityLife.Controllers
             Test.check(9, tBox.translate("Tuesday"));//translation exists in target language 
             Test.check(10, tBox.translate("Wednesday"));//translation exists only in default language
             Test.check(11, tBox.translate("Thursday"));//translation exists in both languages
+        }
+
+        public void MessageTest()
+        {
+            Test.startTestSeries("Message");
+            string filePath = Server.MapPath("/App_Data/testMessage1.txt");
+            Dictionary<string, string> varDict = new Dictionary<string, string>();
+            varDict["name"] = "Moshe";
+            varDict["desc"] = "the great";
+
+            Message mail = new Message(filePath, varDict);
+            Test.check(1, mail.ToString());
+            filePath = Server.MapPath("/App_Data/testMessage2.txt");
+            try
+            {
+                mail = new Message(filePath, varDict);
+            }
+            catch(Exception e)
+            {
+                Test.check(2, e.Message);
+            }
+            filePath = Server.MapPath("/App_Data/testMessage3.txt");
+            try
+            {
+                mail = new Message(filePath, varDict);
+            }
+            catch (Exception e)
+            {
+                Test.check(3, e.Message);
+            }
+
+
         }
     }
 }

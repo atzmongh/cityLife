@@ -25,7 +25,9 @@ namespace cityLife4
             {111,"the name of each element in the translation form should be of the form XX-NN where XX is the language code and NN is the transaltion key id. Actual format was: {0}" },
             {112,"the apartment was not found in the List<ApaartmentPrce> collection in the Session variable. Apartment id was:{0}" },
             {113,"An order was created for a non-free day. Apartment:{0} date:{1} guest name:{2}" },
-            {114,"a foreign key symbolic name was not found in a prevkious table id. symbolic name is:{0}. table name:{1}" }
+            {114,"a foreign key symbolic name was not found in a prevkious table id. symbolic name is:{0}. table name:{1}" },
+            {115,"the variable dictionary does not contain the expected message variable: {0}" },
+            {116, "the message contains either empty variable [], or something like: [asd[ (an open bracket inside a variable name). message is:{0}" }
 
 
         };
