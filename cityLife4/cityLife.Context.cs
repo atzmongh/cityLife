@@ -39,5 +39,6 @@ namespace cityLife4
         public virtual DbSet<ErrorMessage> ErrorMessages { get; set; }
         public virtual DbSet<Order> Orders { get; set; }
         public virtual DbSet<Guest> Guests { get; set; }
+        public virtual DbSet<Employee> Employees { get; set; }
     }
 }

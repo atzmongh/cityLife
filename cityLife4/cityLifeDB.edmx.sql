@@ -2,13 +2,13 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 11/28/2018 22:53:28
+-- Date Created: 12/23/2018 11:38:11
 -- Generated from EDMX file: C:\software\cityLife\cityLife4\cityLifeDB.edmx
 -- --------------------------------------------------
 
 SET QUOTED_IDENTIFIER OFF;
 --GO
---USE [db_cityLife4];
+USE [C:\SOFTWARE\CITYLIFEDB8.MDF];
 --GO
 IF SCHEMA_ID(N'dbo') IS NULL EXECUTE(N'CREATE SCHEMA [dbo]');
 --GO
@@ -106,7 +106,8 @@ IF OBJECT_ID(N'[dbo].[Orders]', 'U') IS NOT NULL
 IF OBJECT_ID(N'[dbo].[Guests]', 'U') IS NOT NULL
     DROP TABLE [dbo].[Guests];
 --GO
-
+IF OBJECT_ID(N'[dbo].[Employees]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Employees];
 -- --------------------------------------------------
 -- Creating all tables
 -- --------------------------------------------------
@@ -273,6 +274,18 @@ CREATE TABLE [dbo].[Guests] (
 );
 --GO
 
+-- Creating table 'Employees'
+CREATE TABLE [dbo].[Employees] (
+    [Id] int IDENTITY(1,1) NOT NULL,
+    [name] nvarchar(max)  NOT NULL,
+    [phone] nvarchar(max)  NOT NULL,
+    [role] nvarchar(max)  NULL,
+    [passwordHash] nvarchar(max)  NOT NULL,
+    [email] nvarchar(max)  NOT NULL,
+    [userName] nvarchar(max)  NOT NULL
+);
+--GO
+
 -- --------------------------------------------------
 -- Creating all PRIMARY KEY constraints
 -- --------------------------------------------------
@@ -358,6 +371,12 @@ ADD CONSTRAINT [PK_Orders]
 -- Creating primary key on [Id] in table 'Guests'
 ALTER TABLE [dbo].[Guests]
 ADD CONSTRAINT [PK_Guests]
+    PRIMARY KEY CLUSTERED ([Id] ASC);
+--GO
+
+-- Creating primary key on [Id] in table 'Employees'
+ALTER TABLE [dbo].[Employees]
+ADD CONSTRAINT [PK_Employees]
     PRIMARY KEY CLUSTERED ([Id] ASC);
 --GO
 

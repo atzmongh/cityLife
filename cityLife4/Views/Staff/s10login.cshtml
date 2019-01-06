@@ -1,0 +1,44 @@
+﻿@using cityLife4;
+@using cityLife.Controllers;
+@{
+    Layout = null;
+    TranslateBox tBox = ViewBag.tBox;
+    LoginFormData theLoginFormData = ViewBag.theLoginFormData;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link rel="stylesheet" type="text/css" href="~/css/libs.css" media="all">
+    <link rel="stylesheet" type="text/css" href="~/css/styles.css" media="all">
+    <title>s10login</title>
+</head>
+<body>
+    <div class="form" style="padding:20px;width:80%">
+        <form id="login" method="post">
+            <h2>Login</h2><br />
+            <div class="field-box @theLoginFormData.userName.errorOrNot">
+                <input type="text" id="userName" name="userName" value="@theLoginFormData.userName.content">
+                <label for="userName">
+                    <span class="field-name"> @tBox.translate("User Name")</span>
+                </label>
+                <span class="field-error" id="userNameError">@tBox.translate(theLoginFormData.userName.errorMessage)</span>
+            </div>
+            <div class="field-box @theLoginFormData.password.errorOrNot">
+                <input type="password" id="password" name="password">
+                <label for="password">
+                    <span class="field-name"> @tBox.translate("Password")</span>
+                </label>
+                <span class="field-error" id="passwordError">@tBox.translate(theLoginFormData.password.errorMessage)</span>
+            </div>
+            <input type="submit" class="btn" style="min-width:120px; height:auto" value="OK" />
+            <input type="button" class="btn" style="min-width:120px; height:auto" value="Cancel" />
+        </form>
+
+    </div>
+    <script src="/js/libs.js"></script>
+    <script src="/js/scripts.js"></script>
+</body>
+</html>

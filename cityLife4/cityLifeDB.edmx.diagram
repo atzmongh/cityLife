@@ -33,6 +33,7 @@
         <AssociationConnector Association="cityLifeDB.ApartmentOrder" />
         <EntityTypeShape EntityType="cityLifeDB.Guest" Width="1.5" PointX="6.625" PointY="9.75" />
         <AssociationConnector Association="cityLifeDB.GuestOrder" />
+        <EntityTypeShape EntityType="cityLifeDB.Employee" Width="1.5" PointX="4.125" PointY="9.625" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
