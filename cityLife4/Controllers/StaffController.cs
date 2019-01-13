@@ -14,6 +14,21 @@ namespace cityLife.Controllers
         public FieldData userName = new FieldData();
         public FieldData password = new FieldData();
     }
+    /// <summary>
+    /// A day block is either a single free day, or a group of occupied days for a single apartment and a single guest.
+    /// OrderStatus - Created (guest did not arrive yet), checkedIn (guest is now in the apartment), checkedOut (guest left the apartment), null (free)
+    /// name - gueset name or empty (if free)
+    /// days - number of days of that order.
+    /// orderId - 
+    /// </summary>
+    public class DayBlock
+    {
+        public int apartmentNumber;
+        public OrderStatus? orderStatus;
+        public string name;
+        public int days;
+        public int orderId;
+    }
     public class StaffController : Controller
     {
         // GET: Staff
@@ -77,10 +92,118 @@ namespace cityLife.Controllers
             return View("s20dashboard");
         }
 
+        /// <summary>
+        /// This is the vertical version of the dashboard. Currently not in use.
+        /// </summary>
+        /// <returns></returns>
         public ActionResult s20dashboard()
         {
-            //return View("s21horizontalDashboard");
             return View("s20dashboard");
+        }
+        /// <summary>
+        /// This is the horizontal version of the dashboard. It shows the orders of all apartments for 31 days, since the date entered by the user, 
+        /// or since today. (the default)
+        /// </summary>
+        /// <param name="fromDateOrNull">Date entered in the date picker, or null</param>
+        /// <returns></returns>
+        [HttpGet]
+        public ActionResult s21Dashboard(DateTime? fromDateOrNull)
+        {
+            DateTime fromDate = fromDateOrNull ?? FakeDateTime.Now;
+            var apartmentDayBlocks = s21dashboardPreparation(fromDate);
+            ViewBag.apartmentDayBlocs = apartmentDayBlocks;
+            TranslateBox tBox = this.setTbox("RU");
+            ViewBag.tBox = tBox;
+            ViewBag.fromDate = fromDate;
+            return View("s21horizontalDashboard");
+        }
+
+        /// <summary>
+        /// The function reads the orders for all apartments starting from the date set by the user and for 31 days.
+        /// </summary>
+        /// <param name="fromDateOrNull"></param>
+        /// <returns>List of apartment orders. For each apartment:
+        /// list of DayBlocks.
+        /// A dayBlock is either a single free day, or an order which can span 1 or more days. Note that a day block may not 
+        /// be identical to the corresponding order because the order may start before the "fromDate" or end after the "fromDate+31".</returns>
+        public List<List<DayBlock>> s21dashboardPreparation(DateTime fromDate)
+        {
+            //for each apartment
+            //for each day from from_date to from_date+3
+            //lastOrderId = 0;
+            //orderLength = 0;
+            //apartmentDay = read apartmentDay record for apartment and day
+            //if record does not exist or record status == free - this is a free day - add a free block
+            //order = apartmentDay->order
+            //if order.isFirstDay - create a new busy block
+            //add the day to the busy block
+            //if order.isLastDay - write busy block
+            //write last busy block
+
+            //a 2 dimensional array - a list of apartments, and for each apartment - a list of day blocks
+            //where each day block is either a free day or an order.
+            var apartmentDayBlocks = new List<List<DayBlock>>();
+            var lastDate = fromDate.AddDays(31);
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+            foreach (var anApartment in db.Apartments)
+            {
+                var dayBlocks = new List<DayBlock>();
+                DayBlock aDayBlock = null;
+                for (var aDate = fromDate; aDate <= lastDate; aDate = aDate.AddDays(1))
+                {
+                    var anApartmentDay = db.ApartmentDays.SingleOrDefault(record => record.Apartment.Id == anApartment.Id && record.date == aDate);
+                    if (anApartmentDay == null || anApartmentDay.status == ApartOccuStatus.Free)
+                    {
+                        //This is a free day
+                        aDayBlock = new DayBlock() { apartmentNumber = anApartment.number, orderStatus = null };//null order status denotes a free day
+                        dayBlocks.Add(aDayBlock);
+                        aDayBlock = null;
+                    }
+                    else
+                    {
+                        //this is a busy day. Read the order record
+                        var anOrder = db.Orders.Single(record => record.Id == anApartmentDay.Order.Id);
+                        if (aDayBlock == null)
+                        {
+                            //This is the first time we see this order - open a new DayBlock object. Note that if the report starts from 
+                            //1/12/2019 and we have an order that started on 39/11/2019 and continued to 4/12/2019 - then the first time we 
+                            //encounted this order is not in the checkin date of it.
+                            aDayBlock = new DayBlock()
+                            {
+                                apartmentNumber = anApartment.number,
+                                days = 1,
+                                name = anOrder.Guest.name,
+                                orderId = anOrder.Id,
+                                orderStatus = anOrder.status
+                            };
+                        }
+                        else
+                        {
+                            //This is a continuation of the order - increment the number of days
+                            aDayBlock.days++;
+                        }
+                        if (anOrder.isLastDay(aDate))
+                        {
+                            //This is the last day of the order - write the day block
+                            dayBlocks.Add(aDayBlock);
+                            aDayBlock = null;
+                        }
+                    }
+                }
+                //At this point we finished going on all dates for a specific apartment. It is possible that the last DayBlock was not yet written
+                //if its checkout date is beyond the last day of the report (our report is from 1/12/2019 till 31/12/2019, but the checkout date
+                //of the last order is 2/1/2020)
+                if (aDayBlock != null)
+                {
+                    dayBlocks.Add(aDayBlock);
+                    aDayBlock = null;
+                }
+                //Add the dayBlocks list into the apartmentDayBlocks
+                apartmentDayBlocks.Add(dayBlocks);
+            }
+            //At this point the apartmentDayBlocks variable contaiins a list of list of day blocks 
+            return apartmentDayBlocks;
+           
         }
 
         /// <summary>

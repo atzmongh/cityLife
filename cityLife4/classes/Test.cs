@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Script.Serialization;
 
 namespace cityLife4
 {
@@ -109,6 +110,13 @@ namespace cityLife4
         public static bool? check(int number, object actualResult)
         {
             return check(number, actualResult.ToString());
+        }
+        public static bool? checkJson(int number, object actualResult)
+        {
+            JavaScriptSerializer jsonSerializer = new JavaScriptSerializer();
+            string jsonResult = jsonSerializer.Serialize(actualResult);
+            return check(number, jsonResult);
+
         }
 
         /// <summary>

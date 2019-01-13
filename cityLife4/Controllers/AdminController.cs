@@ -9,6 +9,7 @@ using System.Text;
 using System.Configuration;
 using System.Data.SqlClient;
 using cityLife4;
+using cityLife.Controllers;
 
 //Look in http://www.binaryintellect.net/articles/6d19edd9-7582-4caf-b254-73deca44ecfb.aspx
 //for how to create infinite scrolling using MVC and Jquery.
@@ -386,6 +387,7 @@ namespace cityLife.Controllers
             moneyTests();
             TranslateBoxTest();
             MessageTest();
+            s21DashboardTest();
             return testTime;
         }
         private void moneyTests()
@@ -477,6 +479,24 @@ namespace cityLife.Controllers
             catch (Exception e)
             {
                 Test.check(3, e.Message);
+            }
+
+
+        }
+
+        public void s21DashboardTest()
+        {
+            Test.startTestSeries("s21dashboard");
+            StaffController theStaffController = new StaffController();
+            var apartmentDayBlocks = theStaffController.s21dashboardPreparation(new DateTime(2018,9,20));
+            int testNumber = 1;
+            foreach(var anApartment in apartmentDayBlocks)
+            {
+                foreach(var aDayBlock in anApartment)
+                {
+                    Test.checkJson(testNumber, aDayBlock);
+                    testNumber++;
+                }
             }
 
 
