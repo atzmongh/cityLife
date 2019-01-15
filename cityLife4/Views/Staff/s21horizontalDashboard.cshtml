@@ -1,10 +1,12 @@
 ﻿@using cityLife4;
+@using cityLife.Controllers;
 @{
     ViewBag.Title = "s21horizontalDahsboard";
     Layout = "~/Views/sharing/_staffLayout.cshtml";
     TranslateBox tBox = ViewBag.tBox;
     DateTime fromDate = ViewBag.fromDate;
     string fromDateSt = fromDate.ToString("dd MMMM, yyyy");
+    List<List<DayBlock>> apartmentDayBlocks = ViewBag.apartmentDayBlocks;
 }
 <style>
     .dash01 {
@@ -62,7 +64,7 @@
 
     
 </style>
-<form id="fromDateForm" method="get" action="s21horizontalDashboard"> 
+<form id="fromDateForm" method="get" action="s21Dashboard"> 
     <div class="field-box datepicker-box" style="width:250px">
         <input type="text" id="fromDate" name="fromDate" value="@fromDateSt" onchange="changeFromDate()">
         <label for="fromDate">
@@ -86,225 +88,49 @@
     <table>
         <tr><td class="dash01td">date</td></tr>
         <tr><td class="dash01td">day</td></tr>
-        <tr><td class="dash01td">24</td></tr>
-        <tr><td class="dash01td">14</td></tr>
-        <tr><td class="dash01td">15</td></tr>
-        <tr><td class="dash01td">16</td></tr>
-        <tr><td class="dash01td">17</td></tr>
-        <tr><td class="dash01td">18</td></tr>
-
+        @foreach (var anApartment in apartmentDayBlocks)
+        {
+            int apartmentNumber = anApartment.First().apartmentNumber;
+            <tr><td class="dash01td">@apartmentNumber</td></tr>
+        }
     </table>
 </div>
 <div class="dash02">
     <table style="table-layout:fixed; width:100%">
 
         <tr>
-            <th class="dash02th">1/10</th>
-            <th class="dash02th">2/10</th>
-            <th class="dash02th">3/10</th>
-            <th class="dash02th">4/10</th>
-            <th class="dash02th">5/10</th>
-            <th class="dash02th">6/10</th>
-            <th class="dash02th">7/10</th>
-            <th class="dash02th">8/10</th>
-            <th class="dash02th">9/10</th>
-            <th class="dash02th">10/10</th>
-            <th class="dash02th">11/10</th>
-            <th class="dash02th">12/10</th>
-            <th class="dash02th">13/10</th>
-            <th class="dash02th">14/10</th>
-            <th class="dash02th">15/10</th>
-            <th class="dash02th">16/10</th>
-            <th class="dash02th">17/10</th>
-            <th class="dash02th">18/10</th>
-            <th class="dash02th">19/10</th>
-            <th class="dash02th">20/10</th>
-            <th class="dash02th">21/10</th>
-            <th class="dash02th">22/10</th>
-            <th class="dash02th">23/10</th>
-            <th class="dash02th">24/10</th>
-            <th class="dash02th">25/10</th>
-            <th class="dash02th">26/10</th>
-            <th class="dash02th">27/10</th>
-            <th class="dash02th">28/10</th>
-            <th class="dash02th">29/10</th>
-            <th class="dash02th">30/10</th>
+            @{ var lastDate = fromDate.AddDays(31);}
+            @for (DateTime aDate = fromDate; aDate < lastDate; aDate = aDate.AddDays(1))
+            {
+                <th class="dash02th">@aDate.ToString("dd/MM")</th>
+            }
         </tr>
         <tr>
-            <th class="dash02th">sun</th>
-            <th class="dash02th">mon</th>
-            <th class="dash02th">tue</th>
-            <th class="dash02th">wed</th>
-            <th class="dash02th">thu</th>
-            <th class="dash02th">fri</th>
-            <th class="dash02th">sat</th>
-            <th class="dash02th">sun</th>
-            <th class="dash02th">mon</th>
-            <th class="dash02th">tue</th>
-            <th class="dash02th">wed</th>
-            <th class="dash02th">thu</th>
-            <th class="dash02th">fri</th>
-            <th class="dash02th">sat</th>
-            <th class="dash02th">sun</th>
-            <th class="dash02th">mon</th>
-            <th class="dash02th">tue</th>
-            <th class="dash02th">wed</th>
-            <th class="dash02th">thu</th>
-            <th class="dash02th">fri</th>
-            <th class="dash02th">sat</th>
-            <th class="dash02th">sun</th>
-            <th class="dash02th">mon</th>
-            <th class="dash02th">tue</th>
-            <th class="dash02th">wed</th>
-            <th class="dash02th">thu</th>
-            <th class="dash02th">fri</th>
-            <th class="dash02th">sat</th>
-            <th class="dash02th">sun</th>
-            <th class="dash02th">mon</th>
+            @for (DateTime aDate = fromDate; aDate < lastDate; aDate = aDate.AddDays(1))
+            {
+                <th class="dash02th">@aDate.ToString("ddd")</th>
+            }
         </tr>
 
-
+       
+        @foreach(var anApartment in apartmentDayBlocks)
+        {
         <tr>
-            <td class="dash02td"></td>
-            <td class="dash02td" style="overflow:hidden">atmonsonmonsonsGhilai</td>
-            <td class="dash02td" colspan="3" style="text-align:center">johnson</td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td">smith</td>
-            <td class="dash02td" colspan="3" style="text-align:center">johnson</td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td">smith</td>
-            <td class="dash02td" colspan="3" style="text-align:center">johnson</td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-
+            @foreach (var aDAyBlock in anApartment)
+            {
+                if (aDAyBlock.orderStatus == null)
+                {
+                    //This is a free day
+                    <td class="dash02td"></td>
+                }
+                else
+                {
+                    //This is a busy day (or days)
+                    <td class="dash02td" colspan="@aDAyBlock.days" >@aDAyBlock.name</td>
+                }
+            }
         </tr>
-        <tr>
-            <td class="dash02td">Michael</td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td" colspan="2">Johnson</td>
-            <td class="dash02td" colspan="4">Maria</td>
-            <td class="dash02td">Michael</td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td" colspan="2">Johnson</td>
-            <td class="dash02td" colspan="4">Maria</td>
-            <td class="dash02td">Michael</td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td" colspan="2">Johnson</td>
-            <td class="dash02td" colspan="4">Maria</td>
-        </tr>
-        <tr>
-            <td class="dash02td"></td>
-            <td class="dash02td">smith</td>
-            <td class="dash02td" colspan="3" style="text-align:center">johnson</td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td">smith</td>
-            <td class="dash02td" colspan="3" style="text-align:center">johnson</td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td">smith</td>
-            <td class="dash02td" colspan="3" style="text-align:center">johnson</td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-
-        </tr>
-        <tr>
-            <td class="dash02td">Michael</td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td" colspan="2" style="background-color:aqua">Johnson</td>
-            <td class="dash02td" colspan="4">Maria</td>
-            <td class="dash02td">Michael</td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td" colspan="2">Johnson</td>
-            <td class="dash02td" colspan="4" style="background-color:aquamarine">Maria</td>
-            <td class="dash02td">Michael</td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td" colspan="2">Johnson</td>
-            <td class="dash02td" colspan="4">Maria</td>
-        </tr>
-        <tr>
-            <td class="dash02td"></td>
-            <td class="dash02td">smith</td>
-            <td class="dash02td" colspan="3" style="text-align:center">johnson</td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td">smith</td>
-            <td class="dash02td" colspan="3" style="text-align:center">johnson</td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td">smith</td>
-            <td class="dash02td" colspan="3" style="text-align:center">johnson</td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-
-        </tr>
-        <tr>
-            <td class="dash02td">Michael</td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td" colspan="2">Johnson</td>
-            <td class="dash02td" colspan="4">Maria</td>
-            <td class="dash02td">Michael</td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td" colspan="2">Johnson</td>
-            <td class="dash02td" colspan="4">Maria</td>
-            <td class="dash02td">Michael</td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td"></td>
-            <td class="dash02td" colspan="2">Johnson</td>
-            <td class="dash02td" colspan="4">Maria</td>
-        </tr>
+        }
 
     </table>
     @*<div style="border:1px solid;">asdasdasdasdasd</div>

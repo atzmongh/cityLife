@@ -11,6 +11,7 @@ namespace cityLife4
         private static string seriesName = "undefined";
         private static DateTime? testStartTime=null;
 
+        
 
         /// <summary>
         /// Each time we run a test cycle we wish to set its start time. This is done in order to make sure that all tests actually were 

@@ -28,6 +28,7 @@ namespace cityLife.Controllers
         public string name;
         public int days;
         public int orderId;
+        public string firstDate;
     }
     public class StaffController : Controller
     {
@@ -109,9 +110,10 @@ namespace cityLife.Controllers
         [HttpGet]
         public ActionResult s21Dashboard(DateTime? fromDateOrNull)
         {
+            FakeDateTime.SetFakeTime(new DateTime(2018, 09, 20));  //DEBUGGING!!!!!!
             DateTime fromDate = fromDateOrNull ?? FakeDateTime.Now;
             var apartmentDayBlocks = s21dashboardPreparation(fromDate);
-            ViewBag.apartmentDayBlocs = apartmentDayBlocks;
+            ViewBag.apartmentDayBlocks = apartmentDayBlocks;
             TranslateBox tBox = this.setTbox("RU");
             ViewBag.tBox = tBox;
             ViewBag.fromDate = fromDate;
@@ -142,6 +144,7 @@ namespace cityLife.Controllers
 
             //a 2 dimensional array - a list of apartments, and for each apartment - a list of day blocks
             //where each day block is either a free day or an order.
+            
             var apartmentDayBlocks = new List<List<DayBlock>>();
             var lastDate = fromDate.AddDays(31);
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
@@ -155,7 +158,13 @@ namespace cityLife.Controllers
                     if (anApartmentDay == null || anApartmentDay.status == ApartOccuStatus.Free)
                     {
                         //This is a free day
-                        aDayBlock = new DayBlock() { apartmentNumber = anApartment.number, orderStatus = null };//null order status denotes a free day
+                        if (aDayBlock != null)
+                        {
+                            //Although this should not occur (assuming that the apartmentDays table matches the orders checkin and checkout dates)
+                            //But anyway - we will write the dayBlock to the list
+                            dayBlocks.Add(aDayBlock);
+                        }
+                        aDayBlock = new DayBlock() { apartmentNumber = anApartment.number, orderStatus = null, firstDate = aDate.ToString("yyyy-MM-dd") };//null order status denotes a free day
                         dayBlocks.Add(aDayBlock);
                         aDayBlock = null;
                     }
@@ -174,7 +183,8 @@ namespace cityLife.Controllers
                                 days = 1,
                                 name = anOrder.Guest.name,
                                 orderId = anOrder.Id,
-                                orderStatus = anOrder.status
+                                orderStatus = anOrder.status,
+                                firstDate = aDate.ToString("yyyy-MM-dd")
                             };
                         }
                         else
