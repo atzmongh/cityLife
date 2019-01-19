@@ -6,6 +6,7 @@
     TranslateBox tBox = ViewBag.tBox;
     DateTime fromDate = ViewBag.fromDate;
     string fromDateSt = fromDate.ToString("dd MMMM, yyyy");
+    DateTime today = ViewBag.today;
     List<List<DayBlock>> apartmentDayBlocks = ViewBag.apartmentDayBlocks;
 }
 <style>
@@ -13,7 +14,7 @@
         position: absolute;
         top: 100px;
         left: 0px;
-        height: 300px;
+        /*height: 300px;*/
         width: 30px;
         border: 1px solid;
     }
@@ -33,7 +34,7 @@
         left: 30px;
         border: 1px solid;
         width: 360px;
-        height: 300px;
+        /*height: 300px;*/
         display: flex;
         flex-wrap: nowrap;
         overflow-x: auto;
@@ -61,29 +62,34 @@
         overflow: hidden;
         text-align: center
     }
+    .orderCreated {
+        background-color: crimson;
+        color:white;
+    }
+    .orderCheckedin {
+        background-color: darkorange;
+    }
+    .orderCheckedout{
+        background-color:aquamarine;
+    }
+    .today{
+        background-color:brown;
+    }
+    
+   
 
     
 </style>
 <form id="fromDateForm" method="get" action="s21Dashboard"> 
     <div class="field-box datepicker-box" style="width:250px">
-        <input type="text" id="fromDate" name="fromDate" value="@fromDateSt" onchange="changeFromDate()">
+        <input type="text" id="fromDate" name="fromDateOrNull" value="@fromDateSt" onchange="changeFromDate()">
         <label for="fromDate">
-            <span class="field-name">@tBox.translate("from date")</span>
             <span class="calendar-ico"></span>
         </label>
         <span class="field-error"></span>
     </div>
 </form>
-@*This field is not needed. It is here for now because the JS in script.js (first function) assumes that both "fromDate and toDate exist.
-    This needs to be cleanedd up. (it was coped from the public website)*@
-<div class="field-box datepicker-box" style="display:none">
-    <input type="text" id="toDate" name="toDate" value="" onchange="enableAvailabilityButton()">
-    <label for="toDate">
-        <span class="field-name">@tBox.translate("Check out date")</span>
-        <span class="calendar-ico"></span>
-    </label>
-    <span class="field-error"></span>
-</div>
+
 <div class="dash01">
     <table>
         <tr><td class="dash01td">date</td></tr>
@@ -102,13 +108,15 @@
             @{ var lastDate = fromDate.AddDays(31);}
             @for (DateTime aDate = fromDate; aDate < lastDate; aDate = aDate.AddDays(1))
             {
-                <th class="dash02th">@aDate.ToString("dd/MM")</th>
+                string todaysBackground = (aDate.Date == today.Date ? "today" : "");  //Check if the date is today - put a different color
+                <th class="dash02th @todaysBackground">@aDate.ToString("dd/MM")</th>
             }
         </tr>
         <tr>
             @for (DateTime aDate = fromDate; aDate < lastDate; aDate = aDate.AddDays(1))
             {
-                <th class="dash02th">@aDate.ToString("ddd")</th>
+                string todaysBackground = (aDate.Date == today.Date ? "today" : "");  //Check if the date is today - put a different color
+                <th class="dash02th @todaysBackground">@aDate.ToString("ddd")</th>
             }
         </tr>
 
@@ -122,27 +130,47 @@
                 {
                     //This is a free day
                     <td class="dash02td"></td>
-                }
-                else
-                {
-                    //This is a busy day (or days)
-                    <td class="dash02td" colspan="@aDAyBlock.days" >@aDAyBlock.name</td>
+                            }
+                            else
+                            {
+                                //This is a busy day (or days)
+                                var backgroundColor = "";
+                                switch (aDAyBlock.orderStatus)
+                                {
+                                    case OrderStatus.Created:
+                                        backgroundColor = "orderCreated";
+                                        break;
+                                    case OrderStatus.CheckedIn:
+                                        backgroundColor = "orderCheckedin";
+                                        break;
+                                    case OrderStatus.CheckedOut:
+                                        backgroundColor = "orderCheckedout";
+                                        break;
+                                }
+                    <td class="dash02td @backgroundColor" colspan="@aDAyBlock.days" >@aDAyBlock.name</td>
                 }
             }
         </tr>
         }
 
     </table>
-    @*<div style="border:1px solid;">asdasdasdasdasd</div>
-        <div style="border:1px solid;">asdasdasdasdasd</div>
-        <div style="border:1px solid;">asdasdasdasdasd</div>
-        <div style="border:1px solid;">asdasdasdasdasd</div>*@
 </div>
 
 <script>
     function changeFromDate() {
         $("#fromDateForm").submit();
-    }
+            }
+    $(document).ready(initializeDatePicker);
+
+            function initializeDatePicker() {
+        $("#fromDate")
+            .datepicker({
+                defaultDate: "+0d",
+                numberOfMonths: 1,
+                dateFormat: "d MM, yy",
+                firstDay: 1
+            });
+            }
 </script>
 
 

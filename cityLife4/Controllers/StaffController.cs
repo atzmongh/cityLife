@@ -117,6 +117,7 @@ namespace cityLife.Controllers
             TranslateBox tBox = this.setTbox("RU");
             ViewBag.tBox = tBox;
             ViewBag.fromDate = fromDate;
+            ViewBag.today = FakeDateTime.Now;
             return View("s21horizontalDashboard");
         }
 
