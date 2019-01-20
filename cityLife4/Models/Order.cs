@@ -30,5 +30,19 @@ namespace cityLife4
         {
             return this.checkoutDate == aDate.AddDays(1);
         }
+
+        public Money priceAsMoney()
+        {
+            decimal priceDecimal = ((decimal)this.price) / 100;     //The price is kept in cents in the DB.
+            Money priceMoney = new Money(priceDecimal, this.Currency.currencyCode);
+            return priceMoney;
+        }
+
+        public Money amountPaidAsMoney()
+        {
+            decimal amountPaidDecimal = ((decimal)this.amountPaid) / 100;     //The price is kept in cents in the DB.
+            Money amountPaidMoney = new Money(amountPaidDecimal, this.Currency.currencyCode);
+            return amountPaidMoney;
+        }
     }
 }

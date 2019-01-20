@@ -30,6 +30,22 @@ namespace cityLife.Controllers
         public int orderId;
         public string firstDate;
     }
+    public class OrderData
+    {
+        public string name;
+        public string phone;
+        public string email;
+        public string country;
+        public int adults;
+        public int children;
+        public string checkin;
+        public string checkout;
+        public Money price;
+        public Money paid;
+        public string expectedArrival;
+        public string comments;
+
+    }
     public class StaffController : Controller
     {
         // GET: Staff
@@ -121,6 +137,30 @@ namespace cityLife.Controllers
             return View("s21horizontalDashboard");
         }
 
+        [HttpGet]
+        public JsonResult s22OrderDetails(int orderId)
+        {
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+            var theOrder = db.Orders.Single(a => a.Id == orderId);
+            OrderData theOrderData = new OrderData()
+            {
+                name = theOrder.Guest.name,
+                phone = theOrder.Guest.phone,
+                email = theOrder.Guest.email,
+                adults = theOrder.adultCount,
+                children = theOrder.childrenCount,
+                checkin = theOrder.checkinDate.ToShortDateString(),
+                checkout = theOrder.checkoutDate.ToShortDateString(),
+                country = theOrder.Guest.country,
+                expectedArrival = theOrder.expectedArrival,
+                price = theOrder.priceAsMoney(),
+                paid = theOrder.amountPaidAsMoney(),
+                comments = theOrder.specialRequest
+            };
+            JsonResult jResult = Json(theOrderData, JsonRequestBehavior.AllowGet);
+            return jResult;
+        }
+
         /// <summary>
         /// The function reads the orders for all apartments starting from the date set by the user and for 31 days.
         /// </summary>
@@ -145,7 +185,7 @@ namespace cityLife.Controllers
 
             //a 2 dimensional array - a list of apartments, and for each apartment - a list of day blocks
             //where each day block is either a free day or an order.
-            
+
             var apartmentDayBlocks = new List<List<DayBlock>>();
             var lastDate = fromDate.AddDays(31);
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
@@ -214,7 +254,7 @@ namespace cityLife.Controllers
             }
             //At this point the apartmentDayBlocks variable contaiins a list of list of day blocks 
             return apartmentDayBlocks;
-           
+
         }
 
         /// <summary>

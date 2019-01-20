@@ -2,7 +2,7 @@ $( function() {
     var dateFormat = "d MM, yy",
         from = $( "#fromDate" )
             .datepicker({
-                defaultDate: "+0d",
+                defaultDate: 0,
                 minDate: timeNow,   //The timenow is defined in a script before this script, and it gives the fake time now
                 numberOfMonths: 1, 
                 dateFormat: "d MM, yy",
@@ -13,7 +13,8 @@ $( function() {
                 var nextDay = fromDate.getDate() + 1;  //get the day component and add 1 to it.
                 var nextDate = new Date(fromDate);   
                 nextDate.setDate(nextDay);             //Add the day component to the "from date". Note that if from date is 31/12/2018, it will skip to 1/1/2019
-                to.datepicker( "option", "minDate", nextDate);
+                to.datepicker("option", "minDate", nextDate);
+                to.datepicker( "setDate", nextDate )
             }),
         to = $( "#toDate" ).datepicker({
             defaultDate: "+1w",

@@ -11,9 +11,9 @@
 }
 <style>
     .dash01 {
-        position: absolute;
+        /*position: absolute;
         top: 100px;
-        left: 0px;
+        left: 0px;*/
         /*height: 300px;*/
         width: 30px;
         border: 1px solid;
@@ -29,9 +29,9 @@
     }
 
     .dash02 {
-        position: absolute;
+        /*position: absolute;
         top: 100px;
-        left: 30px;
+        left: 30px;*/
         border: 1px solid;
         width: 360px;
         /*height: 300px;*/
@@ -62,25 +62,25 @@
         overflow: hidden;
         text-align: center
     }
+
     .orderCreated {
         background-color: crimson;
-        color:white;
+        color: white;
     }
+
     .orderCheckedin {
         background-color: darkorange;
     }
-    .orderCheckedout{
-        background-color:aquamarine;
-    }
-    .today{
-        background-color:brown;
-    }
-    
-   
 
-    
+    .orderCheckedout {
+        background-color: aquamarine;
+    }
+
+    .today {
+        background-color: brown;
+    }
 </style>
-<form id="fromDateForm" method="get" action="s21Dashboard"> 
+<form id="fromDateForm" method="get" action="s21Dashboard">
     <div class="field-box datepicker-box" style="width:250px">
         <input type="text" id="fromDate" name="fromDateOrNull" value="@fromDateSt" onchange="changeFromDate()">
         <label for="fromDate">
@@ -90,79 +90,116 @@
     </div>
 </form>
 
-<div class="dash01">
-    <table>
-        <tr><td class="dash01td">date</td></tr>
-        <tr><td class="dash01td">day</td></tr>
-        @foreach (var anApartment in apartmentDayBlocks)
-        {
-            int apartmentNumber = anApartment.First().apartmentNumber;
-            <tr><td class="dash01td">@apartmentNumber</td></tr>
-        }
-    </table>
-</div>
-<div class="dash02">
-    <table style="table-layout:fixed; width:100%">
-
-        <tr>
-            @{ var lastDate = fromDate.AddDays(31);}
-            @for (DateTime aDate = fromDate; aDate < lastDate; aDate = aDate.AddDays(1))
+<div style="display:flex">
+    <div class="dash01">
+        <table>
+            <tr><td class="dash01td">date</td></tr>
+            <tr><td class="dash01td">day</td></tr>
+            @foreach (var anApartment in apartmentDayBlocks)
             {
-                string todaysBackground = (aDate.Date == today.Date ? "today" : "");  //Check if the date is today - put a different color
-                <th class="dash02th @todaysBackground">@aDate.ToString("dd/MM")</th>
+                int apartmentNumber = anApartment.First().apartmentNumber;
+                <tr><td class="dash01td">@apartmentNumber</td></tr>
             }
-        </tr>
-        <tr>
-            @for (DateTime aDate = fromDate; aDate < lastDate; aDate = aDate.AddDays(1))
-            {
-                string todaysBackground = (aDate.Date == today.Date ? "today" : "");  //Check if the date is today - put a different color
-                <th class="dash02th @todaysBackground">@aDate.ToString("ddd")</th>
-            }
-        </tr>
+        </table>
+    </div>
+    <div class="dash02">
+        <table style="table-layout:fixed; width:100%">
 
-       
-        @foreach(var anApartment in apartmentDayBlocks)
-        {
-        <tr>
-            @foreach (var aDAyBlock in anApartment)
-            {
-                if (aDAyBlock.orderStatus == null)
+            <tr>
+                @{ var lastDate = fromDate.AddDays(31);}
+                @for (DateTime aDate = fromDate; aDate < lastDate; aDate = aDate.AddDays(1))
                 {
-                    //This is a free day
-                    <td class="dash02td"></td>
-                            }
-                            else
-                            {
-                                //This is a busy day (or days)
-                                var backgroundColor = "";
-                                switch (aDAyBlock.orderStatus)
-                                {
-                                    case OrderStatus.Created:
-                                        backgroundColor = "orderCreated";
-                                        break;
-                                    case OrderStatus.CheckedIn:
-                                        backgroundColor = "orderCheckedin";
-                                        break;
-                                    case OrderStatus.CheckedOut:
-                                        backgroundColor = "orderCheckedout";
-                                        break;
-                                }
-                    <td class="dash02td @backgroundColor" colspan="@aDAyBlock.days" >@aDAyBlock.name</td>
+                    string todaysBackground = (aDate.Date == today.Date ? "today" : "");  //Check if the date is today - put a different color
+                    <th class="dash02th @todaysBackground">@aDate.ToString("dd/MM")</th>
                 }
-            }
-        </tr>
-        }
+            </tr>
+            <tr>
+                @for (DateTime aDate = fromDate; aDate < lastDate; aDate = aDate.AddDays(1))
+                {
+                    string todaysBackground = (aDate.Date == today.Date ? "today" : "");  //Check if the date is today - put a different color
+                    <th class="dash02th @todaysBackground">@aDate.ToString("ddd")</th>
+                }
+            </tr>
 
-    </table>
+
+            @foreach (var anApartment in apartmentDayBlocks)
+            {
+                <tr>
+                    @foreach (var aDAyBlock in anApartment)
+                    {
+                        if (aDAyBlock.orderStatus == null)
+                        {
+                            //This is a free day
+                            <td class="dash02td"></td>
+                        }
+                        else
+                        {
+                            //This is a busy day (or days)
+                            var backgroundColor = "";
+                            switch (aDAyBlock.orderStatus)
+                            {
+                                case OrderStatus.Created:
+                                    backgroundColor = "orderCreated";
+                                    break;
+                                case OrderStatus.CheckedIn:
+                                    backgroundColor = "orderCheckedin";
+                                    break;
+                                case OrderStatus.CheckedOut:
+                                    backgroundColor = "orderCheckedout";
+                                    break;
+                            }
+                            <td class="dash02td @backgroundColor" colspan="@aDAyBlock.days" data-order-id="@aDAyBlock.orderId" onclick="showOrder(this)">@aDAyBlock.name</td>
+                        }
+                    }
+                </tr>
+            }
+
+        </table>
+    </div>
+</div>
+<div style="padding:4px">
+    <span style="float:left">@tBox.translate("Name")</span>
+    <span style="float:right">John Smith the third</span>
+    <br />
+    <span style="float:left">@tBox.translate("Phone")</span>
+    <span style="float:right">+97254-4567656</span>
+    <br />
+    <span style="float:left">@tBox.translate("Email")</span>
+    <span style="float:right">atzmon.ghilai@gmail.com</span>
+    <br />
+    <span style="float:left">@tBox.translate("Country")</span>
+    <span style="float:right">Israel</span>
+    <br />
+    <span style="float:left">@tBox.translate("Guests")</span>
+    <span style="float:right">4,2</span>
+    <br />
+    <span style="float:left">@tBox.translate("Checkn")</span>
+    <span style="float:right">2/11/2019</span>
+    <br />
+    <span style="float:left">@tBox.translate("Checkout")</span>
+    <span style="float:right">3/11/2019</span>
+    <br />
+    <span style="float:left">@tBox.translate("Price")</span>
+    <span style="float:right">$240 not paid</span>
+    <br />
+    <span style="float:left">@tBox.translate("Expected Arrival")</span>
+    <span style="float:right">12:30</span>
+    <br />
+    <span style="float:left">@tBox.translate("Comments")</span>
+    <span style="float:right">I want to have a hot shower and some fruits when I arrive.</span>
+    <br />
+    <btn class="btn" name="Update" style="float:left">Update</btn>
+    <btn class="btn" name="Delete" style="float:right">Delete</btn>
+
 </div>
 
 <script>
     function changeFromDate() {
         $("#fromDateForm").submit();
-            }
+    }
     $(document).ready(initializeDatePicker);
 
-            function initializeDatePicker() {
+    function initializeDatePicker() {
         $("#fromDate")
             .datepicker({
                 defaultDate: "+0d",
@@ -170,7 +207,17 @@
                 dateFormat: "d MM, yy",
                 firstDay: 1
             });
-            }
+    }
+
+    function showOrder(td) {
+       // var orderId = td.dataset.orderId;
+        var orderIdJson = { orderId: td.dataset.orderId };
+        $.getJSON("/staff/s22OrderDetails", orderIdJson).done(displayOrderDetails);
+    }
+
+    function displayOrderDetails(orderData) {
+        confirm(orderData);
+    }
 </script>
 
 
