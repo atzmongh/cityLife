@@ -1,0 +1,44 @@
+﻿@using cityLife4;
+@using cityLife.Controllers;
+@{
+    ViewBag.Title = "s22OrderDetails";
+    TranslateBox tBox = ViewBag.tBox;
+    OrderData theOrderData = ViewBag.orderData;
+}
+
+
+<span style="float:left">@tBox.translate("Name")</span>
+<span style="float:right">@theOrderData.name</span>
+<br />
+<span style="float:left">@tBox.translate("Phone")</span>
+<span style="float:right">@theOrderData.phone</span>
+<br />
+<span style="float:left">@tBox.translate("Email")</span>
+<span style="float:right">@theOrderData.email</span>
+<br />
+<span style="float:left">@tBox.translate("Country")</span>
+<span style="float:right">@theOrderData.country</span>
+<br />
+<span style="float:left">@tBox.translate("Guests")</span>
+<span style="float:right">@theOrderData.adults,@theOrderData.children</span>
+<br />
+<span style="float:left">@tBox.translate("Checkn")</span>
+<span style="float:right">@theOrderData.checkin</span>
+<br />
+<span style="float:left">@tBox.translate("Checkout")</span>
+<span style="float:right">@theOrderData.checkout</span>
+<br />
+<span style="float:left">@tBox.translate("Price")</span>
+<span style="float:right">@theOrderData.price</span>
+<br />
+<span style="float:left">@tBox.translate("Paid")</span>
+<span style="float:right">@theOrderData.paid</span>
+<br />
+<span style="float:left">@tBox.translate("Expected Arrival")</span>
+<span style="float:right">@theOrderData.expectedArrival</span>
+<br />
+<span style="float:left">@tBox.translate("Comments")</span>
+<span style="float:right">@theOrderData.comments</span>
+<br />
+<btn class="btn" name="Update" style="float:left">Update</btn>
+<btn class="btn" name="Delete" style="float:right">Delete</btn>

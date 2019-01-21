@@ -64,6 +64,23 @@ namespace cityLife4
             return result;
         }
 
+        //public static bool operator == (Money m1, Money m2)
+        //{
+        //    return m1.amount == m2.amount && m1.currencyCode == m2.currencyCode;
+        //}
+        //public static bool operator !=(Money m1, Money m2)
+        //{
+        //    return m1.amount != m2.amount || m1.currencyCode != m2.currencyCode;
+        //}
+        public static bool operator <=(Money m1, Money m2)
+        {
+            return m1.amount <= m2.amount && m1.currencyCode == m2.currencyCode;
+        }
+        public static bool operator >=(Money m1, Money m2)
+        {
+            return m1.amount >= m2.amount && m1.currencyCode == m2.currencyCode;
+        }
+
         /// <summary>
         /// 
         /// returns a string representation of the Money object as : USD 156.32

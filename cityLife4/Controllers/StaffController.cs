@@ -138,7 +138,7 @@ namespace cityLife.Controllers
         }
 
         [HttpGet]
-        public JsonResult s22OrderDetails(int orderId)
+        public PartialViewResult s22OrderDetails(int orderId)
         {
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
             var theOrder = db.Orders.Single(a => a.Id == orderId);
@@ -157,8 +157,13 @@ namespace cityLife.Controllers
                 paid = theOrder.amountPaidAsMoney(),
                 comments = theOrder.specialRequest
             };
-            JsonResult jResult = Json(theOrderData, JsonRequestBehavior.AllowGet);
-            return jResult;
+            TranslateBox tBox = this.setTbox("RU");
+            ViewBag.tBox = tBox;
+            ViewBag.orderData = theOrderData;
+            PartialViewResult result = PartialView("s22OrderDetails");
+            return result;
+            //JsonResult jResult = Json(theOrderData, JsonRequestBehavior.AllowGet);
+            //return jResult;
         }
 
         /// <summary>
