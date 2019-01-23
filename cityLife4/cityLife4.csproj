@@ -414,8 +414,9 @@
     <Content Include="Views\Staff\s10login.cshtml" />
     <Content Include="Views\sharing\_staffLayout.cshtml" />
     <Content Include="Views\Staff\s20dashboard.cshtml" />
-    <Content Include="Views\Staff\s21horizontalDashboard.cshtml" />
+    <Content Include="Views\Staff\s21Dashboard.cshtml" />
     <Content Include="Views\Staff\s22OrderDetails.cshtml" />
+    <Content Include="Views\Staff\s23addUpdateOrder.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
       <SubType>Designer</SubType>

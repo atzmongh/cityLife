@@ -32,6 +32,7 @@ namespace cityLife.Controllers
     }
     public class OrderData
     {
+        public int id;
         public string name;
         public string phone;
         public string email;
@@ -117,6 +118,7 @@ namespace cityLife.Controllers
         {
             return View("s20dashboard");
         }
+        
         /// <summary>
         /// This is the horizontal version of the dashboard. It shows the orders of all apartments for 31 days, since the date entered by the user, 
         /// or since today. (the default)
@@ -134,36 +136,7 @@ namespace cityLife.Controllers
             ViewBag.tBox = tBox;
             ViewBag.fromDate = fromDate;
             ViewBag.today = FakeDateTime.Now;
-            return View("s21horizontalDashboard");
-        }
-
-        [HttpGet]
-        public PartialViewResult s22OrderDetails(int orderId)
-        {
-            cityLifeDBContainer1 db = new cityLifeDBContainer1();
-            var theOrder = db.Orders.Single(a => a.Id == orderId);
-            OrderData theOrderData = new OrderData()
-            {
-                name = theOrder.Guest.name,
-                phone = theOrder.Guest.phone,
-                email = theOrder.Guest.email,
-                adults = theOrder.adultCount,
-                children = theOrder.childrenCount,
-                checkin = theOrder.checkinDate.ToShortDateString(),
-                checkout = theOrder.checkoutDate.ToShortDateString(),
-                country = theOrder.Guest.country,
-                expectedArrival = theOrder.expectedArrival,
-                price = theOrder.priceAsMoney(),
-                paid = theOrder.amountPaidAsMoney(),
-                comments = theOrder.specialRequest
-            };
-            TranslateBox tBox = this.setTbox("RU");
-            ViewBag.tBox = tBox;
-            ViewBag.orderData = theOrderData;
-            PartialViewResult result = PartialView("s22OrderDetails");
-            return result;
-            //JsonResult jResult = Json(theOrderData, JsonRequestBehavior.AllowGet);
-            //return jResult;
+            return View("s21Dashboard");
         }
 
         /// <summary>
@@ -261,7 +234,48 @@ namespace cityLife.Controllers
             return apartmentDayBlocks;
 
         }
+        [HttpGet]
+        public PartialViewResult s22OrderDetails(int orderId)
+        {
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+            var theOrder = db.Orders.Single(a => a.Id == orderId);
+            OrderData theOrderData = new OrderData()
+            {
+                id = theOrder.Id,
+                name = theOrder.Guest.name,
+                phone = theOrder.Guest.phone,
+                email = theOrder.Guest.email,
+                adults = theOrder.adultCount,
+                children = theOrder.childrenCount,
+                checkin = theOrder.checkinDate.ToShortDateString(),
+                checkout = theOrder.checkoutDate.ToShortDateString(),
+                country = theOrder.Guest.country,
+                expectedArrival = theOrder.expectedArrival,
+                price = theOrder.priceAsMoney(),
+                paid = theOrder.amountPaidAsMoney(),
+                comments = theOrder.specialRequest
+            };
+            TranslateBox tBox = this.setTbox("RU");
+            ViewBag.tBox = tBox;
+            ViewBag.orderData = theOrderData;
+            PartialViewResult result = PartialView("s22OrderDetails");
+            return result;
+            //JsonResult jResult = Json(theOrderData, JsonRequestBehavior.AllowGet);
+            //return jResult;
+        }
 
+        [HttpGet]
+        public ActionResult s23addUpdateOrder(int? orderId)
+        {
+
+            if (orderId != null)
+            {
+                cityLifeDBContainer1 db = new cityLifeDBContainer1();
+                var theOrder = db.Orders.Single(a => a.Id == orderId);
+                ViewBag.order = theOrder;
+            }
+            return View("s23addUpdateOrder");
+        }
         /// <summary>
         /// This method is an auxiliary method to create the translation box and to insert it if needed to the Session variable
         /// It was copied from the public controller. A more elegant solution would be to create one method that will get the 

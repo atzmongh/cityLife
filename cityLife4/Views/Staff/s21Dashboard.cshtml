@@ -79,6 +79,10 @@
     .today {
         background-color: brown;
     }
+
+    .hidden {
+        display: none;
+    }
 </style>
 <form id="fromDateForm" method="get" action="s21Dashboard">
     <div class="field-box datepicker-box" style="width:250px">
@@ -130,7 +134,8 @@
                         if (aDAyBlock.orderStatus == null)
                         {
                             //This is a free day
-                            <td class="dash02td"></td>
+                            <td class="dash02td" data-apartment-id="@anApartment.First().apartmentNumber"
+                                data-date="@aDAyBlock.firstDate" onclick="addOrder(this)"></td>
                         }
                         else
                         {
@@ -158,8 +163,20 @@
     </div>
 </div>
 <div style="padding:4px" id="s22OrderDetails">
-  
 
+
+</div>
+<div id="newOrderDates" class="hidden">
+    <span style="float:left">@tBox.translate("Apartment Number")</span>
+    <span id="apartmentNumber" style="float:right"></span>
+    <br />
+    <span style="float:left">@tBox.translate("Checkin Date")</span>
+    <span id="checkinDate" style="float:right"></span>
+    <br />
+    <span style="float:left">@tBox.translate("Checkout Date")</span>
+    <span id="checkoutDate" style="float:right"></span>
+    <br />
+    <a id="addOrderButton" class="btn" href="/staff/s23addUpdateOrder">@tBox.translate("New Order")</a>
 </div>
 
 <script>
@@ -188,6 +205,49 @@
     function displayOrderDetails(orderDetailsHTML) {
         $("#s22OrderDetails").empty();
         $("#s22OrderDetails").append(orderDetailsHTML);
+    }
+
+    var apartmentNumber = "0";
+    var checkinDate = "";
+    var checkoutDate = "";
+    var cellClickCounter = 0;
+
+    function addOrder(td) {
+        cellClickCounter++;
+        if (cellClickCounter % 2 == 1) {
+            //The user clicked odd number of times on a free cell - it means we need to collect apartment number and checkin date
+            apartmentNumber = td.dataset.apartmentId;
+            checkinDate = td.dataset.date;
+            html = '<h2>kuku</h2>';
+            checkoutDate = "";
+
+            var html = '<div>' +
+                '<span style="float:left">@tBox.translate("Apartment Number")</span>' +
+                '<span id="apartmentNumber" style="float:right">' + apartmentNumber + '</span>' +
+                '<br />' +
+                '<span style="float:left">@tBox.translate("Checkin Date")</span>' +
+                '<span id="checkinDate" style="float:right">' + checkinDate + '</span>' +
+                '<br />' +
+                '</div>';
+           
+            $("#s22OrderDetails").empty();
+            $("#s22OrderDetails").append(html);
+
+        }
+        else {
+            //The user clicked even number of times on a cell = collect the checkout date
+            checkoutDate = td.dataset.date;
+            var html =
+                '<span style="float:left">@tBox.translate("Checkout Date")</span>' +
+                '<span id="checkinDate" style="float:right">' + checkoutDate + '</span>' +
+                '<br />';
+            $("#s22OrderDetails").append(html);
+
+
+        }
+        var apartmentNumber = td.dataset.apartmentId;
+        var date = td.dataset.date;
+       
     }
 </script>
 
