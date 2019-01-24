@@ -179,6 +179,7 @@
     <a id="addOrderButton" class="btn" href="/staff/s23addUpdateOrder">@tBox.translate("New Order")</a>
 </div>
 
+
 <script>
     function changeFromDate() {
         $("#fromDateForm").submit();
@@ -208,48 +209,90 @@
     }
 
     var apartmentNumber = "0";
-    var checkinDate = "";
-    var checkoutDate = "";
+    var checkinDate = new Date();
+    var checkoutDate = new Date();
+    var nights = 0;
     var cellClickCounter = 0;
 
     function addOrder(td) {
         cellClickCounter++;
         if (cellClickCounter % 2 == 1) {
             //The user clicked odd number of times on a free cell - it means we need to collect apartment number and checkin date
+            //We assume a one night stay
             apartmentNumber = td.dataset.apartmentId;
-            checkinDate = td.dataset.date;
-            html = '<h2>kuku</h2>';
-            checkoutDate = "";
+            checkinDate = new Date(td.dataset.date);
+            nights = 1;
+            var checkoutDate = nextDate(checkinDate);
+            displayCheckinOutDates(apartmentNumber, checkinDate, checkoutDate, nights);
+        }
+        else {
+            //The user clicked even number of times on a cell = collect the checkout date
+            checkoutDate = new Date(td.dataset.date);
+            nights = diffDays(checkinDate, checkoutDate);
+            if (nights < 0) {
+                //reverse between checkin and checkout dates
+                var temporary = checkinDate;
+                checkinDate = checkoutDate;
+                checkoutDate = temporary;
+                nights = -nights;
+            }
+            else if (nights == 0) {
+                //The user clicked the same cell twice - assume 1 night.
+                checkoutDate = nextDate(checkinDate);
+                nights = 1;
+            }
+            displayCheckinOutDates(apartmentNumber, checkinDate, checkoutDate, nights);
+        }
+    }
+    //convert a Date object to dd/mm/yyyy
+    function formatDateddmmyyyy(aDate) {
+        var yymmdddd = aDate.getDate() + "/" + (aDate.getMonth() + 1) + "/" + aDate.getFullYear();
+        return yymmdddd;
+    }
+    //returns a date which is 1 day later 
+    function nextDate(aDate) {
+        var nextDate = new Date(aDate);
+        var nextDay = aDate.getDate() + 1;
+        nextDate.setDate(nextDay);
+        return nextDate;
+    }
 
-            var html = '<div>' +
+    function displayCheckinOutDates(apartmentNumber, checkinDate, checkoutDate, nights) {
+        var html = '<div>' +
                 '<span style="float:left">@tBox.translate("Apartment Number")</span>' +
                 '<span id="apartmentNumber" style="float:right">' + apartmentNumber + '</span>' +
                 '<br />' +
                 '<span style="float:left">@tBox.translate("Checkin Date")</span>' +
-                '<span id="checkinDate" style="float:right">' + checkinDate + '</span>' +
+                '<span id="checkinDate" style="float:right">' + formatDateddmmyyyy(checkinDate) + '</span>' +
+                '<br />' +
+                '<span style="float:left">@tBox.translate("Checkout Date")</span>' +
+                '<span id="checkinDate" style="float:right">' + formatDateddmmyyyy(checkoutDate) + '</span>' +
+                '<br />' +
+                '<span style="float:left">@tBox.translate("nights")</span>' +
+                '<span id="checkinDate" style="float:right">' + nights + '</span>' +
                 '<br />' +
                 '</div>';
            
             $("#s22OrderDetails").empty();
             $("#s22OrderDetails").append(html);
-
-        }
-        else {
-            //The user clicked even number of times on a cell = collect the checkout date
-            checkoutDate = td.dataset.date;
-            var html =
-                '<span style="float:left">@tBox.translate("Checkout Date")</span>' +
-                '<span id="checkinDate" style="float:right">' + checkoutDate + '</span>' +
-                '<br />';
-            $("#s22OrderDetails").append(html);
-
-
-        }
-        var apartmentNumber = td.dataset.apartmentId;
-        var date = td.dataset.date;
-       
     }
+
+    //returns the difference between d1 and d2 (actually d2 minus d1)
+    function diffDays(d1, d2) {
+        var ndays;
+        var tv1 = d1.getTime();  // msec since 1970
+        var tv2 = d2.getTime();
+
+        ndays = (tv2 - tv1) / 1000 / 86400;
+        ndays = Math.round(ndays - 0.5);
+        return ndays;
+    }
+
+   
+
+   
 </script>
+
 
 
 
