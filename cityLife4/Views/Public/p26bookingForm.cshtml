@@ -1,5 +1,6 @@
 ﻿@using cityLife4;
 @using cityLife.Controllers;
+@using System.Data.Entity;
 @{ 
     //viewBag.apartmentAndPrice
     //ViewBag.tBox
@@ -17,7 +18,7 @@
 
     TranslateBox tBox = ViewBag.tBox;
     BookingRequest theBookingRequest = ViewBag.bookingRequest;
-    List<string> countryList = ViewBag.countryList;
+    DbSet<Country> countries = ViewBag.countries;
     BookingFormData theBookingFormData = ViewBag.bookingFormData;
 
 }
@@ -29,6 +30,7 @@
             <form id="bookingForm">
                 <input type="hidden" name="apartmentId" value="@theApartment.Id" />
                 @*when an element has eror - add the calss "error to its div and write error message in field-error*@
+               
                 <div class="field-box @theBookingFormData.email.errorOrNot">
                     <input type="email" id="email" name="email" value="@theBookingFormData.email.content" onblur="checkEmailExists(this)">
                     <label for="email">
@@ -44,11 +46,11 @@
                     <span class="field-error" id="nameError">@tBox.translate(theBookingFormData.name.errorMessage)</span>
                 </div>
                 <div class="field-box select-box @theBookingFormData.country.errorOrNot">
-                    <input list="countryList" name="country" id="country" value="@theBookingFormData.country.content" />
+                    <input list="countryList" name="countryName" id="country" value="@theBookingFormData.country.content" />
                     <datalist id="countryList">
-                        @foreach (var aCountry in countryList)
+                        @foreach (var aCountry in countries)
                         {
-                            <option value="@aCountry" />
+                            <option value="@aCountry.name"/>
                         }
                     </datalist>
                     <label for="country">
@@ -56,6 +58,7 @@
                     </label>
                     <span class="field-error" id="countryError">@tBox.translate(theBookingFormData.country.errorMessage)</span>
                 </div>
+                
 
                 <div class="field-box @theBookingFormData.phone.errorOrNot">
                     <input type="tel" id="phone" name="phone" value="@theBookingFormData.phone.content">

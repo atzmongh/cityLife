@@ -190,7 +190,7 @@ namespace cityLife.Controllers
       
 
         [HttpPost]
-        public PartialViewResult p27bookingOrder(int apartmentId, string name, string country, string email, string phone, string arrivalTime, string specialRequest)
+        public PartialViewResult p27bookingOrder(int apartmentId, string name, string countryName, string email, string phone, string arrivalTime, string specialRequest)
         {
             prepareDataForp26p27(apartmentId);
 
@@ -201,9 +201,18 @@ namespace cityLife.Controllers
             {
                 theBookingFormData.name.errorMessage = "Please enter your name";
             }
-            theBookingFormData.country.content = country;
-            if (country == "")
-                theBookingFormData.country.errorMessage = "Please enter your country name";
+            theBookingFormData.country.content = countryName;
+            if (countryName == "")
+                theBookingFormData.country.errorMessage = "Please select your country";
+            else
+            {
+                cityLifeDBContainer1 db = new cityLifeDBContainer1();
+                Country theCountry = db.Countries.SingleOrDefault(a => a.name == countryName);
+                if (theCountry == null)
+                {
+                    theBookingFormData.country.errorMessage = "This country does not exist in our country list";
+                }
+            }
             theBookingFormData.email.content = email;
             if (!this.IsValidEmail(email))
                 theBookingFormData.email.errorMessage = "Please enter a valid email address";
@@ -228,7 +237,7 @@ namespace cityLife.Controllers
                 BookingRequest theBookingRequest = (BookingRequest)Session["bookingRequest"];
                 Currency currentCurrency = (Currency)Session["currentCurrency"];
                 ApartmentPrice apartmentAndPrice = this.calculatePricePerStayForApartment(theAparatment, db, theBookingRequest, currentCurrency);
-
+                Country theCountry = db.Countries.Single(a => a.name == countryName);
                 if (apartmentAndPrice.availability != Availability.AVAILABLE)  
                 {
                     //the apartment is not available, although it seemed to be available. Perhaps it was taken in the last minutes
@@ -243,7 +252,7 @@ namespace cityLife.Controllers
                     Currency theCurrency = db.Currencies.Single(a => a.currencyCode == apartmentAndPrice.pricePerStay.currency);
 
                     Guest theGuest = db.Guests.FirstOrDefault
-                        (aGuest=> aGuest.email == email && aGuest.name == name && aGuest.phone == phone && aGuest.country == country);
+                        (aGuest=> aGuest.email == email && aGuest.name == name && aGuest.phone == phone && aGuest.Country.name == theCountry.name);
 
                     if (theGuest == null)
                     {
@@ -253,7 +262,7 @@ namespace cityLife.Controllers
                             name = name,
                             phone = phone,
                             email = email,
-                            country = country
+                            Country = theCountry
                         };
                         db.Guests.Add(theGuest);
                     }
@@ -372,7 +381,7 @@ namespace cityLife.Controllers
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
             var theGuests = from aGuest in db.Guests
                                            where aGuest.email == email
-                                           select new {aGuest.name, aGuest.phone, aGuest.country};
+                                           select new {aGuest.name, aGuest.phone, country=aGuest.Country.name};
             JsonResult jResult;
             if (theGuests.Count() == 1)
             {
@@ -464,7 +473,7 @@ namespace cityLife.Controllers
                 ViewBag.apartmentAndPrice = theApartmentAndPrice;
                 ViewBag.tBox = this.setTbox(currentLanguage);
                 ViewBag.bookingRequest = theBookingRequest;
-                ViewBag.countryList = this.countryList();
+                ViewBag.countries = db.Countries;
             }
             catch (Exception e)
             {
@@ -712,19 +721,20 @@ namespace cityLife.Controllers
             }
         }
 
-        private List<string> countryList()
-        {
-            string filePath = Server.MapPath("/App_Data/countryList.txt");
-            StreamReader reader = new StreamReader(filePath);
-            List<string> countryList = new List<string>();
+        //Obsolete, as we moved to country table in DB
+        //private List<string> countryList()
+        //{
+        //    string filePath = Server.MapPath("/App_Data/countryList.txt");
+        //    StreamReader reader = new StreamReader(filePath);
+        //    List<string> countryList = new List<string>();
 
-            while (!reader.EndOfStream)
-            {
-                string aCountry = reader.ReadLine();
-                countryList.Add(aCountry);
-            }
-            return countryList;
-        }
+        //    while (!reader.EndOfStream)
+        //    {
+        //        string aCountry = reader.ReadLine();
+        //        countryList.Add(aCountry);
+        //    }
+        //    return countryList;
+        //}
 
         private bool IsValidEmail(string email)
         {

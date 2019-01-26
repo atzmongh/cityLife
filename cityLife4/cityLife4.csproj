@@ -342,6 +342,9 @@
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\PublicController.cs" />
     <Compile Include="Controllers\StaffController.cs" />
+    <Compile Include="Country.cs">
+      <DependentUpon>cityLife.tt</DependentUpon>
+    </Compile>
     <Compile Include="Currency.cs">
       <DependentUpon>cityLife.tt</DependentUpon>
     </Compile>
@@ -419,7 +422,7 @@
     <Content Include="Views\Staff\s21Dashboard.cshtml" />
     <Content Include="Views\Staff\s22OrderDetails.cshtml" />
     <Content Include="Views\Staff\s23addUpdateOrder.cshtml" />
-    <Content Include="Scripts\tsconfig.json" />
+    <Content Include="Views\Staff\s24orderPersonal.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
       <SubType>Designer</SubType>
@@ -428,13 +431,12 @@
       <DependentUpon>Web.config</DependentUpon>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Scripts\typings\jquery\" />
+  </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <ItemGroup>
-    <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

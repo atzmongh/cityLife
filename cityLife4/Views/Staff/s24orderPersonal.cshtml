@@ -1,0 +1,75 @@
+﻿@using cityLife4;
+@using cityLife.Controllers;
+@using System.Data.Entity;
+@{
+    //The view is used for both adding new orders an updating existing orders.
+    //New orders have an order record which contains only checkin, checkout, number of nights and apartment number.
+    //The order id of a new order is 0.
+    //Existing orders contain all data belonging to that order
+    ViewBag.Title = "s23addUpdateOrder";
+    Order theOrder = ViewBag.order;
+    TranslateBox tBox = ViewBag.tBox;
+    BookingFormData theBookingFormData = ViewBag.bookingData;
+    DbSet<Country> countries = ViewBag.countries;
+
+}
+<style>
+    .inputBox {
+        height: 60px;
+        width: 100%;
+        border: 1px solid #A3B6CC;
+        position: relative;
+        margin-bottom: 10px;
+    }
+
+    .inputElement {
+        border: 0px;
+        position: absolute;
+        top: 30px;
+        padding-left: 10px;
+        padding-right: 10px;
+        color: #011A36;
+        text-align: left;
+        width: 100%;
+        font-family: 'lato-semibold', Arial, sans-serif;
+        font-size: 16px;
+    }
+
+    .label {
+        position: absolute;
+        padding-left: 10px;
+        color: #A3B6CC;
+        font-family: 'lato-semibold', Arial, sans-serif;
+        font-size: 16px;
+    }
+</style>
+
+<div class="inputBox">
+    <input id="email" name="email" type="email" value="" class="inputElement" />
+    <label for="email" class="label">@tBox.translate("Email")</label>
+</div>
+<div class="inputBox">
+    <input id="name" name="name" type="text" value="" class="inputElement" />
+    <label for="name" class="label">@tBox.translate("Name")</label>
+</div>
+
+<div class="inputBox select-box @theBookingFormData.country.errorOrNot">
+    <input list="countryList" name="country" id="country" value="@theBookingFormData.country.content" class="inputElement" />
+    <datalist id="countryList">
+        @foreach (var aCountry in countries)
+        {
+            <option value="@aCountry.name" />
+        }
+    </datalist>
+    <label for="country" class="label">@tBox.translate("Country")</label>
+    <span class="field-error" id="countryError">@tBox.translate(theBookingFormData.country.errorMessage)</span>
+</div>
+
+<div class="inputBox">
+    <input id="country" name="country" type="text" value="John Smith" class="inputElement" />
+    <label for="country" class="label">name</label>
+</div>
+
+
+
+

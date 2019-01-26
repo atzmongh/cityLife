@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 12/23/2018 11:38:11
+-- Date Created: 01/26/2019 21:38:03
 -- Generated from EDMX file: C:\software\cityLife\cityLife4\cityLifeDB.edmx
 -- --------------------------------------------------
 
@@ -59,6 +59,9 @@ IF OBJECT_ID(N'[dbo].[FK_ApartmentOrder]', 'F') IS NOT NULL
 IF OBJECT_ID(N'[dbo].[FK_GuestOrder]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[Orders] DROP CONSTRAINT [FK_GuestOrder];
 --GO
+IF OBJECT_ID(N'[dbo].[FK_CountryGuest]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[Guests] DROP CONSTRAINT [FK_CountryGuest];
+--GO
 
 -- --------------------------------------------------
 -- Dropping existing tables
@@ -108,6 +111,11 @@ IF OBJECT_ID(N'[dbo].[Guests]', 'U') IS NOT NULL
 --GO
 IF OBJECT_ID(N'[dbo].[Employees]', 'U') IS NOT NULL
     DROP TABLE [dbo].[Employees];
+--GO
+IF OBJECT_ID(N'[dbo].[Countries]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Countries];
+--GO
+
 -- --------------------------------------------------
 -- Creating all tables
 -- --------------------------------------------------
@@ -270,7 +278,7 @@ CREATE TABLE [dbo].[Guests] (
     [name] nvarchar(max)  NOT NULL,
     [phone] nvarchar(max)  NOT NULL,
     [email] nvarchar(max)  NOT NULL,
-    [country] nvarchar(max)  NOT NULL
+    [Country_code] nchar(3)  NOT NULL
 );
 --GO
 
@@ -283,6 +291,13 @@ CREATE TABLE [dbo].[Employees] (
     [passwordHash] nvarchar(max)  NOT NULL,
     [email] nvarchar(max)  NOT NULL,
     [userName] nvarchar(max)  NOT NULL
+);
+--GO
+
+-- Creating table 'Countries'
+CREATE TABLE [dbo].[Countries] (
+    [code] nchar(3)  NOT NULL,
+    [name] nvarchar(max)  NOT NULL
 );
 --GO
 
@@ -378,6 +393,12 @@ ADD CONSTRAINT [PK_Guests]
 ALTER TABLE [dbo].[Employees]
 ADD CONSTRAINT [PK_Employees]
     PRIMARY KEY CLUSTERED ([Id] ASC);
+--GO
+
+-- Creating primary key on [code] in table 'Countries'
+ALTER TABLE [dbo].[Countries]
+ADD CONSTRAINT [PK_Countries]
+    PRIMARY KEY CLUSTERED ([code] ASC);
 --GO
 
 -- --------------------------------------------------
@@ -592,6 +613,21 @@ ADD CONSTRAINT [FK_GuestOrder]
 CREATE INDEX [IX_FK_GuestOrder]
 ON [dbo].[Orders]
     ([Guest_Id]);
+--GO
+
+-- Creating foreign key on [Country_code] in table 'Guests'
+ALTER TABLE [dbo].[Guests]
+ADD CONSTRAINT [FK_CountryGuest]
+    FOREIGN KEY ([Country_code])
+    REFERENCES [dbo].[Countries]
+        ([code])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+--GO
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_CountryGuest'
+CREATE INDEX [IX_FK_CountryGuest]
+ON [dbo].[Guests]
+    ([Country_code]);
 --GO
 
 -- --------------------------------------------------

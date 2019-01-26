@@ -417,7 +417,7 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
     cursor: text; }
   .field-box .field-name {
     position: absolute;
-    top: 20px;
+    top: 8px;   /*changed it from 20px, so that the text does not move*/
     left: 10px;
     font-size: 0.75rem;
     font-family: "lato-medium", Arial, sans-serif;

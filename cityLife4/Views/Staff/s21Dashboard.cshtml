@@ -176,7 +176,8 @@
     <span style="float:left">@tBox.translate("Checkout Date")</span>
     <span id="checkoutDate" style="float:right"></span>
     <br />
-    <a id="addOrderButton" class="btn" href="/staff/s23addUpdateOrder">@tBox.translate("New Order")</a>
+    <a id="addOrderButton" class="btn" href="/staff/s23updateOrder">@tBox.translate("New Order")</a>
+   
 </div>
 
 
@@ -246,8 +247,13 @@
     }
     //convert a Date object to dd/mm/yyyy
     function formatDateddmmyyyy(aDate) {
-        var yymmdddd = aDate.getDate() + "/" + (aDate.getMonth() + 1) + "/" + aDate.getFullYear();
-        return yymmdddd;
+        var ddmmyyyy = aDate.getDate() + "/" + (aDate.getMonth() + 1) + "/" + aDate.getFullYear();
+        return ddmmyyyy;
+    }
+    //convert a Date object to yyyy-mm-dd
+    function formatDateyyyymmdd(aDate) {
+        var yyyymmdd = aDate.getFullYear() + "-" + (aDate.getMonth() + 1) + "-" + aDate.getDate();
+        return yyyymmdd;
     }
     //returns a date which is 1 day later 
     function nextDate(aDate) {
@@ -270,7 +276,11 @@
                 '<br />' +
                 '<span style="float:left">@tBox.translate("nights")</span>' +
                 '<span id="checkinDate" style="float:right">' + nights + '</span>' +
-                '<br />' +
+            '<br />' +
+            '<a class="btn" href="/staff/s24addOrder?checkin=' + formatDateyyyymmdd(checkinDate) +
+            '&checkout=' + formatDateyyyymmdd(checkoutDate) +
+            '&nights=' + nights +
+            '&apartmentNumber=' + apartmentNumber + '">@tBox.translate("Add Order") </a>' +
                 '</div>';
            
             $("#s22OrderDetails").empty();
@@ -288,8 +298,7 @@
         return ndays;
     }
 
-   
-
+    
    
 </script>
 

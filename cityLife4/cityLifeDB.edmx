@@ -21,6 +21,7 @@
     <EntitySet Name="Orders" EntityType="cityLifeDB.Store.Orders" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="Guests" EntityType="cityLifeDB.Store.Guests" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="Employees" EntityType="cityLifeDB.Store.Employees" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Countries" EntityType="cityLifeDB.Store.Countries" store:Type="Tables" Schema="dbo" />
     <AssociationSet Name="ApartmentApartmentPhoto" Association="cityLifeDB.Store.ApartmentApartmentPhoto">
       <End Role="Apartment" EntitySet="Apartments" />
       <End Role="ApartmentPhoto" EntitySet="ApartmentPhotoes" />
@@ -76,6 +77,10 @@
     <AssociationSet Name="GuestOrder" Association="cityLifeDB.Store.GuestOrder">
       <End Role="Guest" EntitySet="Guests" />
       <End Role="Order" EntitySet="Orders" />
+    </AssociationSet>
+    <AssociationSet Name="CountryGuest" Association="cityLifeDB.Store.CountryGuest">
+      <End Role="Country" EntitySet="Countries" />
+      <End Role="Guest" EntitySet="Guests" />
     </AssociationSet>
   </EntityContainer>
   <EntityType Name="Apartments">
@@ -239,7 +244,7 @@
     <Property Name="name" Type="nvarchar(max)" Nullable="false" />
     <Property Name="phone" Type="nvarchar(max)" Nullable="false" />
     <Property Name="email" Type="nvarchar(max)" Nullable="false" />
-    <Property Name="country" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Country_code" Type="nchar" MaxLength="3" Nullable="false" />
   </EntityType>
   <EntityType Name="Employees">
     <Key>
@@ -252,6 +257,13 @@
     <Property Name="passwordHash" Type="nvarchar(max)" Nullable="false" />
     <Property Name="email" Type="nvarchar(max)" Nullable="false" />
     <Property Name="userName" Type="nvarchar(max)" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Countries">
+    <Key>
+      <PropertyRef Name="code" />
+    </Key>
+    <Property Name="code" Type="nchar" Nullable="false" MaxLength="3" />
+    <Property Name="name" Type="nvarchar(max)" Nullable="false" />
   </EntityType>
   <Association Name="ApartmentApartmentPhoto">
     <End Role="Apartment" Type="cityLifeDB.Store.Apartments" Multiplicity="1" />
@@ -421,6 +433,18 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
+  <Association Name="CountryGuest">
+    <End Role="Country" Type="cityLifeDB.Store.Countries" Multiplicity="1" />
+    <End Role="Guest" Type="cityLifeDB.Store.Guests" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Country">
+        <PropertyRef Name="code" />
+      </Principal>
+      <Dependent Role="Guest">
+        <PropertyRef Name="Country_code" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
 </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
@@ -497,6 +521,11 @@
             <End Role="Order" EntitySet="Orders" />
           </AssociationSet>
           <EntitySet Name="Employees" EntityType="cityLifeDB.Employee" />
+          <EntitySet Name="Countries" EntityType="cityLifeDB.Country" />
+          <AssociationSet Name="CountryGuest" Association="cityLifeDB.CountryGuest">
+            <End Role="Country" EntitySet="Countries" />
+            <End Role="Guest" EntitySet="Guests" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="Apartment">
           <Key>
@@ -786,8 +815,8 @@
           <Property Name="name" Type="String" Nullable="false" />
           <Property Name="phone" Type="String" Nullable="false" />
           <Property Name="email" Type="String" Nullable="false" />
-          <Property Name="country" Type="String" Nullable="false" />
           <NavigationProperty Name="Orders" Relationship="cityLifeDB.GuestOrder" FromRole="Guest" ToRole="Order" />
+          <NavigationProperty Name="Country" Relationship="cityLifeDB.CountryGuest" FromRole="Guest" ToRole="Country" />
         </EntityType>
         <Association Name="GuestOrder">
           <End Type="cityLifeDB.Guest" Role="Guest" Multiplicity="1" />
@@ -805,6 +834,18 @@
           <Property Name="email" Type="String" Nullable="false" />
           <Property Name="userName" Type="String" Nullable="false" />
         </EntityType>
+        <EntityType Name="Country">
+          <Key>
+            <PropertyRef Name="code" />
+          </Key>
+          <Property Name="code" Type="String" Nullable="false" annotation:StoreGeneratedPattern="None" FixedLength="true" MaxLength="3" Unicode="true" />
+          <Property Name="name" Type="String" Nullable="false" />
+          <NavigationProperty Name="Guests" Relationship="cityLifeDB.CountryGuest" FromRole="Country" ToRole="Guest" />
+        </EntityType>
+        <Association Name="CountryGuest">
+          <End Type="cityLifeDB.Country" Role="Country" Multiplicity="1" />
+          <End Type="cityLifeDB.Guest" Role="Guest" Multiplicity="*" />
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -969,7 +1010,6 @@
           <ScalarProperty Name="name" ColumnName="name" />
           <ScalarProperty Name="phone" ColumnName="phone" />
           <ScalarProperty Name="email" ColumnName="email" />
-          <ScalarProperty Name="country" ColumnName="country" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -983,6 +1023,14 @@
           <ScalarProperty Name="passwordHash" ColumnName="passwordHash" />
           <ScalarProperty Name="email" ColumnName="email" />
           <ScalarProperty Name="userName" ColumnName="userName" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Countries">
+      <EntityTypeMapping TypeName="IsTypeOf(cityLifeDB.Country)">
+        <MappingFragment StoreEntitySet="Countries">
+          <ScalarProperty Name="code" ColumnName="code" />
+          <ScalarProperty Name="name" ColumnName="name" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -1096,6 +1144,14 @@
         <ScalarProperty Name="Id" ColumnName="Guest_Id" />
       </EndProperty>
       <EndProperty Name="Order">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="CountryGuest" TypeName="cityLifeDB.CountryGuest" StoreEntitySet="Guests">
+      <EndProperty Name="Country">
+        <ScalarProperty Name="code" ColumnName="Country_code" />
+      </EndProperty>
+      <EndProperty Name="Guest">
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
     </AssociationSetMapping>

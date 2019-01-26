@@ -12,21 +12,18 @@ namespace cityLife4
     using System;
     using System.Collections.Generic;
     
-    public partial class Guest
+    public partial class Country
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Guest()
+        public Country()
         {
-            this.Orders = new HashSet<Order>();
+            this.Guests = new HashSet<Guest>();
         }
     
-        public int Id { get; set; }
+        public string code { get; set; }
         public string name { get; set; }
-        public string phone { get; set; }
-        public string email { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Order> Orders { get; set; }
-        public virtual Country Country { get; set; }
+        public virtual ICollection<Guest> Guests { get; set; }
     }
 }

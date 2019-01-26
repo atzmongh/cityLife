@@ -249,7 +249,7 @@ namespace cityLife.Controllers
                 children = theOrder.childrenCount,
                 checkin = theOrder.checkinDate.ToShortDateString(),
                 checkout = theOrder.checkoutDate.ToShortDateString(),
-                country = theOrder.Guest.country,
+                country = theOrder.Guest.Country.name,
                 expectedArrival = theOrder.expectedArrival,
                 price = theOrder.priceAsMoney(),
                 paid = theOrder.amountPaidAsMoney(),
@@ -264,8 +264,14 @@ namespace cityLife.Controllers
             //return jResult;
         }
 
+        /// <summary>
+        /// Called when the user wants to update an existing order (after pressing an order on the dashboard)
+        /// This is the get request part which displays the order form. The actual update is done by s25addUpdateOrder()
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns>update order form</returns>
         [HttpGet]
-        public ActionResult s23addUpdateOrder(int? orderId)
+        public ActionResult s23updateOrder(int? orderId)
         {
 
             if (orderId != null)
@@ -274,7 +280,51 @@ namespace cityLife.Controllers
                 var theOrder = db.Orders.Single(a => a.Id == orderId);
                 ViewBag.order = theOrder;
             }
+            TranslateBox tBox = this.setTbox("RU");
+            ViewBag.tBox = tBox;
             return View("s23addUpdateOrder");
+        }
+
+        /// <summary>
+        /// Called when the user wants to add a new Order. (when he presses an empty cell on the dashboard).
+        /// This is the get request part which displays the order form. The actual update is done by s25addUpdateOrder()
+        /// </summary>
+        /// <param name="checkin">checkin date (yyyy--mm-dd - converted to DateTime</param>
+        /// <param name="checkout">checkout date</param>
+        /// <param name="nights">number of nights</param>
+        /// <param name="apartmentNumber"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public ActionResult s24addOrder(DateTime checkin, DateTime checkout, int nights, int apartmentNumber)
+        {
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+
+            Apartment theApartment = db.Apartments.Single(a => a.number == apartmentNumber);
+            Order theOrder = new Order()
+            {
+                checkinDate = checkin,
+                checkoutDate = checkout,
+                dayCount = nights,
+                Apartment = theApartment
+            };
+            ViewBag.order = theOrder;
+            BookingFormData theBookingFormData = new BookingFormData();
+            ViewBag.bookingData = theBookingFormData;
+            TranslateBox tBox = this.setTbox("RU");
+            ViewBag.tBox = tBox;
+            ViewBag.countries = db.Countries;
+            return View("s23addUpdateOrder");
+        }
+
+        /// <summary>
+        /// This method is called when the user finished adding or updating an order. This method performs validity checks and if OK - 
+        /// updates or adds the Order. Otherwise - sends error messages.
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult s25addUpdateOrder()
+        {
+            return View();
         }
         /// <summary>
         /// This method is an auxiliary method to create the translation box and to insert it if needed to the Session variable
