@@ -19,7 +19,7 @@
         width: 100%;
         border: 1px solid #A3B6CC;
         position: relative;
-        margin-bottom: 10px;
+        margin-bottom: 15px;
     }
 
     .inputElement {
@@ -42,16 +42,25 @@
         font-family: 'lato-semibold', Arial, sans-serif;
         font-size: 16px;
     }
+
+    .error-text {
+        position: absolute;
+        top: -16px;
+        right: 0px;
+        color: red;
+        background: white;
+    }
+
+    .error {
+        border-color: red;
+    }
 </style>
 
-<div class="inputBox">
-    <input id="email" name="email" type="email" value="" class="inputElement" />
-    <label for="email" class="label">@tBox.translate("Email")</label>
-</div>
-<div class="inputBox">
-    <input id="name" name="name" type="text" value="" class="inputElement" />
-    <label for="name" class="label">@tBox.translate("Name")</label>
-</div>
+
+@Html.inputField(theBookingFormData.email, tBox, fieldType:"email")
+@Html.inputField(theBookingFormData.name, tBox)
+
+
 
 <div class="inputBox select-box @theBookingFormData.country.errorOrNot">
     <input list="countryList" name="country" id="country" value="@theBookingFormData.country.content" class="inputElement" />
@@ -62,14 +71,18 @@
         }
     </datalist>
     <label for="country" class="label">@tBox.translate("Country")</label>
-    <span class="field-error" id="countryError">@tBox.translate(theBookingFormData.country.errorMessage)</span>
+    <span class="error-text" >@tBox.translate(theBookingFormData.country.errorMessage)</span>
 </div>
 
-<div class="inputBox">
-    <input id="country" name="country" type="text" value="John Smith" class="inputElement" />
-    <label for="country" class="label">name</label>
-</div>
+@Html.inputField(theBookingFormData.phone, tBox, "phone")
+@Html.inputField(theBookingFormData.arrivalTime, tBox)
 
+<div class="inputBox @theBookingFormData.specialRequest.errorOrNot" style="height:120px;">
+    <textarea id="specialRequest" name="specialRequest" class="inputElement" style="height:80px;">@theBookingFormData.specialRequest.content</textarea>
+    <label for="specialReqest" class="label">@tBox.translate("Special Requests")</label>
+    <span class="error-text">@theBookingFormData.specialRequest.errorMessage saf sdf sdf sdf </span>
+</div>
+<btn class="btn" onclick="activate('Booking')">@tBox.translate("Next")</btn>
 
 
 

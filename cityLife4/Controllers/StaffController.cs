@@ -11,8 +11,8 @@ namespace cityLife.Controllers
 {
     public class LoginFormData
     {
-        public FieldData userName = new FieldData();
-        public FieldData password = new FieldData();
+        public FieldData userName = new FieldData("User Name");
+        public FieldData password = new FieldData("Password");
     }
     /// <summary>
     /// A day block is either a single free day, or a group of occupied days for a single apartment and a single guest.

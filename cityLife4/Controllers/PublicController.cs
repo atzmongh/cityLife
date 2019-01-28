@@ -61,6 +61,7 @@ namespace cityLife.Controllers
 
     public class FieldData
     {
+        public string fieldName;
         public string content="";
         public string errorMessage = "";
         public string errorOrNot
@@ -70,17 +71,36 @@ namespace cityLife.Controllers
                 return errorMessage != "" ? "error" : "";
             }
         }
+        public FieldData(string theName)
+        {
+            this.fieldName = theName;
+        }
+        /// <summary>
+        /// The method returns the field name without spaces. For examle, the name: Arrival Time will be returned as
+        /// ArrivalTime (Camel Case). It does not change the case of the first letter of each word, so the name:
+        /// Special request will be returned as Specialrequest
+        /// </summary>
+        public string fieldCamelName
+        {
+            get
+            {
+                string camelName = this.fieldName.Replace(" ", "");
+                return camelName;
+            }
+        }
+           
        
     }
+
         
     public class BookingFormData
     {
-        public FieldData name = new FieldData();
-        public FieldData country = new FieldData();
-        public FieldData email = new FieldData();
-        public FieldData phone = new FieldData();
-        public FieldData arrivalTime = new FieldData();
-        public FieldData specialRequest = new FieldData();
+        public FieldData name = new FieldData("Name");
+        public FieldData country = new FieldData("Country");
+        public FieldData email = new FieldData("Email");
+        public FieldData phone = new FieldData("Phone");
+        public FieldData arrivalTime = new FieldData("Arrival Time");
+        public FieldData specialRequest = new FieldData("Special Request");
 
         public bool errorExists()
         {

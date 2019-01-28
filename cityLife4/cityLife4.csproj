@@ -120,7 +120,13 @@
       <DependentUpon>cityLifeDB.edmx</DependentUpon>
     </Content>
     <Content Include="cityLifeDB.edmx.sql" />
+    <Content Include="css\compiled\buttons.css" />
+    <Content Include="css\compiled\extend.css" />
+    <Content Include="css\compiled\styles.css" />
     <Content Include="css\libs.css" />
+    <Content Include="css\parts\_icons.css">
+      <DependentUpon>_icons.scss</DependentUpon>
+    </Content>
     <Content Include="css\styles.css" />
     <Content Include="fonts\icons\clife-icons.svg" />
     <Content Include="fonts\lato-bold.svg" />
@@ -411,6 +417,10 @@
     <Content Include="Views\Public\p26bookingForm.cshtml" />
     <Content Include="Views\Public\p27bookingFailure.cshtml" />
     <Content Include="Views\Public\p28bookingSuccess.cshtml" />
+    <None Include="compilerconfig.json" />
+    <None Include="compilerconfig.json.defaults">
+      <DependentUpon>compilerconfig.json</DependentUpon>
+    </None>
     <None Include="Properties\PublishProfiles\cityLife4 - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\cityLife4 - Web Deploy1.pubxml" />
     <None Include="Properties\PublishProfiles\cityLife4VM - Web Deploy.pubxml" />
@@ -423,6 +433,8 @@
     <Content Include="Views\Staff\s22OrderDetails.cshtml" />
     <Content Include="Views\Staff\s23addUpdateOrder.cshtml" />
     <Content Include="Views\Staff\s24orderPersonal.cshtml" />
+    <Content Include="Views\Staff\s25orderBooking.cshtml" />
+    <Content Include="Views\Staff\s26orderOther.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
       <SubType>Designer</SubType>

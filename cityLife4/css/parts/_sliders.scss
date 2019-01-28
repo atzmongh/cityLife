@@ -120,7 +120,7 @@
 
 .slick-dots {
   min-width: 285px;
-  @extend .horiz-align;
+  @extend .horiz-align !optional;
   top: 60px;
 
   li {
@@ -146,41 +146,43 @@
 }
 
 .slick-arrow {
-  color: transparent;
-  border: none;
-  background: transparent;
-  font-size: 0;
-  padding: 0;
-  @extend .vert-align;
-  cursor: pointer;
-  z-index: 1;
+    color: transparent;
+    border: none;
+    background: transparent;
+    font-size: 0;
+    padding: 0;
+    @extend .vert-align !optional;
+    cursor: pointer;
+    z-index: 1;
 
-  &:before {
-    font-family: 'clife-icons';
-    font-size: 2.813rem;  //45px
-    color: $white;
-    transition: color 0.2s;
-  }
-
-  &.slick-prev {
-    left: 30px;
     &:before {
-      @extend .clife-ico-arrow-thin-l;
+        font-family: 'clife-icons';
+        font-size: 2.813rem; //45px
+        color: $white;
+        transition: color 0.2s;
     }
-  }
 
-  &.slick-next {
-    right: 30px;
-    &:before {
-      @extend .clife-ico-arrow-thin-r;
-    }
-  }
+    &.slick-prev {
+        left: 30px;
 
-  &:hover {
-    &:before {
-      color: $blue-hover;
+        &:before {
+            @extend .clife-ico-arrow-thin-l !optional;
+        }
     }
-  }
+
+    &.slick-next {
+        right: 30px;
+
+        &:before {
+            @extend .clife-ico-arrow-thin-r !optional;
+        }
+    }
+
+    &:hover {
+        &:before {
+            color: $blue-hover;
+        }
+    }
 }
 
 //.fancybox-button.fancybox-button--arrow_left {

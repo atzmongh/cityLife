@@ -150,7 +150,7 @@ aside.main-sidebar {
         position: relative;
         &:before {
           font-family: 'clife-icons';
-          @extend .clife-ico-arr-b;
+          @extend .clife-ico-arr-b ;
           font-size: 6px;
           color: $grey-txt;
           position: absolute;

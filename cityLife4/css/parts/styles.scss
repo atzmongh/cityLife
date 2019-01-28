@@ -1,17 +1,17 @@
-@import "variables";
-@import "extend";
-@import "normalize";
-@import "fonts";
-@import "icons";
-@import "buttons";
-@import "forms";
-@import "ui-styles";
-@import "main-sidebar";
-@import "sidebar";
-@import "popup";
-@import "sliders";
+@import "_variables.scss";
+@import "_extend.scss";
+@import "_normalize.scss";
+@import "_fonts.scss";
+@import "_icons.scss";
+@import "_buttons.scss";
+@import "_forms.scss";
+@import "_ui-styles.scss";
+@import "_main-sidebar.scss";
+@import "_sidebar.scss";
+@import "_popup.scss";
+@import "_sliders.scss";
 
 
 
 
-@import "ie-fixes";  //must be on last string
+@import "_ie-fixes.scss";  //must be on last string

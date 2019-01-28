@@ -1,0 +1,10 @@
+﻿[
+  {
+    "outputFile": "css/compiled/styles.css",
+    "inputFile": "css/parts/styles.scss"
+  },
+  {
+    "outputFile": "css/parts/_icons.css",
+    "inputFile": "css/parts/_icons.scss"
+  }
+]

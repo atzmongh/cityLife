@@ -1,6 +1,6 @@
 @import "variables";
-@import "fonts";
-@import "icons";
+@import "_fonts.scss";
+@import "_icons.scss";
 
 
 
@@ -248,16 +248,17 @@ strong.blue {
 
 .phone .dropdown-toggle,
 .mail {
-  position: relative;
-  padding-left: 40px;
-  &:before {
-    font-family: 'clife-icons';
-    font-size: 1.4rem;
-    line-height: 1;
-    color: $blue-light;
-    @extend .vert-align;
-    left: 0;
-  }
+    position: relative;
+    padding-left: 40px;
+
+    &:before {
+        font-family: 'clife-icons';
+        font-size: 1.4rem;
+        line-height: 1;
+        color: $blue-light;
+        @extend .vert-align !optional;
+        left: 0;
+    }
 }
 
 .icon-btn {
