@@ -124,9 +124,7 @@
     <Content Include="css\compiled\extend.css" />
     <Content Include="css\compiled\styles.css" />
     <Content Include="css\libs.css" />
-    <Content Include="css\parts\_icons.css">
-      <DependentUpon>_icons.scss</DependentUpon>
-    </Content>
+    <Content Include="css\parts\cicons.css" />
     <Content Include="css\styles.css" />
     <Content Include="fonts\icons\clife-icons.svg" />
     <Content Include="fonts\lato-bold.svg" />
@@ -137,7 +135,6 @@
     <Content Include="fonts\lora-italic.svg" />
     <Content Include="fonts\lora-regular.svg" />
     <Content Include="Global.asax" />
-    <Content Include="css\styles.css.map" />
     <Content Include="fonts\lato-bold.eot" />
     <Content Include="fonts\lato-bold.ttf" />
     <Content Include="fonts\lato-bold.woff" />
@@ -261,6 +258,7 @@
     <Content Include="images\marker.png" />
     <Content Include="App_Data\countryList.txt" />
     <Content Include="messages\m010NewOrder.html" />
+    <Content Include="styles2.css" />
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="cityLifeDB.csv" />
     <Content Include="cityLifeDB.xlsx" />

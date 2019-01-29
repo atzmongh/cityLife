@@ -1,4 +1,5 @@
 @import "variables";
+@import "_extend.scss"
 
 
 
@@ -120,7 +121,7 @@
 
 .slick-dots {
   min-width: 285px;
-  @extend .horiz-align !optional;
+  @extend .horiz-align ;
   top: 60px;
 
   li {
@@ -151,7 +152,7 @@
     background: transparent;
     font-size: 0;
     padding: 0;
-    @extend .vert-align !optional;
+    @extend .vert-align ;
     cursor: pointer;
     z-index: 1;
 
@@ -166,7 +167,7 @@
         left: 30px;
 
         &:before {
-            @extend .clife-ico-arrow-thin-l !optional;
+            @extend .clife-ico-arrow-thin-l ;
         }
     }
 
@@ -174,7 +175,7 @@
         right: 30px;
 
         &:before {
-            @extend .clife-ico-arrow-thin-r !optional;
+            @extend .clife-ico-arrow-thin-r ;
         }
     }
 

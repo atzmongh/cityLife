@@ -1,10 +1,30 @@
 ﻿[
   {
-    "outputFile": "css/compiled/styles.css",
+    "outputFile": "css/styles.css",
     "inputFile": "css/parts/styles.scss"
   },
   {
-    "outputFile": "css/parts/_icons.css",
+    "outputFile": "css/parts/cicons.css",
     "inputFile": "css/parts/_icons.scss"
+  },
+  {
+    "outputFile": "css/parts/_popup.css",
+    "inputFile": "css/parts/_popup.scss"
+  },
+  {
+    "outputFile": "css/parts/_forms.css",
+    "inputFile": "css/parts/_forms.scss"
+  },
+  {
+    "outputFile": "css/parts/_main-sidebar.css",
+    "inputFile": "css/parts/_main-sidebar.scss"
+  },
+  {
+    "outputFile": "css/parts/_sliders.css",
+    "inputFile": "css/parts/_sliders.scss"
+  },
+  {
+    "outputFile": "css/parts/_ui-styles.css",
+    "inputFile": "css/parts/_ui-styles.scss"
   }
 ]

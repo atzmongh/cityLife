@@ -1,11 +1,11 @@
 @font-face {
 	font-family: "clife-icons";
-	src: url('../fonts/icons/clife-icons.eot');
-	src: url('../fonts/icons/clife-icons.eot?#iefix') format('eot'),
-	url('../fonts/icons/clife-icons.woff2') format('woff2'),
-	url('../fonts/icons/clife-icons.woff') format('woff'),
-	url('../fonts/icons/clife-icons.ttf') format('truetype'),
-	url('../fonts/icons/clife-icons.svg#clife-icons') format('svg');
+	src: url('/fonts/icons/clife-icons.eot');
+	src: url('/fonts/icons/clife-icons.eot?#iefix') format('eot'),
+	url('/fonts/icons/clife-icons.woff2') format('woff2'),
+	url('/fonts/icons/clife-icons.woff') format('woff'),
+	url('/fonts/icons/clife-icons.ttf') format('truetype'),
+	url('/fonts/icons/clife-icons.svg#clife-icons') format('svg');
 }
 
 @mixin clife-ico-styles {
