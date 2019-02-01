@@ -46,8 +46,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="~/css/libs.css" media="all">
-    <link rel="stylesheet" type="text/css" href="~/css/styles.css" media="all">
+    <link rel="stylesheet" type="text/css" href="~/css/libs.css?version=@AppVersion.current" media="all">
+    <link rel="stylesheet" type="text/css" href="~/css/styles.css?version=@AppVersion.current" media="all">
     <title>@ViewBag.Title</title>
 </head>
 <body>
@@ -272,7 +272,7 @@
             }
         }
     </script>
-    <script src="/js/libs.js"></script>
-    <script src="/js/scripts.js"></script>
+    <script src="/js/libs.js?version=@AppVersion.current"></script>
+    <script src="/js/scripts.js?version=@AppVersion.current"></script>
 </body>
 </html>

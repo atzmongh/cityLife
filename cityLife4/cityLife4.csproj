@@ -345,6 +345,7 @@
     <Compile Include="classes\Money.cs" />
     <Compile Include="classes\Test.cs" />
     <Compile Include="classes\TranslateBox.cs" />
+    <Compile Include="classes\Version.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\PublicController.cs" />
     <Compile Include="Controllers\StaffController.cs" />

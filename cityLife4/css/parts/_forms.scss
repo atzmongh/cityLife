@@ -54,7 +54,7 @@ input, textarea, select{
 
   .field-name {
     position: absolute;
-    top: 20px;
+    top: 8px;  /*avoid the movement of the label when in focus*/
     left: 10px;
     font-size: 0.75rem;  //12px
     font-family: $lato-medium;
