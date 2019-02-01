@@ -2,5 +2,10 @@
   {
     "outputFile": "css/styles2.css",
     "inputFile": "css/parts/styles.scss"
+  },
+  {
+    "outputFile": "css/s99StaffStyles.css",
+    "inputFile": "css/parts/s99StaffStyles.scss"
   }
+ 
 ]

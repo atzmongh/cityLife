@@ -124,6 +124,8 @@
     <Content Include="css\compiled\extend.css" />
     <Content Include="css\compiled\styles.css" />
     <Content Include="css\libs.css" />
+    <None Include="css\parts\s99StaffStyles.scss" />
+    <Content Include="css\s99StaffStyles.css" />
     <Content Include="css\styles.css" />
     <Content Include="css\styles2.css" />
     <Content Include="fonts\icons\clife-icons.svg" />
@@ -419,6 +421,7 @@
     <None Include="compilerconfig.json.defaults">
       <DependentUpon>compilerconfig.json</DependentUpon>
     </None>
+    <Content Include="css\parts\s24inputElement.scss" />
     <None Include="Properties\PublishProfiles\cityLife4 - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\cityLife4 - Web Deploy1.pubxml" />
     <None Include="Properties\PublishProfiles\cityLife4VM - Web Deploy.pubxml" />

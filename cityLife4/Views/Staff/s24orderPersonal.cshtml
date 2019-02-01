@@ -13,48 +13,6 @@
     DbSet<Country> countries = ViewBag.countries;
 
 }
-<style>
-    .inputBox {
-        height: 60px;
-        width: 100%;
-        border: 1px solid #A3B6CC;
-        position: relative;
-        margin-bottom: 15px;
-    }
-
-    .inputElement {
-        border: 0px;
-        position: absolute;
-        top: 30px;
-        padding-left: 10px;
-        padding-right: 10px;
-        color: #011A36;
-        text-align: left;
-        width: 100%;
-        font-family: 'lato-semibold', Arial, sans-serif;
-        font-size: 16px;
-    }
-
-    .label {
-        position: absolute;
-        padding-left: 10px;
-        color: #A3B6CC;
-        font-family: 'lato-semibold', Arial, sans-serif;
-        font-size: 16px;
-    }
-
-    .error-text {
-        position: absolute;
-        top: -16px;
-        right: 0px;
-        color: red;
-        background: white;
-    }
-
-    .error {
-        border-color: red;
-    }
-</style>
 
 
 @Html.inputField(theBookingFormData.email, tBox, fieldType:"email")

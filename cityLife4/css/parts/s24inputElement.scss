@@ -1,0 +1,41 @@
+﻿
+.inputBox {
+    height: 60px;
+    width: 100%;
+    border: 1px solid $grey-txt;
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.inputElement {
+    border: 0px;
+    position: absolute;
+    top: 30px;
+    padding-left: 10px;
+    padding-right: 10px;
+    color: $blue-dark;
+    text-align: left;
+    width: 100%;
+    font-family: $lato-semibold;
+    font-size: 16px;
+}
+
+.label {
+    position: absolute;
+    padding-left: 10px;
+    color: $grey-txt;
+    font-family: $lato-semibold;
+    font-size: 16px;
+}
+
+.error-text {
+    position: absolute;
+    top: -16px;
+    right: 0px;
+    color: red;
+    background: white;
+}
+
+.error {
+    border-color: red;
+}
