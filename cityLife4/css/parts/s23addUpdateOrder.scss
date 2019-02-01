@@ -1,0 +1,22 @@
+﻿/*styles for the order wizard (containing the 3 parts: personal, booking, other*/
+.wizard {
+    display: flex;
+}
+
+.nonActiveWizard {
+    color: black;
+    border-bottom: 1px solid #00C1E5;
+}
+
+.activeWizard {
+    color: #00C1E5;
+    border-bottom: 2px solid #00C1E5;
+}
+
+.wizard li {
+    padding-left: 10px;
+    padding-right: 10px;
+    cursor: pointer;
+}
+
+

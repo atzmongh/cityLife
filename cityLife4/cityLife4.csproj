@@ -124,8 +124,8 @@
     <Content Include="css\compiled\extend.css" />
     <Content Include="css\compiled\styles.css" />
     <Content Include="css\libs.css" />
-    <Content Include="css\parts\cicons.css" />
     <Content Include="css\styles.css" />
+    <Content Include="css\styles2.css" />
     <Content Include="fonts\icons\clife-icons.svg" />
     <Content Include="fonts\lato-bold.svg" />
     <Content Include="fonts\lato-extrabold.svg" />
