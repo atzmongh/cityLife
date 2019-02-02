@@ -107,7 +107,8 @@ namespace cityLife.Controllers
             }
 
             Session["loggedinUser"] = theEmployee;
-            return View("s20dashboard");
+           
+            return this.s21Dashboard(null);
         }
 
         /// <summary>
@@ -136,6 +137,8 @@ namespace cityLife.Controllers
             ViewBag.tBox = tBox;
             ViewBag.fromDate = fromDate;
             ViewBag.today = FakeDateTime.Now;
+            Employee theEmployee = (Employee)Session["loggedinUser"];
+            ViewBag.employee = theEmployee;
             return View("s21Dashboard");
         }
 

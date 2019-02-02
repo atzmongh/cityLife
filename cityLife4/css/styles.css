@@ -380,7 +380,7 @@ aside.main-sidebar .currency .dropdown-toggle .name:before {
   display: none; }
 
 input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus, textarea:-webkit-autofill, textarea:-webkit-autofill:hover, textarea:-webkit-autofill:focus, select:-webkit-autofill, select:-webkit-autofill:hover, select:-webkit-autofill:focus {
-  border: none !important;
+  /*border: none !important;                 it seems not needed - caused input elements to lose their border if google autofilled them*/
   -webkit-text-fill-color: inherit !important;
   -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
   -webkit-transition: background-color 5000s ease-in-out 0s;
@@ -1695,21 +1695,30 @@ aside.main-sidebar {
   background: rgba(0, 0, 0, 0.6);
   overflow: auto;
   z-index: 10;
-  -webkit-transition: opacity 0s ease 0.4s, visibility 0s ease 0.4s;
-  -o-transition: opacity 0s ease 0.4s, visibility 0s ease 0.4s;
-  transition: opacity 0s ease 0.4s, visibility 0s ease 0.4s; }
+  -webkit-transition: opacity 0s ease 0.4s,
+ visibility 0s ease 0.4s;
+  -o-transition: opacity 0s ease 0.4s,
+ visibility 0s ease 0.4s;
+  transition: opacity 0s ease 0.4s,
+ visibility 0s ease 0.4s; }
   .popup.open {
     opacity: 1;
     visibility: visible;
-    -webkit-transition: opacity 0s ease 0s, visibility 0s ease 0s;
-    -o-transition: opacity 0s ease 0s, visibility 0s ease 0s;
-    transition: opacity 0s ease 0s, visibility 0s ease 0s; }
+    -webkit-transition: opacity 0s ease 0s,
+ visibility 0s ease 0s;
+    -o-transition: opacity 0s ease 0s,
+ visibility 0s ease 0s;
+    transition: opacity 0s ease 0s,
+ visibility 0s ease 0s; }
     .popup.open .popup-box {
       opacity: 1;
       visibility: visible;
-      -webkit-transition: opacity 0.4s ease 0s, visibility 0s ease 0s;
-      -o-transition: opacity 0.4s ease 0s, visibility 0s ease 0s;
-      transition: opacity 0.4s ease 0s, visibility 0s ease 0s; }
+      -webkit-transition: opacity 0.4s ease 0s,
+ visibility 0s ease 0s;
+      -o-transition: opacity 0.4s ease 0s,
+ visibility 0s ease 0s;
+      transition: opacity 0.4s ease 0s,
+ visibility 0s ease 0s; }
 
 .popup-centered {
   display: -webkit-box;
@@ -1735,9 +1744,12 @@ aside.main-sidebar {
   padding: 80px 55px 50px;
   text-align: center;
   background: #ffffff;
-  -webkit-transition: opacity 0.4s ease 0s, visibility 0s ease 0.4s;
-  -o-transition: opacity 0.4s ease 0s, visibility 0s ease 0.4s;
-  transition: opacity 0.4s ease 0s, visibility 0s ease 0.4s; }
+  -webkit-transition: opacity 0.4s ease 0s,
+ visibility 0s ease 0.4s;
+  -o-transition: opacity 0.4s ease 0s,
+ visibility 0s ease 0.4s;
+  transition: opacity 0.4s ease 0s,
+ visibility 0s ease 0.4s; }
   .popup-box .btn {
     width: 300px; }
   .popup-box .title {

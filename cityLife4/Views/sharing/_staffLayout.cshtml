@@ -1,6 +1,9 @@
 ﻿@using cityLife4;
 @{
-    Layout = null;
+    TranslateBox tBox = ViewBag.tBox;
+    DateTime fromDate = ViewBag.fromDate;
+    string fromDateSt = fromDate.ToString("dd MMMM, yyyy");
+    Employee theEmployee = ViewBag.employee;
 }
 
 <!DOCTYPE html>
@@ -11,17 +14,57 @@
     <meta name="viewport" content="width=device-width" />
     <link rel="stylesheet" type="text/css" href="~/css/libs.css?version=@AppVersion.current" media="all">
     <link rel="stylesheet" type="text/css" href="~/css/styles.css?version=@AppVersion.current" media="all">
-    <link rel="stylesheet" type="text/css" href="~/css/s99StaffStyles.css?version=@AppVersion.current" media="all"/>
+    <link rel="stylesheet" type="text/css" href="~/css/s99StaffStyles.css?version=@AppVersion.current" media="all" />
     <title>_staffLayout</title>
 </head>
 <body>
-    <div>
-        Dashboard
-    </div>
-    <div>
-        @RenderBody()
-    </div>
-    <script>
+
+    <main>
+        <nav class="main-nav">
+            <div class="holder">
+                <div class="personal-info">
+                    @{ 
+                        string photoURL = string.Format("/images/employee{0}.jpg",theEmployee.Id);
+                    }
+                    <div class="photo" style="background-image: url('@photoURL');background-size:contain;"></div>
+                    <div class="position">@tBox.translate(theEmployee.role)</div>
+                    <div class="email-wrap">
+                        <a href="mailto:@theEmployee.email" class="email">@theEmployee.email</a>
+                    </div>
+                </div>
+                <ul class="list">
+                    <li><a href="#">@tBox.translate("Dashboard")</a></li>
+                    <li><a href="#">@tBox.translate("Book")</a></li>
+                    <li><a href="#">@tBox.translate("Expenses/Income")</a></li>
+                    <li><a href="#">@tBox.translate("Apartment list")</a></li>
+                    <li><a href="#">@tBox.translate("Revenu report")</a></li>
+                </ul>
+            </div>
+        </nav>
+        <div class="mobile-menu-toggle"><span></span></div>
+
+        <div class="main-wrapper reset-indent">
+            <div class="page-heading">
+                @tBox.translate("Dashboard")
+                <span>(</span>
+                <input type="text" id="choosedDate" class="choosed-date">
+                <span>)</span>
+                <label for="datepickerBtn" class="datepicker-btn">
+                    <input type="text" id="datepickerBtn" class="call-datepicker">
+                </label>
+            </div>
+            @RenderBody()
+        </div>
+    </main>
+
+    <script src="/js/libs.js?version=@AppVersion.current"></script>
+    <script src="/js/scripts.js?version=@AppVersion.current"></script>
+</body>
+</html>
+
+
+
+<script>
         @{
             var yearNow = FakeDateTime.Now.Year;
             var monthNow = FakeDateTime.Now.Month-1;
@@ -30,8 +73,4 @@
         var timeNow = new Date(@yearNow,@monthNow,@dayNow);
 
 
-    </script>
-
-    @*<script src="/js/scripts.js"></script>*@
-</body>
-</html>
+</script>

@@ -257,6 +257,8 @@
     <Content Include="images\apartment 24\main_photo_24P.jpg" />
     <Content Include="images\CL_logo_cropped.jpg" />
     <Content Include="images\defaultLandscape.jpg" />
+    <Content Include="images\employee1.jpg" />
+    <Content Include="images\employee2.jpg" />
     <Content Include="images\marker.png" />
     <Content Include="App_Data\countryList.txt" />
     <Content Include="messages\m010NewOrder.html" />
@@ -428,15 +430,17 @@
     <None Include="Properties\PublishProfiles\cityLife4VM - Web Deploy.pubxml" />
     <Content Include="Views\Public\p50OurRulesEnglish.cshtml" />
     <Content Include="Views\Public\t10welcomeMail.cshtml" />
-    <Content Include="Views\Staff\s10login.cshtml" />
     <Content Include="Views\sharing\_staffLayout.cshtml" />
     <Content Include="Views\Staff\s20dashboard.cshtml" />
-    <Content Include="Views\Staff\s21Dashboard.cshtml" />
+    <Content Include="Views\Staff\s21Dashboard-old.cshtml" />
     <Content Include="Views\Staff\s22OrderDetails.cshtml" />
     <Content Include="Views\Staff\s23addUpdateOrder.cshtml" />
     <Content Include="Views\Staff\s24orderPersonal.cshtml" />
     <Content Include="Views\Staff\s25orderBooking.cshtml" />
     <Content Include="Views\Staff\s26orderOther.cshtml" />
+    <Content Include="Views\Staff\s10login.cshtml" />
+    <Content Include="Views\sharing\cityLifeLogoSvg.cshtml" />
+    <Content Include="Views\Staff\s21dashboard.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
       <SubType>Designer</SubType>

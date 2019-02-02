@@ -38,7 +38,14 @@ $( function() {
     }
 } );
 
-//$('.ui-datepicker-calendar').insertAfter('.datepicker-note');
+//datepicker in page heading
+$("#datepickerBtn").datepicker({
+    numberOfMonths: 1,
+    dateFormat: "d M, y",
+    firstDay: 1,
+    altField: "#choosedDate"
+}).datepicker("setDate", new Date());
+
 function dropdown() {
     var dropdown = $('.dropdown');
 
@@ -103,7 +110,7 @@ jQuery(document).ready(function () {
 function mobileMenu(){
     $('.mobile-menu-toggle').on('click', function () {
         $(this).toggleClass('active');
-        $('.main-sidebar').toggleClass('active');
+        $('.main-sidebar, .main-nav').toggleClass('active');
         $('body').toggleClass('active-menu');
     })
 }

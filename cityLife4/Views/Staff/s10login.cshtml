@@ -1,4 +1,5 @@
-﻿@using cityLife4;
+﻿
+@using cityLife4;
 @using cityLife.Controllers;
 @{
     Layout = null;
@@ -8,36 +9,47 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width" />
-    <link rel="stylesheet" type="text/css" href="~/css/libs.css" media="all">
-    <link rel="stylesheet" type="text/css" href="~/css/styles.css" media="all">
-    <title>s10login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="/css/libs.css?version=@AppVersion.current" media="all">
+    <link rel="stylesheet" type="text/css" href="/css/styles.css?version=@AppVersion.current" media="all">
+    <title>Admin - login</title>
 </head>
 <body>
-    <div class="form" style="padding:20px;width:80%">
-        <form id="login" method="post">
-            <h2>Login</h2><br />
-            <div class="field-box @theLoginFormData.userName.errorOrNot">
-                <input type="text" id="userName" name="userName" value="@theLoginFormData.userName.content">
-                <label for="userName">
-                    <span class="field-name"> @tBox.translate("User Name")</span>
-                </label>
-                <span class="field-error" id="userNameError">@tBox.translate(theLoginFormData.userName.errorMessage)</span>
-            </div>
-            <div class="field-box @theLoginFormData.password.errorOrNot">
-                <input type="password" id="password" name="password">
-                <label for="password">
-                    <span class="field-name"> @tBox.translate("Password")</span>
-                </label>
-                <span class="field-error" id="passwordError">@tBox.translate(theLoginFormData.password.errorMessage)</span>
-            </div>
-            <input type="submit" class="btn" style="min-width:120px; height:auto" value="OK" />
-            <input type="button" class="btn" style="min-width:120px; height:auto" value="Cancel" />
-        </form>
 
-    </div>
+    <main>
+        <div class="main-wrapper reset-indent">
+            <div class="login">
+                <div class="helper">
+                    <a href="#" class="logo">
+                       @Html.Partial("/views/sharing/cityLifeLogoSvg.cshtml")
+                    </a>
+                    <form method="post" >
+                        <div class="field-box @theLoginFormData.userName.errorOrNot">
+                            <input type="text" id="userName" name="userName" value="@theLoginFormData.userName.content">
+                            <label for="userName">
+                                <span class="field-name"> @tBox.translate("User Name")</span>
+                            </label>
+                            <span class="field-error" id="userNameError">@tBox.translate(theLoginFormData.userName.errorMessage)</span>
+                        </div>
+                        <div class="field-box @theLoginFormData.password.errorOrNot">
+                            <input type="password" id="password" name="password">
+                            <label for="password">
+                                <span class="field-name"> @tBox.translate("Password")</span>
+                            </label>
+                            <span class="field-error" id="passwordError">@tBox.translate(theLoginFormData.password.errorMessage)</span>
+                        </div>
+                        <input type="submit" class="btn" style="min-width:120px; height:auto" value="OK" />
+                        <input type="button" class="btn" style="min-width:120px; height:auto" value="Cancel" />
+                    </form>
+                </div>
+                <a href="#" class="link">Go to the website</a>
+            </div>
+        </div>
+    </main>
+
     <script src="/js/libs.js"></script>
     <script src="/js/scripts.js"></script>
 </body>
