@@ -96,13 +96,13 @@ namespace cityLife.Controllers
     public class BookingFormData
     {
         public FieldData name = new FieldData("Name");
-        public FieldData country = new FieldData("Country");
+        public FieldData country = new FieldData("Country Name");
         public FieldData email = new FieldData("Email");
         public FieldData phone = new FieldData("Phone");
         public FieldData arrivalTime = new FieldData("Arrival Time");
         public FieldData specialRequest = new FieldData("Special Request");
 
-        public bool errorExists()
+        public virtual bool errorExists()
         {
             if (name.errorMessage != "" ||
                 country.errorMessage != "" ||
@@ -210,38 +210,38 @@ namespace cityLife.Controllers
       
 
         [HttpPost]
-        public PartialViewResult p27bookingOrder(int apartmentId, string name, string countryName, string email, string phone, string arrivalTime, string specialRequest)
+        public PartialViewResult p27bookingOrder(int apartmentId, string Name, string CountryName, string Email, string Phone, string ArrivalTime, string SpecialRequest)
         {
             prepareDataForp26p27(apartmentId);
 
             //perform validity chekcs on the input
             BookingFormData theBookingFormData = new BookingFormData();
-            theBookingFormData.name.content = name;
-            if (name == "")
+            theBookingFormData.name.content = Name;
+            if (Name == "")
             {
                 theBookingFormData.name.errorMessage = "Please enter your name";
             }
-            theBookingFormData.country.content = countryName;
-            if (countryName == "")
+            theBookingFormData.country.content = CountryName;
+            if (CountryName == "")
                 theBookingFormData.country.errorMessage = "Please select your country";
             else
             {
                 cityLifeDBContainer1 db = new cityLifeDBContainer1();
-                Country theCountry = db.Countries.SingleOrDefault(a => a.name == countryName);
+                Country theCountry = db.Countries.SingleOrDefault(a => a.name == CountryName);
                 if (theCountry == null)
                 {
                     theBookingFormData.country.errorMessage = "This country does not exist in our country list";
                 }
             }
-            theBookingFormData.email.content = email;
-            if (!this.IsValidEmail(email))
+            theBookingFormData.email.content = Email;
+            if (!this.IsValidEmail(Email))
                 theBookingFormData.email.errorMessage = "Please enter a valid email address";
-            theBookingFormData.phone.content = phone;
-            if (!Regex.Match(phone, @"^(\+?[0-9]{10,13})$").Success)
+            theBookingFormData.phone.content = Phone;
+            if (!Regex.Match(Phone, @"^(\+?[0-9]{10,13})$").Success)
                 theBookingFormData.phone.errorMessage = "Please enter a valid phone number";
 
-            theBookingFormData.arrivalTime.content = arrivalTime;
-            theBookingFormData.specialRequest.content = specialRequest;
+            theBookingFormData.arrivalTime.content = ArrivalTime;
+            theBookingFormData.specialRequest.content = SpecialRequest;
 
             ViewBag.bookingFormData = theBookingFormData;
             if (theBookingFormData.errorExists())
@@ -256,8 +256,8 @@ namespace cityLife.Controllers
                 Apartment theAparatment = db.Apartments.Single(anApartment => anApartment.Id == apartmentId);
                 BookingRequest theBookingRequest = (BookingRequest)Session["bookingRequest"];
                 Currency currentCurrency = (Currency)Session["currentCurrency"];
-                ApartmentPrice apartmentAndPrice = this.calculatePricePerStayForApartment(theAparatment, db, theBookingRequest, currentCurrency);
-                Country theCountry = db.Countries.Single(a => a.name == countryName);
+                ApartmentPrice apartmentAndPrice = calculatePricePerStayForApartment(theAparatment, db, theBookingRequest, currentCurrency);
+                Country theCountry = db.Countries.Single(a => a.name == CountryName);
                 if (apartmentAndPrice.availability != Availability.AVAILABLE)  
                 {
                     //the apartment is not available, although it seemed to be available. Perhaps it was taken in the last minutes
@@ -272,16 +272,16 @@ namespace cityLife.Controllers
                     Currency theCurrency = db.Currencies.Single(a => a.currencyCode == apartmentAndPrice.pricePerStay.currency);
 
                     Guest theGuest = db.Guests.FirstOrDefault
-                        (aGuest=> aGuest.email == email && aGuest.name == name && aGuest.phone == phone && aGuest.Country.name == theCountry.name);
+                        (aGuest=> aGuest.email == Email && aGuest.name == Name && aGuest.phone == Phone && aGuest.Country.name == theCountry.name);
 
                     if (theGuest == null)
                     {
                         //there is no such guest - create new
                         theGuest = new Guest()
                         {
-                            name = name,
-                            phone = phone,
-                            email = email,
+                            name = Name,
+                            phone = Phone,
+                            email = Email,
                             Country = theCountry
                         };
                         db.Guests.Add(theGuest);
@@ -292,13 +292,13 @@ namespace cityLife.Controllers
                         adultCount = (int)theBookingRequest.adults,
                         amountPaid = 0,
                         Apartment = theAparatment,
-                        bookedBy = name,
+                        bookedBy = Name,
                         checkinDate = (DateTime)theBookingRequest.checkinDate,
                         checkoutDate = (DateTime)theBookingRequest.checkoutDate,
                         childrenCount = theBookingRequest.children??0,
                         confirmationNumber = "0",
-                        expectedArrival = arrivalTime,
-                        specialRequest = specialRequest,
+                        expectedArrival = ArrivalTime,
+                        specialRequest = SpecialRequest,
                         status = OrderStatus.Created,
                         dayCount = dayCount,
                         price = apartmentAndPrice.pricePerStay.toCents(),
@@ -451,7 +451,7 @@ namespace cityLife.Controllers
             {
                 //We have a booking request - we need to show the information about price per stay for each apartment 
                 //and also availabiltiy information for each apartment
-                apartmentList = this.calculatePricePerStay(theBookingRequest, theCurrency);
+                apartmentList = calculatePricePerStay(theBookingRequest, theCurrency);
             }
             else
             {
@@ -514,7 +514,7 @@ namespace cityLife.Controllers
         /// <param name="childrenCount">number of children</param>
         /// <returns>list of apartments. For each apartment - the price per stay (if available)
         /// and the availability (available, not available, not suitable)</returns>
-        public List<ApartmentPrice> calculatePricePerStay(BookingRequest theBookingRequest, Currency theCurrency)
+        public static List<ApartmentPrice> calculatePricePerStay(BookingRequest theBookingRequest, Currency theCurrency)
         {
 
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
@@ -523,7 +523,7 @@ namespace cityLife.Controllers
             //Check apartment availability for the given dates and for the given occupation
             foreach (var anApartment in db.Apartments)
             {
-                ApartmentPrice apartmentAndPrice = this.calculatePricePerStayForApartment(anApartment, db, theBookingRequest, theCurrency);
+                ApartmentPrice apartmentAndPrice = calculatePricePerStayForApartment(anApartment, db, theBookingRequest, theCurrency);
                 apartmentList.Add(apartmentAndPrice);
             }
 
@@ -539,7 +539,7 @@ namespace cityLife.Controllers
         /// <param name="theBookingRequest"></param>
         /// <param name="theCurrency"></param>
         /// <returns>apartment availability and price information</returns>
-        private ApartmentPrice calculatePricePerStayForApartment(Apartment anApartment, cityLifeDBContainer1 db, BookingRequest theBookingRequest, Currency theCurrency)
+        public static ApartmentPrice calculatePricePerStayForApartment(Apartment anApartment, cityLifeDBContainer1 db, BookingRequest theBookingRequest, Currency theCurrency)
         {
             ApartmentPrice apartmentAndPrice;
             var apartmentDays = from anApartmentDay in db.ApartmentDays

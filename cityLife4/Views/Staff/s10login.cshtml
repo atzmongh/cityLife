@@ -26,7 +26,7 @@
                     <a href="#" class="logo">
                        @Html.Partial("/views/sharing/cityLifeLogoSvg.cshtml")
                     </a>
-                    <form method="post" >
+                    <form method="post" action="/staff/s10login" >
                         <div class="field-box @theLoginFormData.userName.errorOrNot">
                             <input type="text" id="userName" name="userName" value="@theLoginFormData.userName.content">
                             <label for="userName">

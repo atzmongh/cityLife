@@ -9,7 +9,7 @@
     ViewBag.Title = "s23addUpdateOrder";
     Order theOrder = ViewBag.order;
     TranslateBox tBox = ViewBag.tBox;
-    BookingFormData theBookingFormData = ViewBag.bookingData;
+    StaffBookingFormData theBookingFormData = ViewBag.bookingData;
     DbSet<Country> countries = ViewBag.countries;
 
 }
@@ -21,7 +21,7 @@
 
 
 <div class="inputBox select-box @theBookingFormData.country.errorOrNot">
-    <input list="countryList" name="country" id="country" value="@theBookingFormData.country.content" class="inputElement" />
+    <input list="countryList" name="@theBookingFormData.country.fieldCamelName" id="country" value="@theBookingFormData.country.content" class="inputElement" />
     <datalist id="countryList">
         @foreach (var aCountry in countries)
         {
@@ -36,7 +36,7 @@
 @Html.inputField(theBookingFormData.arrivalTime, tBox)
 
 <div class="inputBox @theBookingFormData.specialRequest.errorOrNot" style="height:120px;">
-    <textarea id="specialRequest" name="specialRequest" class="inputElement" style="height:80px;">@theBookingFormData.specialRequest.content</textarea>
+    <textarea id="specialRequest" name="@theBookingFormData.specialRequest.fieldCamelName" class="inputElement" style="height:80px;">@theBookingFormData.specialRequest.content</textarea>
     <label for="specialReqest" class="label">@tBox.translate("Special Requests")</label>
     <span class="error-text">@theBookingFormData.specialRequest.errorMessage saf sdf sdf sdf </span>
 </div>

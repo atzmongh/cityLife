@@ -32,7 +32,7 @@ namespace cityLife.Controllers
     }
     public class OrderData
     {
-        public int id;
+        public int orderId;
         public string name;
         public string phone;
         public string email;
@@ -46,6 +46,43 @@ namespace cityLife.Controllers
         public string expectedArrival;
         public string comments;
 
+    }
+    /// <summary>
+    /// The class contains additional fields that do not exist in the booking form data
+    /// </summary>
+    public class StaffBookingFormData : BookingFormData
+    {
+        public FieldData checkinDate = new FieldData("Checkin Date");
+        public FieldData checkoutDate = new FieldData("Checkout Date");
+        public FieldData nights = new FieldData("Nights");
+        public FieldData adults = new FieldData("Adults");
+        public FieldData children = new FieldData("Children");
+        public FieldData price = new FieldData("Price");
+        public FieldData paidAmount = new FieldData("Paid Amount");
+        public FieldData apartmentNumber = new FieldData("Apartment Number");
+        public FieldData confirmationNumber = new FieldData("Confirmation Number");
+        public FieldData orderId = new FieldData("Order ID");
+        public FieldData bookedBy = new FieldData("Booked By");
+
+        public override bool errorExists()
+        {
+            if (base.errorExists())
+                return true;
+
+            if (checkinDate.errorMessage != "" ||
+                checkoutDate.errorMessage != "" ||
+                nights.errorMessage != "" ||
+                adults.errorMessage != "" ||
+                children.errorMessage != "" ||
+                price.errorMessage != "" ||
+                paidAmount.errorMessage != "" ||
+                apartmentNumber.errorMessage != "" ||
+                confirmationNumber.errorMessage != "" ||
+                orderId.errorMessage != "")
+                return true;
+
+            return false;
+        }
     }
     public class StaffController : Controller
     {
@@ -107,8 +144,10 @@ namespace cityLife.Controllers
             }
 
             Session["loggedinUser"] = theEmployee;
-           
-            return this.s21Dashboard(null);
+
+            Response.Redirect("/Staff/s21Dashboard");
+
+            return null;  //Fake return - as the Response.redirect activates a new request from the browser. 
         }
 
         /// <summary>
@@ -124,22 +163,32 @@ namespace cityLife.Controllers
         /// This is the horizontal version of the dashboard. It shows the orders of all apartments for 31 days, since the date entered by the user, 
         /// or since today. (the default)
         /// </summary>
-        /// <param name="fromDateOrNull">Date entered in the date picker, or null</param>
+        /// <param name="fromDate">Date entered in the date picker, or null</param>
         /// <returns></returns>
         [HttpGet]
-        public ActionResult s21Dashboard(DateTime? fromDateOrNull)
+        public ActionResult s21Dashboard(DateTime? fromDate)
         {
-            FakeDateTime.SetFakeTime(new DateTime(2018, 09, 20));  //DEBUGGING!!!!!!
-            DateTime fromDate = fromDateOrNull ?? FakeDateTime.Now;
-            var apartmentDayBlocks = s21dashboardPreparation(fromDate);
-            ViewBag.apartmentDayBlocks = apartmentDayBlocks;
-            TranslateBox tBox = this.setTbox("RU");
-            ViewBag.tBox = tBox;
-            ViewBag.fromDate = fromDate;
-            ViewBag.today = FakeDateTime.Now;
             Employee theEmployee = (Employee)Session["loggedinUser"];
-            ViewBag.employee = theEmployee;
-            return View("s21Dashboard");
+            if (theEmployee == null)
+            {
+                //No user is logged in - go to login screen
+                return s10login();
+            }
+            else
+            {
+                FakeDateTime.SetFakeTime(new DateTime(2018, 09, 20));  //DEBUGGING!!!!!!
+                DateTime fromDateOrNow = fromDate ?? FakeDateTime.Now;
+                var apartmentDayBlocks = s21dashboardPreparation(fromDateOrNow);
+                ViewBag.apartmentDayBlocks = apartmentDayBlocks;
+                TranslateBox tBox = this.setTbox("RU");
+                ViewBag.tBox = tBox;
+                ViewBag.fromDate = fromDateOrNow;
+                ViewBag.today = FakeDateTime.Now;
+
+                ViewBag.employee = theEmployee;
+                return View("s21Dashboard");
+            }
+            
         }
 
         /// <summary>
@@ -244,7 +293,7 @@ namespace cityLife.Controllers
             var theOrder = db.Orders.Single(a => a.Id == orderId);
             OrderData theOrderData = new OrderData()
             {
-                id = theOrder.Id,
+                orderId = theOrder.Id,
                 name = theOrder.Guest.name,
                 phone = theOrder.Guest.phone,
                 email = theOrder.Guest.email,
@@ -300,19 +349,50 @@ namespace cityLife.Controllers
         [HttpGet]
         public ActionResult s24addOrder(DateTime checkin, DateTime checkout, int nights, int apartmentNumber)
         {
+            Employee theEmployee = (Employee)Session["loggedinUser"];
+            if (theEmployee == null)
+            {
+                //No user is logged in - go to login page
+                return s10login();
+            }
+            ViewBag.employee = theEmployee;
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
 
-            Apartment theApartment = db.Apartments.Single(a => a.number == apartmentNumber);
-            Order theOrder = new Order()
-            {
-                checkinDate = checkin,
-                checkoutDate = checkout,
-                dayCount = nights,
-                Apartment = theApartment
-            };
-            ViewBag.order = theOrder;
-            BookingFormData theBookingFormData = new BookingFormData();
+            
+            //Order theOrder = new Order()
+            //{
+            //    checkinDate = checkin,
+            //    checkoutDate = checkout,
+            //    dayCount = nights,
+            //    Apartment = theApartment,
+            //    childrenCount = 0,
+            //    adultCount = 2
+            //};
+            //ViewBag.order = theOrder;
+            StaffBookingFormData theBookingFormData = new StaffBookingFormData();
+            theBookingFormData.checkinDate.content = checkin.ToString("dd MMMM, yyyy");
+            theBookingFormData.checkoutDate.content = checkout.ToString("dd MMMM, yyyy");
+            theBookingFormData.nights.content = nights.ToString();
+            theBookingFormData.children.content = "0";
+            theBookingFormData.adults.content = "2";
+            theBookingFormData.apartmentNumber.content = apartmentNumber.ToString();
+            theBookingFormData.paidAmount.content = "0";
+            theBookingFormData.orderId.content = "0";   //no order ID - this is a  new order   TBD
             ViewBag.bookingData = theBookingFormData;
+
+            //Calculate expected price, assuming 2 adults and 0 children. Calculate the price in UAH
+            BookingRequest theBookingRequest = new BookingRequest()
+            {
+                 checkinDate = checkin,
+                  checkoutDate = checkout,
+                  adults = 2,
+                  children = 0
+            };
+            Currency theCurrency = db.Currencies.Single(a => a.currencyCode == "UAH");
+            Apartment theApartment = db.Apartments.Single(a => a.number == apartmentNumber);
+            var thePrice = PublicController.calculatePricePerStayForApartment(theApartment, db, theBookingRequest, theCurrency);
+            theBookingFormData.price.content = thePrice.pricePerStay.toMoneyString();
+
             TranslateBox tBox = this.setTbox("RU");
             ViewBag.tBox = tBox;
             ViewBag.countries = db.Countries;
@@ -325,8 +405,12 @@ namespace cityLife.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult s25addUpdateOrder()
+        public ActionResult s25addUpdateOrder(int orderId, string Email, string Name, string CountryName, string Phone, string ArrivalTime, 
+            string SpecialRequest, DateTime? CheckinDate, DateTime? CheckoutDate, int Adults, int Children, int Nights, string Price, string PaidAmount, 
+            string BookedBy)
         {
+            Money priceM = new Money(Price,"UAH");  //Default currency is UAH, if the currency symbol does not exist.
+            Money paidAmountM = new Money(PaidAmount,"UAH");
             return View();
         }
         /// <summary>

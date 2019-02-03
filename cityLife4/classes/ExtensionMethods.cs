@@ -37,10 +37,10 @@ namespace cityLife4
         /// </div>
         /// 
         /// </returns>
-        public static MvcHtmlString inputField(this HtmlHelper helper, FieldData theFieldData, TranslateBox tBox, string fieldType = "text")
+        public static MvcHtmlString inputField(this HtmlHelper helper, FieldData theFieldData, TranslateBox tBox, string fieldType = "text", string style="")
         {
             string theField = string.Format(@"
-<div class='inputBox {0}'>
+<div class='inputBox {0}' style='{6}'>
   <input id = '{1}' name = '{1}' type = '{2}' value = '{3}' class='inputElement' />
   <label for='{1}' class='label'>{4}</label>
   <span class='error-text'>{5}</span>
@@ -50,7 +50,8 @@ namespace cityLife4
                                 /*2*/fieldType,                  //normally either text or email
                                 /*3*/theFieldData.content,        //the value of the field
                                 /*4*/tBox.translate(theFieldData.fieldName),   //returns the translation of the field name
-                                /*5*/tBox.translate(theFieldData.errorMessage)    //returns the error message, if any (translated). Or empty string
+                                /*5*/tBox.translate(theFieldData.errorMessage),    //returns the error message, if any (translated). Or empty string
+                                /*6*/style   ///any additional style, such as width:...
 );
             MvcHtmlString mvcString = new MvcHtmlString(theField);
             return mvcString;

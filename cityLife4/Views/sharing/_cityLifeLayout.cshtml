@@ -26,11 +26,11 @@
     string checkoutDate = "";
     if (theBookingRequest.checkinDate != null)
     {
-        checkinDate = ((DateTime)theBookingRequest.checkinDate).ToString("dd MMMM, yyyy");
+        checkinDate = ((DateTime)theBookingRequest.checkinDate).ToString("dd/MM/yyyy");
     }
     if (theBookingRequest.checkoutDate != null)
     {
-        checkoutDate = ((DateTime)theBookingRequest.checkoutDate).ToString("dd MMMM, yyyy");
+        checkoutDate = ((DateTime)theBookingRequest.checkoutDate).ToString("dd/MM/yyyy");
     }
     int adults = theBookingRequest.adults ?? 2;
     int children = theBookingRequest.children ?? 0;

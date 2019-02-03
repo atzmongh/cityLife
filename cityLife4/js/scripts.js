@@ -42,9 +42,9 @@ $( function() {
 $("#datepickerBtn").datepicker({
     numberOfMonths: 1,
     dateFormat: "d M, y",
-    firstDay: 1,
-    altField: "#choosedDate"
-}).datepicker("setDate", new Date());
+    firstDay: 1
+    // altField: "#choosedDate"
+});//.datepicker("setDate", new Date());
 
 function dropdown() {
     var dropdown = $('.dropdown');

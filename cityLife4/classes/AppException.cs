@@ -27,7 +27,9 @@ namespace cityLife4
             {113,"An order was created for a non-free day. Apartment:{0} date:{1} guest name:{2}" },
             {114,"a foreign key symbolic name was not found in a prevkious table id. symbolic name is:{0}. table name:{1}" },
             {115,"the variable dictionary does not contain the expected message variable: {0}" },
-            {116, "the message contains either empty variable [], or something like: [asd[ (an open bracket inside a variable name). message is:{0}" }
+            {116, "the message contains either empty variable [], or something like: [asd[ (an open bracket inside a variable name). message is:{0}" },
+            {117,"the money string contains an invalid currency symbol. money string is:{0}" },
+            {118,"the money string could not be converted to decimal value. String is: {0}" }
 
 
         };

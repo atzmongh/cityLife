@@ -5,7 +5,7 @@
     Layout = "~/Views/sharing/_staffLayout.cshtml";
     TranslateBox tBox = ViewBag.tBox;
     DateTime fromDate = ViewBag.fromDate;
-    string fromDateSt = fromDate.ToString("dd MMMM, yyyy");
+    string fromDateSt = fromDate.ToString("dd/MM/yyyy");
     DateTime today = ViewBag.today;
     List<List<DayBlock>> apartmentDayBlocks = ViewBag.apartmentDayBlocks;
     }
@@ -30,12 +30,8 @@
         }
 
         .dash02 {
-            /*position: absolute;
-        top: 100px;
-        left: 30px;*/
-            border: 1px solid;
-            width: 360px;
-            /*height: 300px;*/
+             border: 1px solid;
+            width: 100%;
             display: flex;
             flex-wrap: nowrap;
             overflow-x: auto;
@@ -93,11 +89,9 @@
         <form id="fromDateForm" method="get" action="s21Dashboard">
             <div class="page-heading">
                 @tBox.translate("Dashboard")
-                <span>(</span>
-                <input type="text" id="choosedDate" class="choosed-date">
-                <span>)</span>
+                <span>(@fromDateSt)</span>
                 <label for="datepickerBtn" class="datepicker-btn">
-                    <input type="text" id="datepickerBtn" class="call-datepicker" onchange="changeFromDate()">
+                    <input type="text" id="datepickerBtn" name="fromDate" class="call-datepicker" onchange="changeFromDate()">
                 </label>
             </div>
         </form>

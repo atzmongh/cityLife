@@ -1,8 +1,116 @@
 ﻿
+@using cityLife;
+@using cityLife4;
+@using cityLife.Controllers;
 @{
     ViewBag.Title = "s25orderBooking";
-    Layout = "~/Views/sharing/_staffLayout.cshtml";
+    // Order theOrder = ViewBag.order;
+    StaffBookingFormData theBookingFormData = ViewBag.bookingData;
+    TranslateBox tBox = ViewBag.tBox;
 }
 
-<div class=""></div>
+<div class="field-box datepicker-box">
+    <input type="text" id="fromDate" name="@theBookingFormData.checkinDate.fieldCamelName" value='@theBookingFormData.checkinDate.content'>
+    <label for="fromDate">
+        <span class="field-name">@tBox.translate("Check-in date")</span>
+        <span class="calendar-ico"></span>
+    </label>
+    <span class="field-error"></span>
+</div>
+<div class="field-box datepicker-box">
+    <input type="text" id="toDate" name="@theBookingFormData.checkoutDate.fieldCamelName" value='@theBookingFormData.checkoutDate.content'>
+    <label for="toDate">
+        <span class="field-name">@tBox.translate("Check out date")</span>
+        <span class="calendar-ico"></span>
+    </label>
+    <span class="field-error"></span>
+</div>
+<div class="form-box-wrap">
+    <div class="field-box select-box">
+        <select name="@theBookingFormData.adults.fieldCamelName">
+            @{
+                for (int i = 0; i <= 4; i++)
+                {
+                    if (theBookingFormData.adults.content == i.ToString())
+                    {
+                        <option selected>@i</option>
+                    }
+                    else
+                    {
+                        <option>@i</option>
+                    }
+                }
+            }
+        </select>
+        <label>
+            <span class="field-name">@tBox.translate("Guests")</span>
+        </label>
+    </div>
+    <div class="field-box select-box">
+        <select name="@theBookingFormData.children.fieldCamelName">
+            @{
+                for (int i = 0; i <= 4; i++)
+                {
+                    if (theBookingFormData.children.content == i.ToString())
+                    {
+                        <option selected>@i</option>
+                    }
+                    else
+                    {
+                        <option>@i</option>
+                    }
+                }
+            }
+        </select>
+        <label>
+            <span class="field-name">@tBox.translate("Children")</span>
+        </label>
+    </div>
+</div>
+<div class="form-box-wrap">
+    <div class="field-box select-box">
+        <select name="@theBookingFormData.nights.fieldCamelName">
+            @{
+                for (int i = 0; i <= 30; i++)
+                {
+                    if (theBookingFormData.nights.content == i.ToString())
+                    {
+                        <option selected>@i</option>
+                    }
+                    else
+                    {
+                        <option>@i</option>
+                    }
+                }
+            }
+        </select>
+        <label>
+            <span class="field-name">@tBox.translate("Nights")</span>
+        </label>
+    </div>
+</div>
+<div>
+    <div class="form-box-wrap">
+        @Html.inputField(theBookingFormData.price, tBox, style: "width:48%")
+        @Html.inputField(theBookingFormData.paidAmount,tBox,style:"width:48%")
+    </div>
+    <div class="form-box-wrap">
+        <div class="field-box select-box">
+            <select name="@theBookingFormData.bookedBy.fieldCamelName">
+                <option value="me" selected>@tBox.translate("Me")</option>
+                <option value="guest">@tBox.translate("Guest")</option>
+                <option value="booking">@tBox.translate("Booking.com")</option>
+                <option value="airbnb">@tBox.translate("Airbnb")</option>
+                <option value="other">@tBox.translate("Other")</option>
+            </select>
+            <label>
+                <span class="field-name">@tBox.translate("Booked By")</span>
+            </label>
+        </div>
+        @Html.inputField(theBookingFormData.confirmationNumber,tBox,style:"width:48%")
+    </div>
+    <input type="submit" class="btn" value='@tBox.translate("OK")'/>
+    <input type="button" class="btn" value='@tBox.translate("Cancel")' />
+    
+</div>
 

@@ -31,6 +31,45 @@ namespace cityLife4
             amount = m.amount;
             currencyCode = m.currencyCode;
         }
+        /// <summary>
+        /// The constructor gets a string containing: $1,234.56. If currencyCode exists - uses it as the currency, regardless if thre is a currency symbol 
+        /// or not. If not - creates the currency based on the symbol. If symbol does not exist, or it is an unknown symbol - aborts
+        /// </summary>
+        /// <param name="moneyString"></param>
+        /// <param name="currencyCode"></param>
+        public Money (string moneyString, string currencyCode=null)
+        {
+            char firstChar = moneyString[0];
+            if (firstChar<'0' || firstChar > '9')
+            {
+                //The amount start with a non-digit character - assuming it is a currency symbol
+                cityLifeDBContainer1 db = new cityLifeDBContainer1();
+                string firstCharAsString = firstChar.ToString();
+                Currency theCurrency = db.Currencies.SingleOrDefault(a => a.symbol == firstCharAsString);
+                if (theCurrency == null)
+                {
+                    //Such currency does not exist in our DB - raise an exception
+                    throw new AppException(117, null, moneyString);
+                }
+                this.currencyCode = theCurrency.currencyCode;
+                string amountSt = moneyString.Substring(1);   //Take out the currency symbol - assuming this is a clean number
+                if (!decimal.TryParse(amountSt, out this.amount))
+                {
+                    //The conversion did not succeed - raise an exception
+                    throw new AppException(118, null, moneyString);
+                }
+            }
+            else
+            {
+                //Assume that the number does not contain a currency symbol - convert it to decimal
+                if (!decimal.TryParse(moneyString, out this.amount))
+                {
+                    //The conversion did not succeed - raise an exception
+                    throw new AppException(118, null, moneyString);
+                }
+                this.currencyCode = currencyCode;
+            }
+        }
         public static Money operator * (Money m1, Money m2)
         {
             if (m1.currencyCode != m2.currencyCode)

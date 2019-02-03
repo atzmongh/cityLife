@@ -426,6 +426,31 @@ namespace cityLife.Controllers
             }
             Test.check(9, anException);
             //Assert.AreEqual("exception was raised", anException);
+            string goodMoney = "$12,345.67";
+            Money gm = new Money(goodMoney);
+            Test.check(10, gm.toMoneyString());
+            string noCurrencyMoney = "12,345.67";
+            Money gm2 = new Money(noCurrencyMoney, "USD");
+            Test.check(11, gm2.toMoneyString());
+            string badCurrency = "*1234.56";
+           
+            try
+            {
+                Money gm3 = new Money(badCurrency);
+            }
+            catch (AppException e)
+            {
+                Test.check(12, e.Message);
+            }
+            string badMoney = "$123a45";
+            try
+            {
+                Money gm4 = new Money(badMoney);
+            }
+            catch(AppException e)
+            {
+                Test.check(13, e.Message);
+            }
         }
 
         public void TranslateBoxTest()
