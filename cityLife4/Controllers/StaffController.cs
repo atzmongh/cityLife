@@ -64,9 +64,9 @@ namespace cityLife.Controllers
         public FieldData orderId = new FieldData("Order ID");
         public FieldData bookedBy = new FieldData("Booked By");
 
-        public override bool errorExists()
+        public override bool isValid()  //NEEDS TO BE FIXED
         {
-            if (base.errorExists())
+            if (base.isValid())
                 return true;
 
             if (checkinDate.errorMessage != "" ||

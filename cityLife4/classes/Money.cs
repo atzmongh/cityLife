@@ -201,9 +201,7 @@ namespace cityLife4
                 if (exchangeRates.Count() == 0)
                 {
                     //no suitable exchange rate was found
-                    string message = string.Format("no suitable exchange rate was found for currencies: {0} and {1} for date {2} (or later). Sum was {3}",
-                                                               this.currencyCode, newCurrencyCode, atDate, this.amount);
-                    throw new AppException(101, null, message);
+                    throw new AppException(101, null, this.currencyCode, newCurrencyCode, atDate, this.amount);
                 }
                 var theExchangeRate = exchangeRates.First();  //take the latest record which is still before or at the requested date
                 decimal result;

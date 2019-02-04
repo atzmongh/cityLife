@@ -75,6 +75,11 @@ namespace cityLife.Controllers
         {
             this.fieldName = theName;
         }
+        public FieldData(string theName, string theContent)
+        {
+            this.fieldName = theName;
+            this.content = theContent;
+        }
         /// <summary>
         /// The method returns the field name without spaces. For examle, the name: Arrival Time will be returned as
         /// ArrivalTime (Camel Case). It does not change the case of the first letter of each word, so the name:
@@ -95,23 +100,88 @@ namespace cityLife.Controllers
         
     public class BookingFormData
     {
-        public FieldData name = new FieldData("Name");
-        public FieldData country = new FieldData("Country Name");
-        public FieldData email = new FieldData("Email");
-        public FieldData phone = new FieldData("Phone");
-        public FieldData arrivalTime = new FieldData("Arrival Time");
-        public FieldData specialRequest = new FieldData("Special Request");
+        public FieldData name;
+        public FieldData country;
+        public FieldData email;
+        public FieldData phone;
+        public FieldData arrivalTime;
+        public FieldData specialRequest;
+        public FieldData bookedBy;
+        private bool formValid = false;
 
-        public virtual bool errorExists()
+        public BookingFormData(string name, string country, string email, string phone, string arrivalTime, string specialRequest, string bookedBy)
         {
-            if (name.errorMessage != "" ||
-                country.errorMessage != "" ||
-                email.errorMessage != "" ||
-                phone.errorMessage != "" ||
-                arrivalTime.errorMessage != "" ||
-                specialRequest.errorMessage != "")
-                return true;
-            else return false;
+            this.name = new FieldData("Name", name);
+            this.country = new FieldData("Country", country);
+            this.email = new FieldData("Email", email);
+            this.phone = new FieldData("Phone", phone);
+            this.arrivalTime = new FieldData("Arrival Time", arrivalTime);
+            this.specialRequest = new FieldData("special Request", specialRequest);
+            this.bookedBy = new FieldData("Booked By", bookedBy);
+        }
+        public BookingFormData()
+        {
+            this.name = new FieldData("Name");
+            this.country = new FieldData("Country");
+            this.email = new FieldData("Email");
+            this.phone = new FieldData("Phone");
+            this.arrivalTime = new FieldData("Arrival Time");
+            this.specialRequest = new FieldData("special Request");
+            this.bookedBy = new FieldData("Booked By");
+        }
+
+        private bool IsValidEmail(string email)
+        {
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        public virtual bool isValid()
+        {
+            this.formValid = true;
+            if (this.name.content == "")
+            {
+                this.name.errorMessage = "Please enter name";
+                this.formValid = false;
+            }
+
+            if (this.country.content == "")
+            {
+                this.country.errorMessage = "Please select country";
+                this.formValid = false;
+            }
+            else
+            {
+                cityLifeDBContainer1 db = new cityLifeDBContainer1();
+                Country theCountry = db.Countries.SingleOrDefault(a => a.name == this.country.content);
+                if (theCountry == null)
+                {
+                    this.country.errorMessage = "This country does not exist in our country list";
+                    this.formValid = false;
+                }
+            }
+            if (!this.IsValidEmail(this.email.content))
+            {
+                this.email.errorMessage = "Please enter a valid email address";
+                this.formValid = false;
+            }
+            if (!Regex.Match(this.phone.content, @"^(\+?[0-9]{10,13})$").Success)
+            {
+                this.phone.errorMessage = "Please enter a valid phone number";
+                this.formValid = false;
+            }
+            if (this.bookedBy.content == "")
+            {
+                this.bookedBy.errorMessage = "Please enter who made the booking";
+                this.formValid = false;
+            }
+            return this.formValid;
         }
     }
    
@@ -210,41 +280,23 @@ namespace cityLife.Controllers
       
 
         [HttpPost]
-        public PartialViewResult p27bookingOrder(int apartmentId, string Name, string CountryName, string Email, string Phone, string ArrivalTime, string SpecialRequest)
+        public PartialViewResult p27bookingOrder(int apartmentId, string Name, string Country, string Email, string Phone, string ArrivalTime, string SpecialRequest)
         {
             prepareDataForp26p27(apartmentId);
 
             //perform validity chekcs on the input
-            BookingFormData theBookingFormData = new BookingFormData();
-            theBookingFormData.name.content = Name;
-            if (Name == "")
-            {
-                theBookingFormData.name.errorMessage = "Please enter your name";
-            }
-            theBookingFormData.country.content = CountryName;
-            if (CountryName == "")
-                theBookingFormData.country.errorMessage = "Please select your country";
-            else
-            {
-                cityLifeDBContainer1 db = new cityLifeDBContainer1();
-                Country theCountry = db.Countries.SingleOrDefault(a => a.name == CountryName);
-                if (theCountry == null)
-                {
-                    theBookingFormData.country.errorMessage = "This country does not exist in our country list";
-                }
-            }
-            theBookingFormData.email.content = Email;
-            if (!this.IsValidEmail(Email))
-                theBookingFormData.email.errorMessage = "Please enter a valid email address";
-            theBookingFormData.phone.content = Phone;
-            if (!Regex.Match(Phone, @"^(\+?[0-9]{10,13})$").Success)
-                theBookingFormData.phone.errorMessage = "Please enter a valid phone number";
-
-            theBookingFormData.arrivalTime.content = ArrivalTime;
-            theBookingFormData.specialRequest.content = SpecialRequest;
+            BookingFormData theBookingFormData = new BookingFormData(
+                name: Name,
+                country: Country,
+                email: Email,
+                phone: Phone,
+                arrivalTime: ArrivalTime,
+                specialRequest: SpecialRequest,
+                bookedBy: "guest"
+                );
 
             ViewBag.bookingFormData = theBookingFormData;
-            if (theBookingFormData.errorExists())
+            if (!theBookingFormData.isValid())
             {
                 return PartialView("p26bookingForm");
             }
@@ -257,7 +309,7 @@ namespace cityLife.Controllers
                 BookingRequest theBookingRequest = (BookingRequest)Session["bookingRequest"];
                 Currency currentCurrency = (Currency)Session["currentCurrency"];
                 ApartmentPrice apartmentAndPrice = calculatePricePerStayForApartment(theAparatment, db, theBookingRequest, currentCurrency);
-                Country theCountry = db.Countries.Single(a => a.name == CountryName);
+                Country theCountry = db.Countries.Single(a => a.name == Country);
                 if (apartmentAndPrice.availability != Availability.AVAILABLE)  
                 {
                     //the apartment is not available, although it seemed to be available. Perhaps it was taken in the last minutes
@@ -266,110 +318,112 @@ namespace cityLife.Controllers
                 else
                 {
                     //Complete the booking
-                    DateTime checkIn = (DateTime)theBookingRequest.checkinDate;
-                    DateTime checkOut = (DateTime)theBookingRequest.checkoutDate;
-                    var dayCount = (checkOut - checkIn).Days;
-                    Currency theCurrency = db.Currencies.Single(a => a.currencyCode == apartmentAndPrice.pricePerStay.currency);
-
-                    Guest theGuest = db.Guests.FirstOrDefault
-                        (aGuest=> aGuest.email == Email && aGuest.name == Name && aGuest.phone == Phone && aGuest.Country.name == theCountry.name);
-
-                    if (theGuest == null)
-                    {
-                        //there is no such guest - create new
-                        theGuest = new Guest()
-                        {
-                            name = Name,
-                            phone = Phone,
-                            email = Email,
-                            Country = theCountry
-                        };
-                        db.Guests.Add(theGuest);
-                    }
-
-                    Order theOrder = new Order()
-                    {
-                        adultCount = (int)theBookingRequest.adults,
-                        amountPaid = 0,
-                        Apartment = theAparatment,
-                        bookedBy = Name,
-                        checkinDate = (DateTime)theBookingRequest.checkinDate,
-                        checkoutDate = (DateTime)theBookingRequest.checkoutDate,
-                        childrenCount = theBookingRequest.children??0,
-                        confirmationNumber = "0",
-                        expectedArrival = ArrivalTime,
-                        specialRequest = SpecialRequest,
-                        status = OrderStatus.Created,
-                        dayCount = dayCount,
-                        price = apartmentAndPrice.pricePerStay.toCents(),
-                        Guest = theGuest,
-                        Currency = theCurrency
-                    };
-                    db.Orders.Add(theOrder);
-
-
-                    //Create or update the apartment day records (a record for each apartment-day)
-                    for (var aDay = checkIn;aDay < checkOut; aDay = aDay.AddDays(1))
-                    {
-                        ApartmentDay anApartmentDay = db.ApartmentDays.SingleOrDefault(a => a.date == aDay && a.Apartment.Id == theAparatment.Id);
-                        if (anApartmentDay == null)
-                        {
-                            //record does not exist - create it
-                            anApartmentDay = new ApartmentDay()
-                            {
-                                 Order = theOrder,
-                                 date = aDay,
-                                 Apartment = theAparatment,
-                                 Currency = theCurrency,
-                                 priceFactor = 1.0m,
-                                 isCleaned = false,
-                                 revenue = (apartmentAndPrice.pricePerStay / dayCount).toCents(),
-                                 status = ApartOccuStatus.Reserved
-                            };
-                            db.ApartmentDays.Add(anApartmentDay);
-                        }
-                        else
-                        {
-                            //a apartment day record exists.
-                            if (anApartmentDay.status == ApartOccuStatus.Free)
-                            {
-                                anApartmentDay.Order = theOrder;
-                                anApartmentDay.Apartment = theAparatment;
-                                anApartmentDay.Currency = theCurrency;
-                                anApartmentDay.revenue = (apartmentAndPrice.pricePerStay / dayCount).toCents();
-                                anApartmentDay.status = ApartOccuStatus.Reserved;
-                            }
-                            else
-                            {
-                                //The record exists but it is not free - raise an exception
-                                throw new AppException(113, null, theAparatment.number, aDay.ToShortDateString(), theGuest.name);
-                            }
-                        }
-                    }
-                    db.SaveChanges();
+                    Order theOrder = PublicController.p27createOrder(db, theBookingRequest, apartmentAndPrice, theBookingFormData, theCountry);
                     TranslateBox tBox = ViewBag.tBox;
                     ViewBag.theOrder = theOrder;
                     ViewBag.apartmentAndPrice = apartmentAndPrice;
 
-                   // string theEmail = this.RenderViewToString(this.ControllerContext, "t10welcomeMail");
-
-                  
-                    
-                    
                     EmailMessage mailToCustomer = new EmailMessage(
                         to: theOrder.Guest.email,
                         subject: tBox.translate("Welcome to Kharkov Apartments City Life"),
                         mailName: "t10welcomeMail",
                         theController:this
                         );
-                   
-                   
-                    
                     mailToCustomer.send();
-                   // this.sendMail(theOrder, apartmentAndPrice);
+                   
                     return PartialView("p28bookingSuccess");
                 }
             }
+        }
+
+        public static Order p27createOrder(cityLifeDBContainer1 db, BookingRequest theBookingRequest, ApartmentPrice apartmentAndPrice,
+            BookingFormData theBookingFormData, Country theCountry)
+        {
+            DateTime checkIn = (DateTime)theBookingRequest.checkinDate;
+            DateTime checkOut = (DateTime)theBookingRequest.checkoutDate;
+            var dayCount = (checkOut - checkIn).Days;
+            Currency theCurrency = db.Currencies.Single(a => a.currencyCode == apartmentAndPrice.pricePerStay.currency);
+
+            Guest theGuest = db.Guests.FirstOrDefault
+                (aGuest => aGuest.email == theBookingFormData.email.content && 
+                aGuest.name == theBookingFormData.name.content && 
+                aGuest.phone == theBookingFormData.phone.content && 
+                aGuest.Country.name == theBookingFormData.country.content);
+
+            if (theGuest == null)
+            {
+                //there is no such guest - create new
+                theGuest = new Guest()
+                {
+                    name =  theBookingFormData.name.content,
+                    phone = theBookingFormData.phone.content,
+                    email = theBookingFormData.email.content,
+                    Country = theCountry
+                };
+                db.Guests.Add(theGuest);
+            }
+
+            Order theOrder = new Order()
+            {
+                adultCount = (int)theBookingRequest.adults,
+                amountPaid = 0,
+                Apartment = apartmentAndPrice.theApartment,
+                bookedBy = theBookingFormData.bookedBy.content,
+                checkinDate = (DateTime)theBookingRequest.checkinDate,
+                checkoutDate = (DateTime)theBookingRequest.checkoutDate,
+                childrenCount = theBookingRequest.children ?? 0,
+                confirmationNumber = "0",    //TBD
+                expectedArrival = theBookingFormData.arrivalTime.content,
+                specialRequest = theBookingFormData.specialRequest.content,
+                status = OrderStatus.Created,
+                dayCount = dayCount,
+                price = apartmentAndPrice.pricePerStay.toCents(),
+                Guest = theGuest,
+                Currency = theCurrency
+            };
+            db.Orders.Add(theOrder);
+
+
+            //Create or update the apartment day records (a record for each apartment-day)
+            for (var aDay = checkIn; aDay < checkOut; aDay = aDay.AddDays(1))
+            {
+                ApartmentDay anApartmentDay = db.ApartmentDays.SingleOrDefault(a => a.date == aDay && a.Apartment.Id == theAparatment.Id);
+                if (anApartmentDay == null)
+                {
+                    //record does not exist - create it
+                    anApartmentDay = new ApartmentDay()
+                    {
+                        Order = theOrder,
+                        date = aDay,
+                        Apartment = apartmentAndPrice.theApartment,
+                        Currency = theCurrency,
+                        priceFactor = 1.0m,
+                        isCleaned = false,
+                        revenue = (apartmentAndPrice.pricePerStay / dayCount).toCents(),
+                        status = ApartOccuStatus.Reserved
+                    };
+                    db.ApartmentDays.Add(anApartmentDay);
+                }
+                else
+                {
+                    //a apartment day record exists.
+                    if (anApartmentDay.status == ApartOccuStatus.Free)
+                    {
+                        anApartmentDay.Order = theOrder;
+                        anApartmentDay.Apartment = apartmentAndPrice.theApartment;
+                        anApartmentDay.Currency = theCurrency;
+                        anApartmentDay.revenue = (apartmentAndPrice.pricePerStay / dayCount).toCents();
+                        anApartmentDay.status = ApartOccuStatus.Reserved;
+                    }
+                    else
+                    {
+                        //The record exists but it is not free - raise an exception
+                        throw new AppException(113, null, apartmentAndPrice.theApartment.number, aDay.ToShortDateString(), theGuest.name);
+                    }
+                }
+            }
+            db.SaveChanges();
+            return theOrder;
         }
 
         private void sendMail(Order theOrder, ApartmentPrice apartmentAndPrice)
@@ -741,33 +795,9 @@ namespace cityLife.Controllers
             }
         }
 
-        //Obsolete, as we moved to country table in DB
-        //private List<string> countryList()
-        //{
-        //    string filePath = Server.MapPath("/App_Data/countryList.txt");
-        //    StreamReader reader = new StreamReader(filePath);
-        //    List<string> countryList = new List<string>();
+       
 
-        //    while (!reader.EndOfStream)
-        //    {
-        //        string aCountry = reader.ReadLine();
-        //        countryList.Add(aCountry);
-        //    }
-        //    return countryList;
-        //}
-
-        private bool IsValidEmail(string email)
-        {
-            try
-            {
-                var addr = new System.Net.Mail.MailAddress(email);
-                return addr.Address == email;
-            }
-            catch
-            {
-                return false;
-            }
-        }
+        
 
         
 
