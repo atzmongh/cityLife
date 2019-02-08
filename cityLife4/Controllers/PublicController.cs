@@ -97,40 +97,26 @@ namespace cityLife.Controllers
        
     }
 
-        
-    public class BookingFormData
+    public class OrderData
     {
-        public FieldData name;
-        public FieldData country;
-        public FieldData email;
-        public FieldData phone;
-        public FieldData arrivalTime;
-        public FieldData specialRequest;
-        public FieldData bookedBy;
-        private bool formValid = false;
+        public int orderId;
+        public string name;
+        public string phone;
+        public string email;
+        public string country;
+        public int adults;
+        public int children;
+        public DateTime checkin;
+        public DateTime checkout;
+        public Money price;
+        public Money paid;
+        public string expectedArrival;
+        public string comments;
+        public string bookedBy;
 
-        public BookingFormData(string name, string country, string email, string phone, string arrivalTime, string specialRequest, string bookedBy)
-        {
-            this.name = new FieldData("Name", name);
-            this.country = new FieldData("Country", country);
-            this.email = new FieldData("Email", email);
-            this.phone = new FieldData("Phone", phone);
-            this.arrivalTime = new FieldData("Arrival Time", arrivalTime);
-            this.specialRequest = new FieldData("special Request", specialRequest);
-            this.bookedBy = new FieldData("Booked By", bookedBy);
-        }
-        public BookingFormData()
-        {
-            this.name = new FieldData("Name");
-            this.country = new FieldData("Country");
-            this.email = new FieldData("Email");
-            this.phone = new FieldData("Phone");
-            this.arrivalTime = new FieldData("Arrival Time");
-            this.specialRequest = new FieldData("special Request");
-            this.bookedBy = new FieldData("Booked By");
-        }
+        private Dictionary<string, string> errorMessage = new Dictionary<string, string>();
 
-        private bool IsValidEmail(string email)
+        private static bool IsValidEmail(string email)
         {
             try
             {
@@ -142,48 +128,165 @@ namespace cityLife.Controllers
                 return false;
             }
         }
-        public virtual bool isValid()
+        public bool isValid()
         {
-            this.formValid = true;
-            if (this.name.content == "")
+            this.errorMessage.Clear();
+            if (this.name == null || this.name == "")
             {
-                this.name.errorMessage = "Please enter name";
-                this.formValid = false;
+                this.errorMessage.Add("name", "Please enter name");
             }
 
-            if (this.country.content == "")
+            if (this.country == null || this.country == "")
             {
-                this.country.errorMessage = "Please select country";
-                this.formValid = false;
+                this.errorMessage.Add("country", "Please select country");
             }
             else
             {
                 cityLifeDBContainer1 db = new cityLifeDBContainer1();
-                Country theCountry = db.Countries.SingleOrDefault(a => a.name == this.country.content);
+                Country theCountry = db.Countries.SingleOrDefault(a => a.name == this.country);
                 if (theCountry == null)
                 {
-                    this.country.errorMessage = "This country does not exist in our country list";
-                    this.formValid = false;
+                    this.errorMessage.Add("country", "This country does not exist in our country list");
                 }
             }
-            if (!this.IsValidEmail(this.email.content))
+            if (!OrderData.IsValidEmail(this.email))
             {
-                this.email.errorMessage = "Please enter a valid email address";
-                this.formValid = false;
+                this.errorMessage.Add("email", "Please enter a valid email address");
             }
-            if (!Regex.Match(this.phone.content, @"^(\+?[0-9]{10,13})$").Success)
+            if (!Regex.Match(this.phone, @"^(\+?[0-9]{10,13})$").Success)
             {
-                this.phone.errorMessage = "Please enter a valid phone number";
-                this.formValid = false;
+                this.errorMessage.Add("phone", "Please enter a valid phone number");
             }
-            if (this.bookedBy.content == "")
+            if (adults <= 1)
             {
-                this.bookedBy.errorMessage = "Please enter who made the booking";
-                this.formValid = false;
+                this.errorMessage.Add("adults", "Number of adults must be at least 1");
             }
-            return this.formValid;
+            if (children < 0)
+            {
+                this.errorMessage.Add("children", "number of children cannot be negative");
+            }
+            if (checkout <= checkin)
+            {
+                this.errorMessage.Add("checkin", "Checkout date cannot be before or equal to checkin date");
+            }
+            return errorMessage.Count() == 0;
         }
+        /// <summary>
+        /// The method returns the error message attached to this field, or empty string otherwise
+        /// Thne method translates the error message, using the tBox it receives
+        /// </summary>
+        /// <param name="fieldName"></param>
+        /// <returns></returns>
+        public string errorMessageOf(string fieldName, TranslateBox tBox)
+        {
+            try
+            {
+                return tBox.translate(this.errorMessage[fieldName]);
+            }
+            catch ( Exception )
+            {
+                return "";
+            }
+        }
+        /// <summary>
+        /// The method returns the word "error" if the field has an error. This will create the CSS class "error"
+        /// It returns empty string otherwise
+        /// </summary>
+        /// <param name="fieldName"></param>
+        /// <returns></returns>
+        public string errorOf(string fieldName)
+        {
+            return this.errorMessage.ContainsKey(fieldName) ? "error" : "";
+        }
+
     }
+
+    //public class BookingFormData
+    //{
+    //    public FieldData name;
+    //    public FieldData country;
+    //    public FieldData email;
+    //    public FieldData phone;
+    //    public FieldData arrivalTime;
+    //    public FieldData specialRequest;
+    //    public FieldData bookedBy;
+    //    private bool formValid = false;
+
+    //    public BookingFormData(string name, string country, string email, string phone, string arrivalTime, string specialRequest, string bookedBy)
+    //    {
+    //        this.name = new FieldData("Name", name);
+    //        this.country = new FieldData("Country", country);
+    //        this.email = new FieldData("Email", email);
+    //        this.phone = new FieldData("Phone", phone);
+    //        this.arrivalTime = new FieldData("Arrival Time", arrivalTime);
+    //        this.specialRequest = new FieldData("special Request", specialRequest);
+    //        this.bookedBy = new FieldData("Booked By", bookedBy);
+    //    }
+    //    public BookingFormData()
+    //    {
+    //        this.name = new FieldData("Name");
+    //        this.country = new FieldData("Country");
+    //        this.email = new FieldData("Email");
+    //        this.phone = new FieldData("Phone");
+    //        this.arrivalTime = new FieldData("Arrival Time");
+    //        this.specialRequest = new FieldData("special Request");
+    //        this.bookedBy = new FieldData("Booked By");
+    //    }
+
+    //    private static bool IsValidEmail(string email)
+    //    {
+    //        try
+    //        {
+    //            var addr = new System.Net.Mail.MailAddress(email);
+    //            return addr.Address == email;
+    //        }
+    //        catch
+    //        {
+    //            return false;
+    //        }
+    //    }
+    //    public virtual bool isValid()
+    //    {
+    //        this.formValid = true;
+    //        if (this.name.content == "")
+    //        {
+    //            this.name.errorMessage = "Please enter name";
+    //            this.formValid = false;
+    //        }
+
+    //        if (this.country.content == "")
+    //        {
+    //            this.country.errorMessage = "Please select country";
+    //            this.formValid = false;
+    //        }
+    //        else
+    //        {
+    //            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+    //            Country theCountry = db.Countries.SingleOrDefault(a => a.name == this.country.content);
+    //            if (theCountry == null)
+    //            {
+    //                this.country.errorMessage = "This country does not exist in our country list";
+    //                this.formValid = false;
+    //            }
+    //        }
+    //        if (!this.IsValidEmail(this.email.content))
+    //        {
+    //            this.email.errorMessage = "Please enter a valid email address";
+    //            this.formValid = false;
+    //        }
+    //        if (!Regex.Match(this.phone.content, @"^(\+?[0-9]{10,13})$").Success)
+    //        {
+    //            this.phone.errorMessage = "Please enter a valid phone number";
+    //            this.formValid = false;
+    //        }
+    //        if (this.bookedBy.content == "")
+    //        {
+    //            this.bookedBy.errorMessage = "Please enter who made the booking";
+    //            this.formValid = false;
+    //        }
+    //        return this.formValid;
+    //    }
+    //}
    
     public class PublicController : Controller
     {
@@ -271,32 +374,38 @@ namespace cityLife.Controllers
         public PartialViewResult p26bookingForm(int apartmentId)
         {
             this.prepareDataForp26p27(apartmentId);
-            ViewBag.bookingFormData = new BookingFormData();   //Empty booking form data, as this is a new form with no data
+            ViewBag.orderData = new OrderData();   //Empty order data, as this is a new form with no data
 
 
             return PartialView("p26bookingForm");
 
         }
-      
+
 
         [HttpPost]
         public PartialViewResult p27bookingOrder(int apartmentId, string Name, string Country, string Email, string Phone, string ArrivalTime, string SpecialRequest)
         {
             prepareDataForp26p27(apartmentId);
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+            Apartment theAparatment = db.Apartments.Single(anApartment => anApartment.Id == apartmentId);
+            BookingRequest theBookingRequest = (BookingRequest)Session["bookingRequest"];
 
             //perform validity chekcs on the input
-            BookingFormData theBookingFormData = new BookingFormData(
-                name: Name,
-                country: Country,
-                email: Email,
-                phone: Phone,
-                arrivalTime: ArrivalTime,
-                specialRequest: SpecialRequest,
-                bookedBy: "guest"
-                );
+            OrderData theOrderData = new OrderData() {
+                name = Name,
+                country = Country,
+                email = Email,
+                phone = Phone,
+                expectedArrival = ArrivalTime,
+                comments = SpecialRequest,
+                adults = (int)theBookingRequest.adults,
+                children = (int)theBookingRequest.children,
+                checkin = (DateTime)theBookingRequest.checkinDate,
+                checkout = (DateTime)theBookingRequest.checkoutDate
+                };
 
-            ViewBag.bookingFormData = theBookingFormData;
-            if (!theBookingFormData.isValid())
+            ViewBag.orderData = theOrderData;
+            if (!theOrderData.isValid())
             {
                 return PartialView("p26bookingForm");
             }
@@ -304,9 +413,7 @@ namespace cityLife.Controllers
             {
                 //The form is valid - create the booking order
                 //Check if the booking request is still valid.
-                cityLifeDBContainer1 db = new cityLifeDBContainer1();
-                Apartment theAparatment = db.Apartments.Single(anApartment => anApartment.Id == apartmentId);
-                BookingRequest theBookingRequest = (BookingRequest)Session["bookingRequest"];
+               
                 Currency currentCurrency = (Currency)Session["currentCurrency"];
                 ApartmentPrice apartmentAndPrice = calculatePricePerStayForApartment(theAparatment, db, theBookingRequest, currentCurrency);
                 Country theCountry = db.Countries.Single(a => a.name == Country);
@@ -318,26 +425,28 @@ namespace cityLife.Controllers
                 else
                 {
                     //Complete the booking
-                    Order theOrder = PublicController.p27createOrder(db, theBookingRequest, apartmentAndPrice, theBookingFormData, theCountry);
+                    Order theOrder = PublicController.p27createOrder(db, theBookingRequest, apartmentAndPrice, theOrderData, theCountry);
                     TranslateBox tBox = ViewBag.tBox;
                     ViewBag.theOrder = theOrder;
                     ViewBag.apartmentAndPrice = apartmentAndPrice;
 
-                    EmailMessage mailToCustomer = new EmailMessage(
+                    if (theOrder.Guest.email != null && theOrder.Guest.email != "")
+                    {
+                        EmailMessage mailToCustomer = new EmailMessage(
                         to: theOrder.Guest.email,
                         subject: tBox.translate("Welcome to Kharkov Apartments City Life"),
                         mailName: "t10welcomeMail",
-                        theController:this
+                        theController: this
                         );
-                    mailToCustomer.send();
-                   
+                        mailToCustomer.send();
+                    }
                     return PartialView("p28bookingSuccess");
                 }
             }
         }
 
         public static Order p27createOrder(cityLifeDBContainer1 db, BookingRequest theBookingRequest, ApartmentPrice apartmentAndPrice,
-            BookingFormData theBookingFormData, Country theCountry)
+            OrderData theOrderData, Country theCountry)
         {
             DateTime checkIn = (DateTime)theBookingRequest.checkinDate;
             DateTime checkOut = (DateTime)theBookingRequest.checkoutDate;
@@ -345,19 +454,19 @@ namespace cityLife.Controllers
             Currency theCurrency = db.Currencies.Single(a => a.currencyCode == apartmentAndPrice.pricePerStay.currency);
 
             Guest theGuest = db.Guests.FirstOrDefault
-                (aGuest => aGuest.email == theBookingFormData.email.content && 
-                aGuest.name == theBookingFormData.name.content && 
-                aGuest.phone == theBookingFormData.phone.content && 
-                aGuest.Country.name == theBookingFormData.country.content);
+                (aGuest => aGuest.email == theOrderData.email && 
+                aGuest.name == theOrderData.name && 
+                aGuest.phone == theOrderData.phone && 
+                aGuest.Country.name == theOrderData.country);
 
             if (theGuest == null)
             {
                 //there is no such guest - create new
                 theGuest = new Guest()
                 {
-                    name =  theBookingFormData.name.content,
-                    phone = theBookingFormData.phone.content,
-                    email = theBookingFormData.email.content,
+                    name =  theOrderData.name,
+                    phone = theOrderData.phone,
+                    email = theOrderData.email,
                     Country = theCountry
                 };
                 db.Guests.Add(theGuest);
@@ -368,13 +477,13 @@ namespace cityLife.Controllers
                 adultCount = (int)theBookingRequest.adults,
                 amountPaid = 0,
                 Apartment = apartmentAndPrice.theApartment,
-                bookedBy = theBookingFormData.bookedBy.content,
+                bookedBy = theOrderData.bookedBy,
                 checkinDate = (DateTime)theBookingRequest.checkinDate,
                 checkoutDate = (DateTime)theBookingRequest.checkoutDate,
                 childrenCount = theBookingRequest.children ?? 0,
                 confirmationNumber = "0",    //TBD
-                expectedArrival = theBookingFormData.arrivalTime.content,
-                specialRequest = theBookingFormData.specialRequest.content,
+                expectedArrival = theOrderData.expectedArrival,
+                specialRequest = theOrderData.comments,
                 status = OrderStatus.Created,
                 dayCount = dayCount,
                 price = apartmentAndPrice.pricePerStay.toCents(),
@@ -387,7 +496,7 @@ namespace cityLife.Controllers
             //Create or update the apartment day records (a record for each apartment-day)
             for (var aDay = checkIn; aDay < checkOut; aDay = aDay.AddDays(1))
             {
-                ApartmentDay anApartmentDay = db.ApartmentDays.SingleOrDefault(a => a.date == aDay && a.Apartment.Id == theAparatment.Id);
+                ApartmentDay anApartmentDay = db.ApartmentDays.SingleOrDefault(a => a.date == aDay && a.Apartment.Id == apartmentAndPrice.theApartment.Id);
                 if (anApartmentDay == null)
                 {
                     //record does not exist - create it
@@ -423,6 +532,7 @@ namespace cityLife.Controllers
                 }
             }
             db.SaveChanges();
+
             return theOrder;
         }
 

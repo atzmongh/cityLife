@@ -6,6 +6,7 @@ using System.Web.Configuration;
 using System.Web.Mvc;
 using cityLife;
 using cityLife4;
+using System.Text.RegularExpressions;
 
 namespace cityLife.Controllers
 {
@@ -30,60 +31,74 @@ namespace cityLife.Controllers
         public int orderId;
         public string firstDate;
     }
-    public class OrderData
-    {
-        public int orderId;
-        public string name;
-        public string phone;
-        public string email;
-        public string country;
-        public int adults;
-        public int children;
-        public string checkin;
-        public string checkout;
-        public Money price;
-        public Money paid;
-        public string expectedArrival;
-        public string comments;
+   
 
-    }
+    
     /// <summary>
     /// The class contains additional fields that do not exist in the booking form data
     /// </summary>
-    public class StaffBookingFormData : BookingFormData
-    {
-        public FieldData checkinDate = new FieldData("Checkin Date");
-        public FieldData checkoutDate = new FieldData("Checkout Date");
-        public FieldData nights = new FieldData("Nights");
-        public FieldData adults = new FieldData("Adults");
-        public FieldData children = new FieldData("Children");
-        public FieldData price = new FieldData("Price");
-        public FieldData paidAmount = new FieldData("Paid Amount");
-        public FieldData apartmentNumber = new FieldData("Apartment Number");
-        public FieldData confirmationNumber = new FieldData("Confirmation Number");
-        public FieldData orderId = new FieldData("Order ID");
-        public FieldData bookedBy = new FieldData("Booked By");
+    //public class StaffBookingFormData : BookingFormData
+    //{
+    //    public FieldData checkinDate;
+    //    public FieldData checkoutDate;
+    //    public FieldData nights;
+    //    public FieldData adults;
+    //    public FieldData children;
+    //    public FieldData price;
+    //    public FieldData paidAmount;
+    //    public FieldData apartmentNumber;
+    //    public FieldData confirmationNumber;
+    //    public FieldData orderId;
 
-        public override bool isValid()  //NEEDS TO BE FIXED
-        {
-            if (base.isValid())
-                return true;
+    //    public StaffBookingFormData():base()
+    //    {
+    //         this.checkinDate = new FieldData("Checkin Date");
+    //    this.checkoutDate = new FieldData("Checkout Date");
+    //    this.nights = new FieldData("Nights");
+    //    this.adults = new FieldData("Adults");
+    //    this.children = new FieldData("Children");
+    //    this.price = new FieldData("Price");
+    //    this.paidAmount = new FieldData("Paid Amount");
+    //    this.apartmentNumber = new FieldData("Apartment Number");
+    //    this.confirmationNumber = new FieldData("Confirmation Number");
+    //    this.orderId = new FieldData("Order ID");
+    //    }
+    //    public StaffBookingFormData(string name, string country, string email, string phone, string arrivalTime, 
+    //        string specialRequest, string bookedBy,
+    //        string checkin, string checkout, string nights, string adults, 
+    //        string children, string price, string paidAmount, string apartmentNumber, string orderId):base(name,country,email,phone,arrivalTime,specialRequest,bookedBy)
+    //    {
+    //        this.checkinDate = new FieldData("Checkin Date", checkin);
+    //        this.checkoutDate = new FieldData("Checkout Date", checkout);
+    //        this.nights = new FieldData("Nights", nights);
+    //        this.adults = new FieldData("Adults", adults);
+    //        this.children = new FieldData("Children", children);
+    //        this.price = new FieldData("Price", price);
+    //        this.paidAmount = new FieldData("Paid Amount", paidAmount);
+    //        this.apartmentNumber = new FieldData("Apartment Number", apartmentNumber);
+    //       // this.confirmationNumber = new FieldData("Confirmation Number", confirmationNumber);
+    //        this.orderId = new FieldData("Order Id", orderId);
+    //    }
+    //    public override bool isValid()  
+    //    {
+    //        if (base.isValid())   //TBD - should be changted
+    //            return true;
 
-            if (checkinDate.errorMessage != "" ||
-                checkoutDate.errorMessage != "" ||
-                nights.errorMessage != "" ||
-                adults.errorMessage != "" ||
-                children.errorMessage != "" ||
-                price.errorMessage != "" ||
-                paidAmount.errorMessage != "" ||
-                apartmentNumber.errorMessage != "" ||
-                confirmationNumber.errorMessage != "" ||
-                orderId.errorMessage != "")
-                return true;
+    //        if (checkinDate.errorMessage != "" ||
+    //            checkoutDate.errorMessage != "" ||
+    //            nights.errorMessage != "" ||
+    //            adults.errorMessage != "" ||
+    //            children.errorMessage != "" ||
+    //            price.errorMessage != "" ||
+    //            paidAmount.errorMessage != "" ||
+    //            apartmentNumber.errorMessage != "" ||
+    //            confirmationNumber.errorMessage != "" ||
+    //            orderId.errorMessage != "")
+    //            return true;
 
-            return false;
-        }
-    }
+    //        return false;
+    //    }
+    //}
     public class StaffController : Controller
     {
         // GET: Staff
@@ -299,8 +314,8 @@ namespace cityLife.Controllers
                 email = theOrder.Guest.email,
                 adults = theOrder.adultCount,
                 children = theOrder.childrenCount,
-                checkin = theOrder.checkinDate.ToShortDateString(),
-                checkout = theOrder.checkoutDate.ToShortDateString(),
+                checkin = theOrder.checkinDate,
+                checkout = theOrder.checkoutDate,
                 country = theOrder.Guest.Country.name,
                 expectedArrival = theOrder.expectedArrival,
                 price = theOrder.priceAsMoney(),
@@ -369,16 +384,16 @@ namespace cityLife.Controllers
             //    adultCount = 2
             //};
             //ViewBag.order = theOrder;
-            StaffBookingFormData theBookingFormData = new StaffBookingFormData();
-            theBookingFormData.checkinDate.content = checkin.ToString("dd MMMM, yyyy");
-            theBookingFormData.checkoutDate.content = checkout.ToString("dd MMMM, yyyy");
-            theBookingFormData.nights.content = nights.ToString();
-            theBookingFormData.children.content = "0";
-            theBookingFormData.adults.content = "2";
-            theBookingFormData.apartmentNumber.content = apartmentNumber.ToString();
-            theBookingFormData.paidAmount.content = "0";
-            theBookingFormData.orderId.content = "0";   //no order ID - this is a  new order   TBD
-            ViewBag.bookingData = theBookingFormData;
+            //StaffBookingFormData theBookingFormData = new StaffBookingFormData();
+            //theBookingFormData.checkinDate.content = checkin.ToString("dd MMMM, yyyy");
+            //theBookingFormData.checkoutDate.content = checkout.ToString("dd MMMM, yyyy");
+            //theBookingFormData.nights.content = nights.ToString();
+            //theBookingFormData.children.content = "0";
+            //theBookingFormData.adults.content = "2";
+            //theBookingFormData.apartmentNumber.content = apartmentNumber.ToString();
+            //theBookingFormData.paidAmount.content = "0";
+            //theBookingFormData.orderId.content = "0";   //no order ID - this is a  new order   TBD
+            //ViewBag.bookingData = theBookingFormData;
 
             //Calculate expected price, assuming 2 adults and 0 children. Calculate the price in UAH
             BookingRequest theBookingRequest = new BookingRequest()
@@ -391,7 +406,7 @@ namespace cityLife.Controllers
             Currency theCurrency = db.Currencies.Single(a => a.currencyCode == "UAH");
             Apartment theApartment = db.Apartments.Single(a => a.number == apartmentNumber);
             var thePrice = PublicController.calculatePricePerStayForApartment(theApartment, db, theBookingRequest, theCurrency);
-            theBookingFormData.price.content = thePrice.pricePerStay.toMoneyString();
+           // theBookingFormData.price.content = thePrice.pricePerStay.toMoneyString();
 
             TranslateBox tBox = this.setTbox("RU");
             ViewBag.tBox = tBox;
@@ -406,9 +421,13 @@ namespace cityLife.Controllers
         /// <returns></returns>
         [HttpPost]
         public ActionResult s25addUpdateOrder(int orderId, string Email, string Name, string CountryName, string Phone, string ArrivalTime, 
-            string SpecialRequest, DateTime? CheckinDate, DateTime? CheckoutDate, int Adults, int Children, int Nights, string Price, string PaidAmount, 
+            string SpecialRequest, DateTime CheckinDate, DateTime CheckoutDate, int Adults, int Children, int Nights, string Price, string PaidAmount, 
             string BookedBy)
         {
+            //Perform validity checks on the input
+           // StaffBookingFormData theBookingForm = new StaffBookingFormData(
+                
+                
             Money priceM = new Money(Price,"UAH");  //Default currency is UAH, if the currency symbol does not exist.
             Money paidAmountM = new Money(PaidAmount,"UAH");
             return View();

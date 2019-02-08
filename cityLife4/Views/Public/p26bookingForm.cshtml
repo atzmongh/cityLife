@@ -19,7 +19,7 @@
     TranslateBox tBox = ViewBag.tBox;
     BookingRequest theBookingRequest = ViewBag.bookingRequest;
     DbSet<Country> countries = ViewBag.countries;
-    BookingFormData theBookingFormData = ViewBag.bookingFormData;
+    OrderData theOrderData = ViewBag.orderData;
 
 }
 <div class="sidebar booking-form" id="bookingFormWrapper" >
@@ -31,22 +31,22 @@
                 <input type="hidden" name="apartmentId" value="@theApartment.Id" />
                 @*when an element has eror - add the calss "error to its div and write error message in field-error*@
                
-                <div class="field-box @theBookingFormData.email.errorOrNot">
-                    <input type="email" id="email" name="@theBookingFormData.email.fieldCamelName" value="@theBookingFormData.email.content" onblur="checkEmailExists(this)">
+                <div class='field-box @theOrderData.errorOf("email")'>
+                    <input type="email" id="email" name="email" value="@theOrderData.email" onblur="checkEmailExists(this)">
                     <label for="email">
                         <span class="field-name">@tBox.translate("Email")</span>
                     </label>
-                    <span class="field-error">@tBox.translate(theBookingFormData.email.errorMessage)</span>
+                    <span class="field-error">@theOrderData.errorMessageOf("email",tBox)</span>
                 </div>
-                <div class="field-box @theBookingFormData.name.errorOrNot">
-                    <input type="text" id="name" name="@theBookingFormData.name.fieldCamelName" value="@theBookingFormData.name.content">
+                <div class='field-box @theOrderData.errorOf("name")'>
+                    <input type="text" id="name" name="name" value="@theOrderData.name">
                     <label for="name">
                         <span class="field-name"> @tBox.translate("Name")</span>
                     </label>
-                    <span class="field-error" id="nameError">@tBox.translate(theBookingFormData.name.errorMessage)</span>
+                    <span class="field-error" id="nameError">@theOrderData.errorMessageOf("name",tBox)</span>
                 </div>
-                <div class="field-box select-box @theBookingFormData.country.errorOrNot">
-                    <input list="countryList" name="@theBookingFormData.country.fieldCamelName" id="country" value="@theBookingFormData.country.content" />
+                <div class='field-box select-box @theOrderData.errorOf("country")'>
+                    <input list="countryList" name="country" id="country" value="@theOrderData.country" />
                     <datalist id="countryList">
                         @foreach (var aCountry in countries)
                         {
@@ -56,26 +56,26 @@
                     <label for="country">
                         <span class="field-name">@tBox.translate("Country")</span>
                     </label>
-                    <span class="field-error" id="countryError">@tBox.translate(theBookingFormData.country.errorMessage)</span>
+                    <span class="field-error" id="countryError">@theOrderData.errorMessageOf("country",tBox)</span>
                 </div>
                 
 
-                <div class="field-box @theBookingFormData.phone.errorOrNot">
-                    <input type="tel" id="phone" name="@theBookingFormData.phone.fieldCamelName" value="@theBookingFormData.phone.content">
+                <div class='field-box @theOrderData.errorOf("phone")'>
+                    <input type="tel" id="phone" name="phone" value="@theOrderData.phone">
                     <label for="phone">
                         <span class="field-name">@tBox.translate("Phone")</span>
                     </label>
-                    <span class="field-error">@tBox.translate(theBookingFormData.phone.errorMessage)</span>
+                    <span class="field-error">@theOrderData.errorMessageOf("phone",tBox)</span>
                 </div>
                 <div class="field-box">
-                    <input type="text" id="arrivalTime" name="@theBookingFormData.arrivalTime.fieldCamelName" value="@theBookingFormData.arrivalTime.content">
+                    <input type="text" id="arrivalTime" name="arrivalTime" value="@theOrderData.expectedArrival">
                     <label for="arrivalTime">
                         <span class="field-name">@tBox.translate("expected arrival time")</span>
                     </label>
                     <span class="field-error"></span>
                 </div>
                 <div class="field-box">
-                    <textarea id="specialRequest" name="@theBookingFormData.specialRequest.fieldCamelName">@theBookingFormData.specialRequest.content</textarea>
+                    <textarea id="specialRequest" name="specialRequest">@theOrderData.comments</textarea>
                     <label for="specialRequest">
                         <span class="field-name">@tBox.translate("special request")</span>
                     </label>
