@@ -7,7 +7,7 @@
     //Existing orders contain all data belonging to that order
     ViewBag.Title = "s23addUpdateOrder";
     Layout = "~/Views/sharing/_staffLayout.cshtml";
-    StaffBookingFormData theBookingFormData = ViewBag.bookingData;
+    OrderData theOrderData = ViewBag.orderData;
     TranslateBox tBox = ViewBag.tBox;
 
 }
@@ -36,7 +36,7 @@
 
 <div class="main-wrapper reset-indent">
     <div class="page-heading">
-        Add/update order for apartment @theBookingFormData.apartmentNumber.content
+        @tBox.translate("Add/update order for apartment") @theOrderData.apartmentNumber
     </div>
 
     <header style="padding-bottom:5px;">
@@ -48,7 +48,8 @@
         </ul>
     </header>
     <form method="post" action="/staff/s25addUpdateOrder">
-        <input type="hidden" name="orderId" value="@theBookingFormData.orderId.content" />
+        <input type="hidden" name="orderId" value="@theOrderData.orderId" />
+        <input type="hidden" name="apartmentNumber" value="@theOrderData.apartmentNumber" />
         <div id="divPersonal" style="max-width:500px;margin:10px;">
             @Html.Partial("s24orderPersonal")
         </div>

@@ -4,22 +4,21 @@
 @using cityLife.Controllers;
 @{
     ViewBag.Title = "s25orderBooking";
-    // Order theOrder = ViewBag.order;
-    StaffBookingFormData theBookingFormData = ViewBag.bookingData;
+    OrderData theOrderData = ViewBag.orderData;
     TranslateBox tBox = ViewBag.tBox;
 }
 
-<div class="field-box datepicker-box">
-    <input type="text" id="fromDate" name="@theBookingFormData.checkinDate.fieldCamelName" value='@theBookingFormData.checkinDate.content'>
-    <label for="fromDate">
+<div class='field-box datepicker-box @theOrderData.errorOf("checkin")'>
+    <input type="text" id="checkinDate" name="checkinDate" value='@theOrderData.checkin.ToString("dd MMM yyyy")'>
+    <label for="checkinDate">
         <span class="field-name">@tBox.translate("Check-in date")</span>
         <span class="calendar-ico"></span>
     </label>
-    <span class="field-error"></span>
+    <span class="field-error">@theOrderData.errorMessageOf("checkin",tBox)</span>
 </div>
 <div class="field-box datepicker-box">
-    <input type="text" id="toDate" name="@theBookingFormData.checkoutDate.fieldCamelName" value='@theBookingFormData.checkoutDate.content'>
-    <label for="toDate">
+    <input type="text" id="checkoutDate" name="checkoutDate" value='@theOrderData.checkout.ToString("dd MMM yyyy")'>
+    <label for="checkoutDate">
         <span class="field-name">@tBox.translate("Check out date")</span>
         <span class="calendar-ico"></span>
     </label>
@@ -27,11 +26,11 @@
 </div>
 <div class="form-box-wrap">
     <div class="field-box select-box">
-        <select name="@theBookingFormData.adults.fieldCamelName">
+        <select name="adults">
             @{
                 for (int i = 0; i <= 4; i++)
                 {
-                    if (theBookingFormData.adults.content == i.ToString())
+                    if (theOrderData.adults == i)
                     {
                         <option selected>@i</option>
                     }
@@ -47,11 +46,11 @@
         </label>
     </div>
     <div class="field-box select-box">
-        <select name="@theBookingFormData.children.fieldCamelName">
+        <select name="children">
             @{
                 for (int i = 0; i <= 4; i++)
                 {
-                    if (theBookingFormData.children.content == i.ToString())
+                    if (theOrderData.children == i)
                     {
                         <option selected>@i</option>
                     }
@@ -69,11 +68,11 @@
 </div>
 <div class="form-box-wrap">
     <div class="field-box select-box">
-        <select name="@theBookingFormData.nights.fieldCamelName">
+        <select name="nights">
             @{
                 for (int i = 0; i <= 30; i++)
                 {
-                    if (theBookingFormData.nights.content == i.ToString())
+                    if (theOrderData.nights == i)
                     {
                         <option selected>@i</option>
                     }
@@ -91,12 +90,12 @@
 </div>
 <div>
     <div class="form-box-wrap">
-        @Html.inputField(theBookingFormData.price, tBox, style: "width:48%")
-        @Html.inputField(theBookingFormData.paidAmount,tBox,style:"width:48%")
+        @Html.inputField("price",theOrderData.price.toMoneyString(), theOrderData.errorMessageOf("price",tBox), tBox, style: "width:48%")
+        @Html.inputField("paid",theOrderData.paid.toMoneyString(), theOrderData.errorMessageOf("paid",tBox),tBox,style:"width:48%")
     </div>
     <div class="form-box-wrap">
         <div class="field-box select-box">
-            <select name="@theBookingFormData.bookedBy.fieldCamelName">
+            <select name="bookedBy">
                 <option value="me" selected>@tBox.translate("Me")</option>
                 <option value="guest">@tBox.translate("Guest")</option>
                 <option value="booking">@tBox.translate("Booking.com")</option>
@@ -107,7 +106,7 @@
                 <span class="field-name">@tBox.translate("Booked By")</span>
             </label>
         </div>
-        @Html.inputField(theBookingFormData.confirmationNumber,tBox,style:"width:48%")
+        @Html.inputField("confirmationNumber",theOrderData.confirmationNumber.ToString(), theOrderData.errorMessageOf("confirmationNumber",tBox),tBox,style:"width:48%")
     </div>
     <input type="submit" class="btn" value='@tBox.translate("OK")'/>
     <input type="button" class="btn" value='@tBox.translate("Cancel")' />

@@ -9,19 +9,19 @@
     ViewBag.Title = "s23addUpdateOrder";
     Order theOrder = ViewBag.order;
     TranslateBox tBox = ViewBag.tBox;
-    StaffBookingFormData theBookingFormData = ViewBag.bookingData;
+    OrderData theOrderData = ViewBag.orderData;
     DbSet<Country> countries = ViewBag.countries;
 
 }
 
 
-@Html.inputField(theBookingFormData.email, tBox, fieldType:"email")
-@Html.inputField(theBookingFormData.name, tBox)
+@Html.inputField("email",theOrderData.email, theOrderData.errorMessageOf("email",tBox), tBox, fieldType:"email")
+@Html.inputField("name",theOrderData.name, theOrderData.errorMessageOf("name",tBox), tBox)
 
 
 
-<div class="inputBox select-box @theBookingFormData.country.errorOrNot">
-    <input list="countryList" name="@theBookingFormData.country.fieldCamelName" id="country" value="@theBookingFormData.country.content" class="inputElement" />
+<div class='inputBox select-box @theOrderData.errorOf("country")'>
+    <input list="countryList" name="country" id="country" value="@theOrderData.country" class="inputElement" />
     <datalist id="countryList">
         @foreach (var aCountry in countries)
         {
@@ -29,16 +29,16 @@
         }
     </datalist>
     <label for="country" class="label">@tBox.translate("Country")</label>
-    <span class="error-text" >@tBox.translate(theBookingFormData.country.errorMessage)</span>
+    <span class="error-text" >@theOrderData.errorMessageOf("country", tBox)</span>
 </div>
 
-@Html.inputField(theBookingFormData.phone, tBox, "phone")
-@Html.inputField(theBookingFormData.arrivalTime, tBox)
+@Html.inputField("Phone",theOrderData.phone, theOrderData.errorMessageOf("phone",tBox) , tBox, "phone")
+@Html.inputField("ArrivalTime", theOrderData.expectedArrival, theOrderData.errorMessageOf("arrivalTime",tBox),tBox)
 
-<div class="inputBox @theBookingFormData.specialRequest.errorOrNot" style="height:120px;">
-    <textarea id="specialRequest" name="@theBookingFormData.specialRequest.fieldCamelName" class="inputElement" style="height:80px;">@theBookingFormData.specialRequest.content</textarea>
+<div class='inputBox @theOrderData.errorOf("comments")' style="height:120px;">
+    <textarea id="specialRequest" name="specialRequest" class="inputElement" style="height:80px;">@theOrderData.comments</textarea>
     <label for="specialReqest" class="label">@tBox.translate("Special Requests")</label>
-    <span class="error-text">@theBookingFormData.specialRequest.errorMessage saf sdf sdf sdf </span>
+    <span class="error-text">@theOrderData.errorMessageOf("comments",tBox)</span>
 </div>
 <btn class="btn" onclick="activate('Booking')">@tBox.translate("Next")</btn>
 

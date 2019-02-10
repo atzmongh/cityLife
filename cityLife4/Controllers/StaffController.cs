@@ -10,10 +10,38 @@ using System.Text.RegularExpressions;
 
 namespace cityLife.Controllers
 {
-    public class LoginFormData
+    public class LoginFormData:formData
     {
-        public FieldData userName = new FieldData("User Name");
-        public FieldData password = new FieldData("Password");
+        public string userName;
+        public string password;
+
+        public override bool isValid()
+        {
+            errorMessage.Clear();
+            if (userName == "")
+            {
+                errorMessage.Add("userName", "Please enter your user name");
+            }
+            if (password == "")
+            {
+                errorMessage.Add("password", "Please enter the password");
+            }
+            if (errorMessage.Count() == 0)
+            {
+                //No error so far - check if such user exist and password matches
+                cityLifeDBContainer1 db = new cityLifeDBContainer1();
+                Employee theEmployee = db.Employees.FirstOrDefault(anEmp => anEmp.userName == userName);
+                if (theEmployee == null)
+                {
+                    errorMessage.Add("userName", "Username was not found");
+                }
+                else if (theEmployee.passwordHash != password)
+                {
+                    errorMessage.Add("password", "The password does not match our records");
+                }
+            }
+            return errorMessage.Count() == 0;
+        }
     }
     /// <summary>
     /// A day block is either a single free day, or a group of occupied days for a single apartment and a single guest.
@@ -120,49 +148,30 @@ namespace cityLife.Controllers
         [HttpPost]
         public ActionResult s10login(string userName, string password)
         {
-            LoginFormData theLoginFormData = new LoginFormData();
+            LoginFormData theLoginFormData = new LoginFormData()
+            {
+                userName = userName,
+                password = password
+            };
+
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
             TranslateBox tBox = this.setTbox("RU");
             ViewBag.tBox = tBox;
             ViewBag.theLoginFormData = theLoginFormData;
 
-            bool errorExists = false;
-            if (userName == "")
+            if (!theLoginFormData.isValid())
             {
-                theLoginFormData.userName.errorMessage = "Please enter your user name";
-                errorExists = true;
-            }
-            if (password == "")
-            {
-                theLoginFormData.password.errorMessage = "Please enter the password";
-                errorExists = true;
-            }
-            if (errorExists)
-            {
-                //return the same login screen with error messages
                 return View("s10login");
             }
-            theLoginFormData.userName.content = userName;
-
-            //check if user name and password are valid
-            Employee theEmployee = db.Employees.FirstOrDefault(anEmp => anEmp.userName == userName);
-            if (theEmployee == null)
+            else
             {
-                theLoginFormData.userName.errorMessage = "Username was not found";
-                return View("s10login");
+                Employee theEmployee = db.Employees.Single(anEmp => anEmp.userName == userName);
+                Session["loggedinUser"] = theEmployee;
+
+                Response.Redirect("/Staff/s21Dashboard");
+
+                return null;  //Fake return - as the Response.redirect activates a new request from the browser. 
             }
-
-            if (theEmployee.passwordHash != password)
-            {
-                theLoginFormData.password.errorMessage = "The password does not match our records";
-                return View("s10login");
-            }
-
-            Session["loggedinUser"] = theEmployee;
-
-            Response.Redirect("/Staff/s21Dashboard");
-
-            return null;  //Fake return - as the Response.redirect activates a new request from the browser. 
         }
 
         /// <summary>
@@ -320,7 +329,10 @@ namespace cityLife.Controllers
                 expectedArrival = theOrder.expectedArrival,
                 price = theOrder.priceAsMoney(),
                 paid = theOrder.amountPaidAsMoney(),
-                comments = theOrder.specialRequest
+                comments = theOrder.specialRequest,
+                nights = theOrder.nights,
+                bookedBy = theOrder.bookedBy,
+                apartmentNumber = theOrder.Apartment.number
             };
             TranslateBox tBox = this.setTbox("RU");
             ViewBag.tBox = tBox;
@@ -371,46 +383,44 @@ namespace cityLife.Controllers
                 return s10login();
             }
             ViewBag.employee = theEmployee;
+            OrderData theOrderData = new OrderData()
+            {
+                checkin = checkin,
+                checkout = checkout,
+                apartmentNumber = apartmentNumber,
+                nights = Order.dateDifference(checkout,checkin),
+                adults = 2,
+                children = 0
+            };
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
-
-            
-            //Order theOrder = new Order()
-            //{
-            //    checkinDate = checkin,
-            //    checkoutDate = checkout,
-            //    dayCount = nights,
-            //    Apartment = theApartment,
-            //    childrenCount = 0,
-            //    adultCount = 2
-            //};
-            //ViewBag.order = theOrder;
-            //StaffBookingFormData theBookingFormData = new StaffBookingFormData();
-            //theBookingFormData.checkinDate.content = checkin.ToString("dd MMMM, yyyy");
-            //theBookingFormData.checkoutDate.content = checkout.ToString("dd MMMM, yyyy");
-            //theBookingFormData.nights.content = nights.ToString();
-            //theBookingFormData.children.content = "0";
-            //theBookingFormData.adults.content = "2";
-            //theBookingFormData.apartmentNumber.content = apartmentNumber.ToString();
-            //theBookingFormData.paidAmount.content = "0";
-            //theBookingFormData.orderId.content = "0";   //no order ID - this is a  new order   TBD
-            //ViewBag.bookingData = theBookingFormData;
 
             //Calculate expected price, assuming 2 adults and 0 children. Calculate the price in UAH
             BookingRequest theBookingRequest = new BookingRequest()
             {
                  checkinDate = checkin,
-                  checkoutDate = checkout,
-                  adults = 2,
-                  children = 0
+                 checkoutDate = checkout,
+                 adults = 2,
+                 children = 0
             };
             Currency theCurrency = db.Currencies.Single(a => a.currencyCode == "UAH");
             Apartment theApartment = db.Apartments.Single(a => a.number == apartmentNumber);
             var thePrice = PublicController.calculatePricePerStayForApartment(theApartment, db, theBookingRequest, theCurrency);
-           // theBookingFormData.price.content = thePrice.pricePerStay.toMoneyString();
+            if (thePrice.availability != Availability.AVAILABLE)
+            {
+                //The apartment is not available for that period. 
+                theOrderData.price = new Money(0m, "UAH");
+            }
+            else
+            {
+                theOrderData.price = thePrice.pricePerStay;
+            }
+           
+            theOrderData.paid = new Money(0m, "UAH");
 
             TranslateBox tBox = this.setTbox("RU");
             ViewBag.tBox = tBox;
             ViewBag.countries = db.Countries;
+            ViewBag.orderData = theOrderData;
             return View("s23addUpdateOrder");
         }
 
@@ -420,16 +430,98 @@ namespace cityLife.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult s25addUpdateOrder(int orderId, string Email, string Name, string CountryName, string Phone, string ArrivalTime, 
-            string SpecialRequest, DateTime CheckinDate, DateTime CheckoutDate, int Adults, int Children, int Nights, string Price, string PaidAmount, 
-            string BookedBy)
+        public ActionResult s25addUpdateOrder(int orderId, int apartmentNumber, string Email, string Name, string Country, string Phone, string ArrivalTime, 
+            string SpecialRequest, DateTime CheckinDate, DateTime CheckoutDate, int Adults, int Children, int Nights, string Price, string Paid, 
+            string BookedBy, int confirmationNumber)
         {
             //Perform validity checks on the input
            // StaffBookingFormData theBookingForm = new StaffBookingFormData(
                 
                 
             Money priceM = new Money(Price,"UAH");  //Default currency is UAH, if the currency symbol does not exist.
-            Money paidAmountM = new Money(PaidAmount,"UAH");
+            Money paidAmountM = new Money(Paid,"UAH");
+
+            //prepareDataForp26p27(apartmentId);
+            TranslateBox tBox = new TranslateBox("UAH", "UAH", "dontShowAsterisks");
+            ViewBag.tBox = tBox;
+            
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+            Apartment theAparatment = db.Apartments.Single(anApartment => anApartment.number == apartmentNumber);
+            BookingRequest theBookingRequest = new BookingRequest()
+            {
+                checkinDate = CheckinDate,
+                checkoutDate = CheckoutDate,
+                adults = Adults,
+                children = Children
+            };
+            ViewBag.countries = db.Countries;
+            ViewBag.employee = (Employee)Session["loggedinUser"];
+
+            //perform validity chekcs on the input
+            OrderData theOrderData = new OrderData()
+            {
+                name = Name,
+                country = Country,
+                email = Email,
+                phone = Phone,
+                expectedArrival = ArrivalTime,
+                comments = SpecialRequest,
+                adults =  Adults,
+                children = Children,
+                checkin = CheckinDate,
+                checkout = CheckoutDate,
+                 apartmentNumber = apartmentNumber,
+                 bookedBy = BookedBy,
+                 confirmationNumber = confirmationNumber,
+                 nights = Nights,
+                 orderId = orderId,
+                 paid = paidAmountM,
+                 price = priceM
+            };
+
+            ViewBag.orderData = theOrderData;
+            if (!theOrderData.isValid())
+            {
+                return View("s23addUpdateOrder");
+            }
+            else
+            {
+                //The form is valid - create the booking order
+                //Check if the booking request is still valid.
+
+                Currency currentCurrency = db.Currencies.Single(a => a.currencyCode == "UAH");   //The staff application works currently only with UAH
+                ApartmentPrice apartmentAndPrice = PublicController.calculatePricePerStayForApartment(theAparatment, db, theBookingRequest, currentCurrency);
+                Country theCountry = db.Countries.Single(a => a.name == Country);
+                if (apartmentAndPrice.availability == Availability.OCCUPIED)
+                {
+                    //the apartment is not available, although it seemed to be available. Perhaps it was taken in the last minutes
+                    theOrderData.setErrorMessageFor("comments", "These dates are not available for that apartment");
+                   return View("s23addUpdateOrder");
+                }
+                else
+                {
+                    //Complete the booking
+                    Order theOrder = PublicController.p27createOrder(db, theBookingRequest, apartmentAndPrice, theOrderData, theCountry, tBox);
+
+                    ViewBag.theOrder = theOrder;
+                    ViewBag.apartmentAndPrice = apartmentAndPrice;
+
+                    if (theOrder.Guest.email != null && theOrder.Guest.email != "")
+                    {
+                        EmailMessage mailToCustomer = new EmailMessage(
+                        to: theOrder.Guest.email,
+                        subject: tBox.translate("Welcome to Kharkov Apartments City Life"),
+                        mailName: "t10welcomeMail",
+                        theController: this
+                        );
+                        mailToCustomer.send();
+                    }
+                    return View("s28bookingSuccess");
+                }
+            }
+
+
+
             return View();
         }
         /// <summary>

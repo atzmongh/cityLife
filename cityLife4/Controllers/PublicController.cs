@@ -59,10 +59,57 @@ namespace cityLife.Controllers
         }
     }
 
+    /// <summary>
+    /// This is a base class for classes that define the fields of a form. They should contain all properties of the form, plus an "isValid"
+    /// method that checks the form for validity. Each invalid property will get an error message in the errorMessage dictionary.
+    /// where the key is the property name. For example, if the address field is empty, we will add a <key,value> pair to the dictioanry:
+    /// key="address", value="address cannot be empty"
+    /// </summary>
+    public abstract class formData
+    {
+        protected Dictionary<string, string> errorMessage = new Dictionary<string, string>();
+        /// <summary>
+        /// Returns true if the form is valid. If not valid - adds error messages to the dictionary.
+        /// </summary>
+        /// <returns></returns>
+        public abstract bool isValid();
+        /// <summary>
+        /// Returns the translated error messages for a specific property, or empty string if the field was valid
+        /// </summary>
+        /// <param name="fieldName"></param>
+        /// <param name="tBox"></param>
+        /// <returns></returns>
+        public string errorMessageOf(string fieldName, TranslateBox tBox)
+        {
+            try
+            {
+                return tBox.translate(this.errorMessage[fieldName]);
+            }
+            catch (Exception)
+            {
+                return "";
+            }
+        }
+        public void setErrorMessageFor(string fieldName, string message)
+        {
+            errorMessage.Add(fieldName, message);
+        }
+        /// <summary>
+        /// The method returns the word "error" if the field has an error. This will create the CSS class "error"
+        /// It returns empty string otherwise
+        /// </summary>
+        /// <param name="fieldName"></param>
+        /// <returns></returns>
+        public string errorOf(string fieldName)
+        {
+            return this.errorMessage.ContainsKey(fieldName) ? "error" : "";
+        }
+
+    }
     public class FieldData
     {
         public string fieldName;
-        public string content="";
+        public string content = "";
         public string errorMessage = "";
         public string errorOrNot
         {
@@ -93,11 +140,16 @@ namespace cityLife.Controllers
                 return camelName;
             }
         }
-           
-       
+
+
     }
 
-    public class OrderData
+
+
+    /// <summary>
+    /// Note that the class inherits methods errorMessageOf and errorOf
+    /// </summary>
+    public class OrderData: formData
     {
         public int orderId;
         public string name;
@@ -108,13 +160,14 @@ namespace cityLife.Controllers
         public int children;
         public DateTime checkin;
         public DateTime checkout;
+        public int nights;
         public Money price;
         public Money paid;
         public string expectedArrival;
         public string comments;
         public string bookedBy;
-
-        private Dictionary<string, string> errorMessage = new Dictionary<string, string>();
+        public int apartmentNumber;
+        public int confirmationNumber;
 
         private static bool IsValidEmail(string email)
         {
@@ -128,7 +181,7 @@ namespace cityLife.Controllers
                 return false;
             }
         }
-        public bool isValid()
+        public override bool isValid()
         {
             this.errorMessage.Clear();
             if (this.name == null || this.name == "")
@@ -171,122 +224,8 @@ namespace cityLife.Controllers
             }
             return errorMessage.Count() == 0;
         }
-        /// <summary>
-        /// The method returns the error message attached to this field, or empty string otherwise
-        /// Thne method translates the error message, using the tBox it receives
-        /// </summary>
-        /// <param name="fieldName"></param>
-        /// <returns></returns>
-        public string errorMessageOf(string fieldName, TranslateBox tBox)
-        {
-            try
-            {
-                return tBox.translate(this.errorMessage[fieldName]);
-            }
-            catch ( Exception )
-            {
-                return "";
-            }
-        }
-        /// <summary>
-        /// The method returns the word "error" if the field has an error. This will create the CSS class "error"
-        /// It returns empty string otherwise
-        /// </summary>
-        /// <param name="fieldName"></param>
-        /// <returns></returns>
-        public string errorOf(string fieldName)
-        {
-            return this.errorMessage.ContainsKey(fieldName) ? "error" : "";
-        }
-
     }
 
-    //public class BookingFormData
-    //{
-    //    public FieldData name;
-    //    public FieldData country;
-    //    public FieldData email;
-    //    public FieldData phone;
-    //    public FieldData arrivalTime;
-    //    public FieldData specialRequest;
-    //    public FieldData bookedBy;
-    //    private bool formValid = false;
-
-    //    public BookingFormData(string name, string country, string email, string phone, string arrivalTime, string specialRequest, string bookedBy)
-    //    {
-    //        this.name = new FieldData("Name", name);
-    //        this.country = new FieldData("Country", country);
-    //        this.email = new FieldData("Email", email);
-    //        this.phone = new FieldData("Phone", phone);
-    //        this.arrivalTime = new FieldData("Arrival Time", arrivalTime);
-    //        this.specialRequest = new FieldData("special Request", specialRequest);
-    //        this.bookedBy = new FieldData("Booked By", bookedBy);
-    //    }
-    //    public BookingFormData()
-    //    {
-    //        this.name = new FieldData("Name");
-    //        this.country = new FieldData("Country");
-    //        this.email = new FieldData("Email");
-    //        this.phone = new FieldData("Phone");
-    //        this.arrivalTime = new FieldData("Arrival Time");
-    //        this.specialRequest = new FieldData("special Request");
-    //        this.bookedBy = new FieldData("Booked By");
-    //    }
-
-    //    private static bool IsValidEmail(string email)
-    //    {
-    //        try
-    //        {
-    //            var addr = new System.Net.Mail.MailAddress(email);
-    //            return addr.Address == email;
-    //        }
-    //        catch
-    //        {
-    //            return false;
-    //        }
-    //    }
-    //    public virtual bool isValid()
-    //    {
-    //        this.formValid = true;
-    //        if (this.name.content == "")
-    //        {
-    //            this.name.errorMessage = "Please enter name";
-    //            this.formValid = false;
-    //        }
-
-    //        if (this.country.content == "")
-    //        {
-    //            this.country.errorMessage = "Please select country";
-    //            this.formValid = false;
-    //        }
-    //        else
-    //        {
-    //            cityLifeDBContainer1 db = new cityLifeDBContainer1();
-    //            Country theCountry = db.Countries.SingleOrDefault(a => a.name == this.country.content);
-    //            if (theCountry == null)
-    //            {
-    //                this.country.errorMessage = "This country does not exist in our country list";
-    //                this.formValid = false;
-    //            }
-    //        }
-    //        if (!this.IsValidEmail(this.email.content))
-    //        {
-    //            this.email.errorMessage = "Please enter a valid email address";
-    //            this.formValid = false;
-    //        }
-    //        if (!Regex.Match(this.phone.content, @"^(\+?[0-9]{10,13})$").Success)
-    //        {
-    //            this.phone.errorMessage = "Please enter a valid phone number";
-    //            this.formValid = false;
-    //        }
-    //        if (this.bookedBy.content == "")
-    //        {
-    //            this.bookedBy.errorMessage = "Please enter who made the booking";
-    //            this.formValid = false;
-    //        }
-    //        return this.formValid;
-    //    }
-    //}
    
     public class PublicController : Controller
     {
@@ -425,8 +364,9 @@ namespace cityLife.Controllers
                 else
                 {
                     //Complete the booking
-                    Order theOrder = PublicController.p27createOrder(db, theBookingRequest, apartmentAndPrice, theOrderData, theCountry);
                     TranslateBox tBox = ViewBag.tBox;
+                    Order theOrder = PublicController.p27createOrder(db, theBookingRequest, apartmentAndPrice, theOrderData, theCountry, tBox);
+                   
                     ViewBag.theOrder = theOrder;
                     ViewBag.apartmentAndPrice = apartmentAndPrice;
 
@@ -446,7 +386,7 @@ namespace cityLife.Controllers
         }
 
         public static Order p27createOrder(cityLifeDBContainer1 db, BookingRequest theBookingRequest, ApartmentPrice apartmentAndPrice,
-            OrderData theOrderData, Country theCountry)
+            OrderData theOrderData, Country theCountry, TranslateBox tBox)
         {
             DateTime checkIn = (DateTime)theBookingRequest.checkinDate;
             DateTime checkOut = (DateTime)theBookingRequest.checkoutDate;
@@ -491,6 +431,8 @@ namespace cityLife.Controllers
                 Currency = theCurrency
             };
             db.Orders.Add(theOrder);
+
+           
 
 
             //Create or update the apartment day records (a record for each apartment-day)

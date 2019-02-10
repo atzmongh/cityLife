@@ -441,6 +441,8 @@
     <Content Include="Views\Staff\s10login.cshtml" />
     <Content Include="Views\sharing\cityLifeLogoSvg.cshtml" />
     <Content Include="Views\Staff\s21dashboard.cshtml" />
+    <Content Include="Views\Staff\t10welcomeMail.cshtml" />
+    <Content Include="Views\Staff\s28bookingSuccess.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
       <SubType>Designer</SubType>

@@ -27,19 +27,19 @@
                        @Html.Partial("/views/sharing/cityLifeLogoSvg.cshtml")
                     </a>
                     <form method="post" action="/staff/s10login" >
-                        <div class="field-box @theLoginFormData.userName.errorOrNot">
-                            <input type="text" id="userName" name="userName" value="@theLoginFormData.userName.content">
+                        <div class='field-box @theLoginFormData.errorOf("userName")'>
+                            <input type="text" id="userName" name="userName" value="@theLoginFormData.userName">
                             <label for="userName">
                                 <span class="field-name"> @tBox.translate("User Name")</span>
                             </label>
-                            <span class="field-error" id="userNameError">@tBox.translate(theLoginFormData.userName.errorMessage)</span>
+                            <span class="field-error" id="userNameError">@theLoginFormData.errorMessageOf("userName",tBox)</span>
                         </div>
-                        <div class="field-box @theLoginFormData.password.errorOrNot">
+                        <div class='field-box @theLoginFormData.errorOf("password")'>
                             <input type="password" id="password" name="password">
                             <label for="password">
                                 <span class="field-name"> @tBox.translate("Password")</span>
                             </label>
-                            <span class="field-error" id="passwordError">@tBox.translate(theLoginFormData.password.errorMessage)</span>
+                            <span class="field-error" id="passwordError">@theLoginFormData.errorMessageOf("password",tBox)</span>
                         </div>
                         <input type="submit" class="btn" style="min-width:120px; height:auto" value="OK" />
                         <input type="button" class="btn" style="min-width:120px; height:auto" value="Cancel" />

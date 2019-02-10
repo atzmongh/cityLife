@@ -44,5 +44,20 @@ namespace cityLife4
             Money amountPaidMoney = new Money(amountPaidDecimal, this.Currency.currencyCode);
             return amountPaidMoney;
         }
+
+        public int nights
+        {
+            get
+            {
+                return Order.dateDifference(this.checkoutDate, this.checkinDate);
+            }
+            
+        }
+        public static int dateDifference(DateTime checkoutDate, DateTime checkinDate)
+        {
+            var nightsSpan = (checkoutDate - checkinDate);
+            var nightCount = (int)Math.Round(nightsSpan.TotalDays, 0);
+            return nightCount;
+        }
     }
 }

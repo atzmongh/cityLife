@@ -37,20 +37,22 @@ namespace cityLife4
         /// </div>
         /// 
         /// </returns>
-        public static MvcHtmlString inputField(this HtmlHelper helper, FieldData theFieldData, TranslateBox tBox, string fieldType = "text", string style="")
+        public static MvcHtmlString inputField(this HtmlHelper helper, string fieldName, string fieldContent, string fieldErrorMessage, TranslateBox tBox, string fieldType = "text", string style="")
         {
+            string error = fieldErrorMessage != "" ? "error" : "";
+            string fieldCamelName = fieldName.Replace(" ", "");
             string theField = string.Format(@"
 <div class='inputBox {0}' style='{6}'>
   <input id = '{1}' name = '{1}' type = '{2}' value = '{3}' class='inputElement' />
   <label for='{1}' class='label'>{4}</label>
   <span class='error-text'>{5}</span>
 </div>",
-                                /*0*/theFieldData.errorOrNot,   //returns either empty string or "error" (the error CSS class)
-                                /*1*/theFieldData.fieldCamelName,//returns the field name without spaces, such as "SpecialRequest"
+                                /*0*/error,   //returns either empty string or "error" (the error CSS class)
+                                /*1*/fieldCamelName,//returns the field name without spaces, such as "SpecialRequest"
                                 /*2*/fieldType,                  //normally either text or email
-                                /*3*/theFieldData.content,        //the value of the field
-                                /*4*/tBox.translate(theFieldData.fieldName),   //returns the translation of the field name
-                                /*5*/tBox.translate(theFieldData.errorMessage),    //returns the error message, if any (translated). Or empty string
+                                /*3*/fieldContent,        //the value of the field
+                                /*4*/tBox.translate(fieldName),   //returns the translation of the field name
+                                /*5*/tBox.translate(fieldErrorMessage),    //returns the error message, if any (translated). Or empty string
                                 /*6*/style   ///any additional style, such as width:...
 );
             MvcHtmlString mvcString = new MvcHtmlString(theField);

@@ -1,0 +1,67 @@
+﻿//Copied from the public controller. I did not find a way to share the same file for both controllers
+@using cityLife4;
+@using cityLife.Controllers;
+@{
+    Layout = null;
+    Order theOrder = (Order)ViewBag.theOrder;
+    TranslateBox tBox = (TranslateBox)ViewBag.tBox;
+    ApartmentPrice apartmentAndPrice = ViewBag.apartmentAndPrice;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>t10welcomeMail</title>
+</head>
+<body>
+    <div >
+        <img src="/images/CL_logo_cropped.jpg"  style="width:100px; text-align:center"/>
+        <h3 style="text-align:left"> @tBox.translate("Dear") @theOrder.Guest.name</h3>,
+       
+        <h3 style="text-align:left">@tBox.translate("We are happy to host you in one of our apartments").</h3>
+        <h3 style="text-align:left">@tBox.translate("Here are your booking details"):</h3>
+        <br />
+        <div style="width:400px;border-bottom: 2px solid #EEF3F7;border-top: 2px solid #EEF3F7;">
+           
+            <br />
+            <span style="float:left">@tBox.translate("Checkin Date")</span>
+            <span style="float:right">@theOrder.checkinDate.ToShortDateString() </span>
+            <br />
+            <span style="float:left">@tBox.translate("Checkout Date")</span>
+            <span style="float:right">@theOrder.checkoutDate.ToShortDateString() </span>
+            <br />
+            <span style="float:left">@tBox.translate("Checkin Time")</span>
+            <span style="float:right">14:00 </span>
+            <br />
+            <span style="float:left">@tBox.translate("Checkout Time")</span>
+            <span style="float:right">12:00</span>
+            <br />
+            <span style="float:left">@tBox.translate("Guests")</span>
+            <span style="float:right">@theOrder.adultCount </span>
+            <br />
+            <span style="float:left">@tBox.translate("Children")</span>
+            <span style="float:right">@theOrder.childrenCount </span>
+            <br />
+            <span style="float:left">@tBox.translate("Price")</span>
+            <span style="float:right">@apartmentAndPrice.pricePerStay.toMoneyString() </span>
+            <br />
+            <span style="float:left">@tBox.translate("Expected Arrival Time")</span>
+            <span style="float:right">@theOrder.expectedArrival </span>
+            <br />
+            <span style="float:left">@tBox.translate("Booking Number")</span>
+            <span style="float:right">@theOrder.Id</span>
+            <br />
+            <span style="float:left">@tBox.translate("Special Requests")</span>
+            <span style="float:right">@theOrder.specialRequest </span>
+            <br />
+        </div>
+        <br />
+        @tBox.translate("Sincerely Yours");<br />
+        @tBox.translate("Ksenia Ghilai");
+
+
+    </div>
+</body>
+</html>
