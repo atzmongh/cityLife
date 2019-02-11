@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 
 namespace cityLife.Controllers
 {
-    public class LoginFormData:formData
+    public class LoginFormData : formData
     {
         public string userName;
         public string password;
@@ -59,9 +59,9 @@ namespace cityLife.Controllers
         public int orderId;
         public string firstDate;
     }
-   
 
-    
+
+
     /// <summary>
     /// The class contains additional fields that do not exist in the booking form data
     /// </summary>
@@ -182,7 +182,7 @@ namespace cityLife.Controllers
         {
             return View("s20dashboard");
         }
-        
+
         /// <summary>
         /// This is the horizontal version of the dashboard. It shows the orders of all apartments for 31 days, since the date entered by the user, 
         /// or since today. (the default)
@@ -212,7 +212,7 @@ namespace cityLife.Controllers
                 ViewBag.employee = theEmployee;
                 return View("s21Dashboard");
             }
-            
+
         }
 
         /// <summary>
@@ -350,17 +350,23 @@ namespace cityLife.Controllers
         /// <param name="orderId"></param>
         /// <returns>update order form</returns>
         [HttpGet]
-        public ActionResult s23updateOrder(int? orderId)
+        public ActionResult s23updateOrder(int orderId)
         {
 
-            if (orderId != null)
-            {
-                cityLifeDBContainer1 db = new cityLifeDBContainer1();
-                var theOrder = db.Orders.Single(a => a.Id == orderId);
-                ViewBag.order = theOrder;
-            }
+
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+            Order theOrder = db.Orders.Single(a => a.Id == orderId);
+            OrderData theOrderData = new OrderData(theOrder);
+            ViewBag.orderData = theOrderData;
+            var apartmentNumbers = from anApartment in db.Apartments
+                                   select anApartment.number;
+            ViewBag.apartmentNumbers = apartmentNumbers;
+
             TranslateBox tBox = this.setTbox("RU");
             ViewBag.tBox = tBox;
+            ViewBag.countries = db.Countries;
+            var theEmployee = (Employee)Session["loggedinUser"];
+            ViewBag.employee = theEmployee;
             return View("s23addUpdateOrder");
         }
 
@@ -388,7 +394,7 @@ namespace cityLife.Controllers
                 checkin = checkin,
                 checkout = checkout,
                 apartmentNumber = apartmentNumber,
-                nights = Order.dateDifference(checkout,checkin),
+                nights = Order.dateDifference(checkout, checkin),
                 adults = 2,
                 children = 0
             };
@@ -397,10 +403,10 @@ namespace cityLife.Controllers
             //Calculate expected price, assuming 2 adults and 0 children. Calculate the price in UAH
             BookingRequest theBookingRequest = new BookingRequest()
             {
-                 checkinDate = checkin,
-                 checkoutDate = checkout,
-                 adults = 2,
-                 children = 0
+                checkinDate = checkin,
+                checkoutDate = checkout,
+                adults = 2,
+                children = 0
             };
             Currency theCurrency = db.Currencies.Single(a => a.currencyCode == "UAH");
             Apartment theApartment = db.Apartments.Single(a => a.number == apartmentNumber);
@@ -414,8 +420,11 @@ namespace cityLife.Controllers
             {
                 theOrderData.price = thePrice.pricePerStay;
             }
-           
+
             theOrderData.paid = new Money(0m, "UAH");
+            var apartmentNumbers = from anApartment in db.Apartments
+                                   select anApartment.number;
+            ViewBag.apartmentNumbers = apartmentNumbers;
 
             TranslateBox tBox = this.setTbox("RU");
             ViewBag.tBox = tBox;
@@ -430,21 +439,21 @@ namespace cityLife.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult s25addUpdateOrder(int orderId, int apartmentNumber, string Email, string Name, string Country, string Phone, string ArrivalTime, 
-            string SpecialRequest, DateTime CheckinDate, DateTime CheckoutDate, int Adults, int Children, int Nights, string Price, string Paid, 
-            string BookedBy, int confirmationNumber)
+        public ActionResult s25addUpdateOrder(int orderId, int apartmentNumber, string Email, string Name, string Country, string Phone, string ArrivalTime,
+            string SpecialRequest, DateTime CheckinDate, DateTime CheckoutDate, int Adults, int Children, int Nights, string Price, string Paid,
+            string BookedBy, string confirmationNumber)
         {
             //Perform validity checks on the input
-           // StaffBookingFormData theBookingForm = new StaffBookingFormData(
-                
-                
-            Money priceM = new Money(Price,"UAH");  //Default currency is UAH, if the currency symbol does not exist.
-            Money paidAmountM = new Money(Paid,"UAH");
+            // StaffBookingFormData theBookingForm = new StaffBookingFormData(
+
+
+            Money priceM = new Money(Price, "UAH");  //Default currency is UAH, if the currency symbol does not exist.
+            Money paidAmountM = new Money(Paid, "UAH");
 
             //prepareDataForp26p27(apartmentId);
             TranslateBox tBox = new TranslateBox("UAH", "UAH", "dontShowAsterisks");
             ViewBag.tBox = tBox;
-            
+
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
             Apartment theAparatment = db.Apartments.Single(anApartment => anApartment.number == apartmentNumber);
             BookingRequest theBookingRequest = new BookingRequest()
@@ -466,19 +475,21 @@ namespace cityLife.Controllers
                 phone = Phone,
                 expectedArrival = ArrivalTime,
                 comments = SpecialRequest,
-                adults =  Adults,
+                adults = Adults,
                 children = Children,
                 checkin = CheckinDate,
                 checkout = CheckoutDate,
-                 apartmentNumber = apartmentNumber,
-                 bookedBy = BookedBy,
-                 confirmationNumber = confirmationNumber,
-                 nights = Nights,
-                 orderId = orderId,
-                 paid = paidAmountM,
-                 price = priceM
+                apartmentNumber = apartmentNumber,
+                bookedBy = BookedBy,
+                confirmationNumber = confirmationNumber,
+                nights = Nights,
+                orderId = orderId,
+                paid = paidAmountM,
+                price = priceM
             };
-
+            var apartmentNumbers = from anApartment in db.Apartments
+                                   select anApartment.number;
+            ViewBag.apartmentNumbers = apartmentNumbers;
             ViewBag.orderData = theOrderData;
             if (!theOrderData.isValid())
             {
@@ -496,7 +507,7 @@ namespace cityLife.Controllers
                 {
                     //the apartment is not available, although it seemed to be available. Perhaps it was taken in the last minutes
                     theOrderData.setErrorMessageFor("comments", "These dates are not available for that apartment");
-                   return View("s23addUpdateOrder");
+                    return View("s23addUpdateOrder");
                 }
                 else
                 {

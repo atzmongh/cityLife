@@ -73,6 +73,18 @@
         $(".wizard li").removeClass("active").addClass("nonActive");
         $("#li" + screen).addClass("active");
     }
+    $(document).ready(function ()
+    {
+        var checkinDate = new Date($("#checkinDate").val());
+        $("#checkinDate").datepicker({
+            defaultDate: checkinDate,
+           // minDate: timeNow,   //The timenow is defined in a script before this script, and it gives the fake time now
+            numberOfMonths: 1,
+            dateFormat: "d MM, yy",   //5 Feb, 2019
+            firstDay: 1
+        });
+    });
+    
 </script>
 
 

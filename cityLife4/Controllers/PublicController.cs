@@ -167,8 +167,32 @@ namespace cityLife.Controllers
         public string comments;
         public string bookedBy;
         public int apartmentNumber;
-        public int confirmationNumber;
+        public string confirmationNumber;
 
+        public OrderData()
+        {
+
+        }
+        public OrderData(Order anOrder)
+        {
+            orderId = anOrder.Id;
+            name = anOrder.Guest.name;
+            phone = anOrder.Guest.phone;
+            email = anOrder.Guest.email;
+            country = anOrder.Guest.Country.name;
+            adults = anOrder.adultCount;
+            children = anOrder.childrenCount;
+            checkin = anOrder.checkinDate;
+            checkout = anOrder.checkoutDate;
+            nights = anOrder.nights;
+            price = anOrder.priceAsMoney();
+            paid = anOrder.amountPaidAsMoney();
+            expectedArrival = anOrder.expectedArrival;
+            comments = anOrder.specialRequest;
+            bookedBy = anOrder.bookedBy;
+            apartmentNumber = anOrder.Apartment.number;
+            confirmationNumber = anOrder.confirmationNumber;
+        }
         private static bool IsValidEmail(string email)
         {
             try

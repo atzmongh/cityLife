@@ -6,10 +6,11 @@
     ViewBag.Title = "s25orderBooking";
     OrderData theOrderData = ViewBag.orderData;
     TranslateBox tBox = ViewBag.tBox;
+    IEnumerable<short> theApartmentNumbers = ViewBag.apartmentNumbers;
 }
 
 <div class='field-box datepicker-box @theOrderData.errorOf("checkin")'>
-    <input type="text" id="checkinDate" name="checkinDate" value='@theOrderData.checkin.ToString("dd MMM yyyy")'>
+    <input type="text" id="checkinDate" name="checkinDate" value='@theOrderData.checkin.ToString("dd MMM, yyyy")'>
     <label for="checkinDate">
         <span class="field-name">@tBox.translate("Check-in date")</span>
         <span class="calendar-ico"></span>
@@ -17,7 +18,7 @@
     <span class="field-error">@theOrderData.errorMessageOf("checkin",tBox)</span>
 </div>
 <div class="field-box datepicker-box">
-    <input type="text" id="checkoutDate" name="checkoutDate" value='@theOrderData.checkout.ToString("dd MMM yyyy")'>
+    <input type="text" id="checkoutDate" name="checkoutDate" value='@theOrderData.checkout.ToString("dd MMM, yyyy")'>
     <label for="checkoutDate">
         <span class="field-name">@tBox.translate("Check out date")</span>
         <span class="calendar-ico"></span>
@@ -85,6 +86,24 @@
         </select>
         <label>
             <span class="field-name">@tBox.translate("Nights")</span>
+        </label>
+    </div>
+    <div class="field-box select-box">
+        <select name="apartment">
+            @foreach (int anApartmentNumber in theApartmentNumbers)
+            {
+                if (anApartmentNumber == theOrderData.apartmentNumber)
+                {
+                    <option selected>@anApartmentNumber</option>
+                }
+                else
+                {
+                    <option>@anApartmentNumber</option>
+                }
+            }
+        </select>
+        <label>
+            <span class="field-name">@tBox.translate("Apartment")</span>
         </label>
     </div>
 </div>
