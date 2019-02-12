@@ -10,15 +10,15 @@
 }
 
 <div class='field-box datepicker-box @theOrderData.errorOf("checkin")'>
-    <input type="text" id="checkinDate" name="checkinDate" value='@theOrderData.checkin.ToString("dd MMM, yyyy")'>
+    <input type="text" id="checkinDate" name="checkinDate" value='@theOrderData.checkin.ToString("dd MMM, yyyy")' onchange="bookingChanged(this)">
     <label for="checkinDate">
         <span class="field-name">@tBox.translate("Check-in date")</span>
         <span class="calendar-ico"></span>
     </label>
-    <span class="field-error">@theOrderData.errorMessageOf("checkin",tBox)</span>
+    <span class="field-error">@theOrderData.errorMessageOf("checkin", tBox)</span>
 </div>
 <div class="field-box datepicker-box">
-    <input type="text" id="checkoutDate" name="checkoutDate" value='@theOrderData.checkout.ToString("dd MMM, yyyy")'>
+    <input type="text" id="checkoutDate" name="checkoutDate" value='@theOrderData.checkout.ToString("dd MMM, yyyy")' onchange="bookingChanged(this)">
     <label for="checkoutDate">
         <span class="field-name">@tBox.translate("Check out date")</span>
         <span class="calendar-ico"></span>
@@ -27,17 +27,17 @@
 </div>
 <div class="form-box-wrap">
     <div class="field-box select-box">
-        <select name="adults">
+        <select id="adults" name="adults" onchange="bookingChanged(this)">
             @{
                 for (int i = 0; i <= 4; i++)
                 {
                     if (theOrderData.adults == i)
                     {
-                        <option selected>@i</option>
+                        <option value="@i" selected>@i</option>
                     }
                     else
                     {
-                        <option>@i</option>
+                        <option value="@i">@i</option>
                     }
                 }
             }
@@ -47,17 +47,17 @@
         </label>
     </div>
     <div class="field-box select-box">
-        <select name="children">
+        <select id="children" name="children" onchange="bookingChanged(this)">
             @{
                 for (int i = 0; i <= 4; i++)
                 {
                     if (theOrderData.children == i)
                     {
-                        <option selected>@i</option>
+                        <option value="@i" selected>@i</option>
                     }
                     else
                     {
-                        <option>@i</option>
+                        <option value="@i">@i</option>
                     }
                 }
             }
@@ -69,17 +69,17 @@
 </div>
 <div class="form-box-wrap">
     <div class="field-box select-box">
-        <select name="nights">
+        <select id="nights" name="nights" onchange="bookingChanged(this)">
             @{
                 for (int i = 0; i <= 30; i++)
                 {
                     if (theOrderData.nights == i)
                     {
-                        <option selected>@i</option>
+                        <option value="@i" selected>@i</option>
                     }
                     else
                     {
-                        <option>@i</option>
+                        <option value="@i">@i</option>
                     }
                 }
             }
@@ -89,16 +89,16 @@
         </label>
     </div>
     <div class="field-box select-box">
-        <select name="apartment">
+        <select id="apartmentNumber" name="apartmentNumber" onchange="bookingChanged(this)">
             @foreach (int anApartmentNumber in theApartmentNumbers)
             {
                 if (anApartmentNumber == theOrderData.apartmentNumber)
                 {
-                    <option selected>@anApartmentNumber</option>
+                    <option value="@anApartmentNumber" selected>@anApartmentNumber</option>
                 }
                 else
                 {
-                    <option>@anApartmentNumber</option>
+                    <option value="@anApartmentNumber">@anApartmentNumber</option>
                 }
             }
         </select>
@@ -109,8 +109,8 @@
 </div>
 <div>
     <div class="form-box-wrap">
-        @Html.inputField("price",theOrderData.price.toMoneyString(), theOrderData.errorMessageOf("price",tBox), tBox, style: "width:48%")
-        @Html.inputField("paid",theOrderData.paid.toMoneyString(), theOrderData.errorMessageOf("paid",tBox),tBox,style:"width:48%")
+        @Html.inputField("price", theOrderData.price.toMoneyString(), theOrderData.errorMessageOf("price", tBox), tBox, style: "width:48%")
+        @Html.inputField("paid", theOrderData.paid.toMoneyString(), theOrderData.errorMessageOf("paid", tBox), tBox, style: "width:48%")
     </div>
     <div class="form-box-wrap">
         <div class="field-box select-box">
@@ -125,10 +125,51 @@
                 <span class="field-name">@tBox.translate("Booked By")</span>
             </label>
         </div>
-        @Html.inputField("confirmationNumber",theOrderData.confirmationNumber.ToString(), theOrderData.errorMessageOf("confirmationNumber",tBox),tBox,style:"width:48%")
+        @Html.inputField("confirmationNumber", theOrderData.confirmationNumber, theOrderData.errorMessageOf("confirmationNumber", tBox), tBox, style: "width:48%")
     </div>
-    <input type="submit" class="btn" value='@tBox.translate("OK")'/>
+    <input type="submit" class="btn" value='@tBox.translate("OK")' />
     <input type="button" class="btn" value='@tBox.translate("Cancel")' />
-    
+    <br/>
+    <span style="color:red" id="notAvailable"></span>
+
 </div>
 
+<script>
+    function bookingChanged(field) {
+        var fieldId = field.id;
+       
+        $.ajaxSetup({ cache: false });
+        var bookingParameters = {};
+        bookingParameters.checkinDate = $("#checkinDate").val();
+        bookingParameters.checkoutDate = $("#checkoutDate").val();
+        bookingParameters.adults = $("#adults").val();
+        bookingParameters.children = $("#children").val();
+        bookingParameters.apartmentNumber = $("#apartmentNumber").val();
+        if (fieldId == "nights") {
+            //The user changed the number of nights - send the new number of nights to the server for calculation
+            bookingParameters.nights = $("#nights").val();
+        }
+        else {
+            bookingParameters.nights = 0;
+        }
+
+        $.getJSON("/staff/s26checkBookingPrice", bookingParameters).done(updatePrice);
+    }
+
+    function updatePrice(priceInfo) {
+        confirm(priceInfo.price + " " + priceInfo.availability + " " + priceInfo.nights);
+        if (priceInfo.availability == "AVAILABLE") {
+            //Update the price and nights
+            $("#nights").val(priceInfo.nights).change();
+            $("#price").val(priceInfo.price)
+            $("#notAvailable").text("");
+        }
+        else {
+            $("#notAvailable").text("apartment is not available");
+
+        }
+    }
+</script>
+
+
+ 

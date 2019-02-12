@@ -444,13 +444,12 @@ namespace cityLife.Controllers
             string BookedBy, string confirmationNumber)
         {
             //Perform validity checks on the input
-            // StaffBookingFormData theBookingForm = new StaffBookingFormData(
 
 
             Money priceM = new Money(Price, "UAH");  //Default currency is UAH, if the currency symbol does not exist.
             Money paidAmountM = new Money(Paid, "UAH");
 
-            //prepareDataForp26p27(apartmentId);
+            
             TranslateBox tBox = new TranslateBox("UAH", "UAH", "dontShowAsterisks");
             ViewBag.tBox = tBox;
 
@@ -534,6 +533,36 @@ namespace cityLife.Controllers
 
 
             return View();
+        }
+
+        [HttpGet]
+        public JsonResult s26checkBookingPrice(DateTime checkinDate, DateTime checkoutDate, int nights, int adults, int children, int apartmentNumber)
+        {
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+            Apartment theApartment = db.Apartments.Single(a => a.number == apartmentNumber);
+            if (nights > 0)
+            {
+                //The user entered number of nights - change the "checkout date" to match the new night count
+                checkoutDate = checkinDate.AddDays(nights);
+            }
+            BookingRequest theBookingRequest = new BookingRequest()
+            {
+                 checkinDate = checkinDate,
+                 checkoutDate = checkoutDate,
+                 adults = adults,
+                 children = children
+            };
+            Currency theCrrency = db.Currencies.Single(a => a.currencyCode == "UAH");
+            ApartmentPrice apartmentAndPrice = PublicController.calculatePricePerStayForApartment(theApartment, db, theBookingRequest, theCrrency);
+            string availabilityName = Enum.GetName(typeof(Availability), apartmentAndPrice.availability);
+            
+            //If the apartment is occupied, the price will be null. Replace it with 0
+            Money thePrice = apartmentAndPrice.pricePerStay == null ? new Money(0m, "UAH") : apartmentAndPrice.pricePerStay;
+            var priceInfo = new { price = thePrice.toMoneyString(), availability = availabilityName, nights = apartmentAndPrice.nightCount };
+            JsonResult jResult = Json(priceInfo, JsonRequestBehavior.AllowGet);
+            return jResult;
+
+
         }
         /// <summary>
         /// This method is an auxiliary method to create the translation box and to insert it if needed to the Session variable
