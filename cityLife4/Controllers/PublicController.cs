@@ -445,7 +445,7 @@ namespace cityLife.Controllers
                 checkinDate = (DateTime)theBookingRequest.checkinDate,
                 checkoutDate = (DateTime)theBookingRequest.checkoutDate,
                 childrenCount = theBookingRequest.children ?? 0,
-                confirmationNumber = "0",    //TBD
+                confirmationNumber = theOrderData.confirmationNumber,    
                 expectedArrival = theOrderData.expectedArrival,
                 specialRequest = theOrderData.comments,
                 status = OrderStatus.Created,
@@ -668,14 +668,20 @@ namespace cityLife.Controllers
         /// <param name="db"></param>
         /// <param name="theBookingRequest"></param>
         /// <param name="theCurrency"></param>
+        /// <param name="originalOrderId">In case we update an existing order - gives the original order ID which we wish to update. Otherwise
+        /// it is set to 0</param>
         /// <returns>apartment availability and price information</returns>
-        public static ApartmentPrice calculatePricePerStayForApartment(Apartment anApartment, cityLifeDBContainer1 db, BookingRequest theBookingRequest, Currency theCurrency)
+        public static ApartmentPrice calculatePricePerStayForApartment(Apartment anApartment, cityLifeDBContainer1 db, BookingRequest theBookingRequest, Currency theCurrency, int originalOrderId = 0)
         {
+     
             ApartmentPrice apartmentAndPrice;
+            //Look for apartment days for that apartment and these dates. Note that we exclude from the list records belonging to the same order ID (in case of update)
+            //For example: we had an order for 1/12 until 3/12. If we added another day - we are only interestsed to know if the new day is free or not.
             var apartmentDays = from anApartmentDay in db.ApartmentDays
                                 where anApartmentDay.Apartment.Id == anApartment.Id &&
                                 anApartmentDay.date >= theBookingRequest.checkinDate &&
-                                anApartmentDay.date < theBookingRequest.checkoutDate
+                                anApartmentDay.date < theBookingRequest.checkoutDate &&
+                                anApartmentDay.Order.Id != originalOrderId   //if the apartment day is for the same order ID - it is not "blocking" us from updating the order
                                 select anApartmentDay;
 
             var nonFreeDays = from anApartmentDay in apartmentDays

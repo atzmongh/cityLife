@@ -440,7 +440,7 @@ namespace cityLife.Controllers
         /// <returns></returns>
         [HttpPost]
         public ActionResult s25addUpdateOrder(int orderId, int apartmentNumber, string Email, string Name, string Country, string Phone, string ArrivalTime,
-            string SpecialRequest, DateTime CheckinDate, DateTime CheckoutDate, int Adults, int Children, int Nights, string Price, string Paid,
+            string SpecialRequest, DateTime CheckinDate, DateTime CheckoutDate, int Adults, int Children,  string Price, string Paid,
             string BookedBy, string confirmationNumber)
         {
             //Perform validity checks on the input
@@ -465,6 +465,7 @@ namespace cityLife.Controllers
             ViewBag.countries = db.Countries;
             ViewBag.employee = (Employee)Session["loggedinUser"];
 
+            int nights = (int)Math.Round((CheckoutDate - CheckinDate).TotalDays, 0);
             //perform validity chekcs on the input
             OrderData theOrderData = new OrderData()
             {
@@ -481,7 +482,7 @@ namespace cityLife.Controllers
                 apartmentNumber = apartmentNumber,
                 bookedBy = BookedBy,
                 confirmationNumber = confirmationNumber,
-                nights = Nights,
+                nights = nights,
                 orderId = orderId,
                 paid = paidAmountM,
                 price = priceM
@@ -500,7 +501,7 @@ namespace cityLife.Controllers
                 //Check if the booking request is still valid.
 
                 Currency currentCurrency = db.Currencies.Single(a => a.currencyCode == "UAH");   //The staff application works currently only with UAH
-                ApartmentPrice apartmentAndPrice = PublicController.calculatePricePerStayForApartment(theAparatment, db, theBookingRequest, currentCurrency);
+                ApartmentPrice apartmentAndPrice = PublicController.calculatePricePerStayForApartment(theAparatment, db, theBookingRequest, currentCurrency,orderId);
                 Country theCountry = db.Countries.Single(a => a.name == Country);
                 if (apartmentAndPrice.availability == Availability.OCCUPIED)
                 {
