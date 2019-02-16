@@ -40,6 +40,9 @@
 <span style="float:left">@tBox.translate("Comments")</span>
 <span style="float:right">@theOrderData.comments</span>
 <br />
+<span style="float:left">@tBox.translate("Status")</span>
+<span style="float:right">@tBox.translate(theOrderData.status.ToString())</span>
+<br />
 <a class="btn" name="Update" style="float:left" href="/staff/s23updateOrder?orderId=@theOrderData.orderId">@tBox.translate("Update")</a>
 
 <btn class="btn" name="Delete" style="float:right">@tBox.translate("Delete")</btn>

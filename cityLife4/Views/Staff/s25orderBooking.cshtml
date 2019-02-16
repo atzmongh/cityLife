@@ -24,6 +24,7 @@
         <span class="calendar-ico"></span>
     </label>
     <span class="field-error"></span>
+    <span id="nights" class="nights">@theOrderData.nights @tBox.translate("nights")</span>
 </div>
 <div class="form-box-wrap">
     <div class="field-box select-box">
@@ -68,9 +69,24 @@
     </div>
 </div>
 <div class="form-box-wrap">
-    <div class="field-box" style="width:48%">
-        <input type="text" id="nights" name="nights"  value="@theOrderData.nights" disabled/>
-        <label for="nights" class="label">@tBox.translate("nights")</label>
+    <div class="field-box select-box">
+        <select id="status" name="status">
+            @foreach (OrderStatus aStatus in Enum.GetValues(typeof(OrderStatus)))
+            {
+                string statusName = Enum.GetName(typeof(OrderStatus), aStatus);
+                if (aStatus == theOrderData.status)
+                {
+                    <option value="@aStatus" selected>@statusName</option>
+                }
+                else
+                {
+                    <option value="@aStatus">@statusName</option>
+                }
+            }
+        </select>
+        <label>
+            <span class="field-name">@tBox.translate("Apartment")</span>
+        </label>
     </div>
 
     <div class="field-box select-box">
@@ -114,7 +130,7 @@
     </div>
     <input type="submit" class="btn" value='@tBox.translate("OK")' />
     <input type="button" class="btn" value='@tBox.translate("Cancel")' />
-    <br/>
+    <br />
     <span style="color:red" id="notAvailable"></span>
 
 </div>
@@ -122,7 +138,7 @@
 <script>
     function bookingChanged(field) {
         var fieldId = field.id;
-       
+
         $.ajaxSetup({ cache: false });
         var bookingParameters = {};
         bookingParameters.checkinDate = $("#checkinDate").val();
@@ -130,13 +146,7 @@
         bookingParameters.adults = $("#adults").val();
         bookingParameters.children = $("#children").val();
         bookingParameters.apartmentNumber = $("#apartmentNumber").val();
-        if (fieldId == "nights") {
-            //The user changed the number of nights - send the new number of nights to the server for calculation
-            bookingParameters.nights = $("#nights").val();
-        }
-        else {
-            bookingParameters.nights = 0;
-        }
+        bookingParameters.orderId = $("#orderId").val();
 
         $.getJSON("/staff/s26checkBookingPrice", bookingParameters).done(updatePrice);
     }
@@ -145,16 +155,15 @@
         confirm(priceInfo.price + " " + priceInfo.availability + " " + priceInfo.nights);
         if (priceInfo.availability == "AVAILABLE") {
             //Update the price and nights
-            $("#nights").val(priceInfo.nights).change();
+            $("#nights").html(priceInfo.nights + " " + '@tBox.translate("nights")');
             $("#price").val(priceInfo.price)
             $("#notAvailable").text("");
         }
         else {
-            $("#notAvailable").text("apartment is not available");
+            $("#notAvailable").text('@tBox.translate("apartment is not available")');
 
         }
     }
 </script>
 
 
- 

@@ -58,6 +58,7 @@ namespace cityLife.Controllers
         public int days;
         public int orderId;
         public string firstDate;
+        public Money price;
     }
 
 
@@ -279,7 +280,8 @@ namespace cityLife.Controllers
                                 name = anOrder.Guest.name,
                                 orderId = anOrder.Id,
                                 orderStatus = anOrder.status,
-                                firstDate = aDate.ToString("yyyy-MM-dd")
+                                firstDate = aDate.ToString("yyyy-MM-dd"),
+                                price = anOrder.priceAsMoney()
                             };
                         }
                         else
@@ -315,25 +317,8 @@ namespace cityLife.Controllers
         {
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
             var theOrder = db.Orders.Single(a => a.Id == orderId);
-            OrderData theOrderData = new OrderData()
-            {
-                orderId = theOrder.Id,
-                name = theOrder.Guest.name,
-                phone = theOrder.Guest.phone,
-                email = theOrder.Guest.email,
-                adults = theOrder.adultCount,
-                children = theOrder.childrenCount,
-                checkin = theOrder.checkinDate,
-                checkout = theOrder.checkoutDate,
-                country = theOrder.Guest.Country.name,
-                expectedArrival = theOrder.expectedArrival,
-                price = theOrder.priceAsMoney(),
-                paid = theOrder.amountPaidAsMoney(),
-                comments = theOrder.specialRequest,
-                nights = theOrder.nights,
-                bookedBy = theOrder.bookedBy,
-                apartmentNumber = theOrder.Apartment.number
-            };
+            OrderData theOrderData = new OrderData(theOrder);
+            
             TranslateBox tBox = this.setTbox("RU");
             ViewBag.tBox = tBox;
             ViewBag.orderData = theOrderData;
@@ -441,7 +426,7 @@ namespace cityLife.Controllers
         [HttpPost]
         public ActionResult s25addUpdateOrder(int orderId, int apartmentNumber, string Email, string Name, string Country, string Phone, string ArrivalTime,
             string SpecialRequest, DateTime CheckinDate, DateTime CheckoutDate, int Adults, int Children,  string Price, string Paid,
-            string BookedBy, string confirmationNumber)
+            string BookedBy, string confirmationNumber, OrderStatus status)
         {
             //Perform validity checks on the input
 
@@ -485,8 +470,10 @@ namespace cityLife.Controllers
                 nights = nights,
                 orderId = orderId,
                 paid = paidAmountM,
-                price = priceM
+                price = priceM,
+                status = status
             };
+           
             var apartmentNumbers = from anApartment in db.Apartments
                                    select anApartment.number;
             ViewBag.apartmentNumbers = apartmentNumbers;
@@ -512,7 +499,7 @@ namespace cityLife.Controllers
                 else
                 {
                     //Complete the booking
-                    Order theOrder = PublicController.p27createOrder(db, theBookingRequest, apartmentAndPrice, theOrderData, theCountry, tBox);
+                    Order theOrder = PublicController.p27createUpdateOrder(db, theBookingRequest, apartmentAndPrice, theOrderData, theCountry, tBox);
 
                     ViewBag.theOrder = theOrder;
                     ViewBag.apartmentAndPrice = apartmentAndPrice;
@@ -537,15 +524,11 @@ namespace cityLife.Controllers
         }
 
         [HttpGet]
-        public JsonResult s26checkBookingPrice(DateTime checkinDate, DateTime checkoutDate, int nights, int adults, int children, int apartmentNumber)
+        public JsonResult s26checkBookingPrice(DateTime checkinDate, DateTime checkoutDate, int adults, int children, int apartmentNumber, int orderId)
         {
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
             Apartment theApartment = db.Apartments.Single(a => a.number == apartmentNumber);
-            if (nights > 0)
-            {
-                //The user entered number of nights - change the "checkout date" to match the new night count
-                checkoutDate = checkinDate.AddDays(nights);
-            }
+           
             BookingRequest theBookingRequest = new BookingRequest()
             {
                  checkinDate = checkinDate,
@@ -554,7 +537,7 @@ namespace cityLife.Controllers
                  children = children
             };
             Currency theCrrency = db.Currencies.Single(a => a.currencyCode == "UAH");
-            ApartmentPrice apartmentAndPrice = PublicController.calculatePricePerStayForApartment(theApartment, db, theBookingRequest, theCrrency);
+            ApartmentPrice apartmentAndPrice = PublicController.calculatePricePerStayForApartment(theApartment, db, theBookingRequest, theCrrency,orderId);
             string availabilityName = Enum.GetName(typeof(Availability), apartmentAndPrice.availability);
             
             //If the apartment is occupied, the price will be null. Replace it with 0

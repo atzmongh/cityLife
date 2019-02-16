@@ -13,7 +13,7 @@ using System.Net;
 
 namespace cityLife.Controllers
 {
-    public enum Availability { UNKNOWN, AVAILABLE, OCCUPIED, NOT_SUITABLE};
+    public enum Availability { UNKNOWN, AVAILABLE, OCCUPIED, NOT_SUITABLE };
     /// <summary>
     /// contains an apartment with 2 possible prices:
     /// - price per night (which is actually the minimum price per night) or
@@ -149,7 +149,7 @@ namespace cityLife.Controllers
     /// <summary>
     /// Note that the class inherits methods errorMessageOf and errorOf
     /// </summary>
-    public class OrderData: formData
+    public class OrderData : formData
     {
         public int orderId;
         public string name;
@@ -168,10 +168,11 @@ namespace cityLife.Controllers
         public string bookedBy;
         public int apartmentNumber;
         public string confirmationNumber;
+        public OrderStatus status;
 
         public OrderData()
         {
-
+            status = OrderStatus.Created;
         }
         public OrderData(Order anOrder)
         {
@@ -192,6 +193,7 @@ namespace cityLife.Controllers
             bookedBy = anOrder.bookedBy;
             apartmentNumber = anOrder.Apartment.number;
             confirmationNumber = anOrder.confirmationNumber;
+            status = anOrder.status;
         }
         private static bool IsValidEmail(string email)
         {
@@ -250,7 +252,7 @@ namespace cityLife.Controllers
         }
     }
 
-   
+
     public class PublicController : Controller
     {
         /// <summary>
@@ -288,13 +290,13 @@ namespace cityLife.Controllers
         /// <param name="childrenCount"></param>
         /// <returns></returns>
         [HttpGet]
-        public ActionResult p20checkAvailability (string language, string currency, DateTime? fromDate, DateTime? toDate, int? adultsCount, int? childrenCount)
+        public ActionResult p20checkAvailability(string language, string currency, DateTime? fromDate, DateTime? toDate, int? adultsCount, int? childrenCount)
         {
             this.prepareApartmentData(language, currency, fromDate, toDate, adultsCount, childrenCount);
 
             ViewBag.pageURL = "/public/p20checkAvailability";
 
-            return View("p20availableAppartments");  
+            return View("p20availableAppartments");
         }
 
         [HttpGet]
@@ -354,7 +356,8 @@ namespace cityLife.Controllers
             BookingRequest theBookingRequest = (BookingRequest)Session["bookingRequest"];
 
             //perform validity chekcs on the input
-            OrderData theOrderData = new OrderData() {
+            OrderData theOrderData = new OrderData()
+            {
                 name = Name,
                 country = Country,
                 email = Email,
@@ -365,7 +368,7 @@ namespace cityLife.Controllers
                 children = (int)theBookingRequest.children,
                 checkin = (DateTime)theBookingRequest.checkinDate,
                 checkout = (DateTime)theBookingRequest.checkoutDate
-                };
+            };
 
             ViewBag.orderData = theOrderData;
             if (!theOrderData.isValid())
@@ -376,11 +379,14 @@ namespace cityLife.Controllers
             {
                 //The form is valid - create the booking order
                 //Check if the booking request is still valid.
-               
+
                 Currency currentCurrency = (Currency)Session["currentCurrency"];
                 ApartmentPrice apartmentAndPrice = calculatePricePerStayForApartment(theAparatment, db, theBookingRequest, currentCurrency);
+                theOrderData.price = apartmentAndPrice.pricePerStay;
+                theOrderData.apartmentNumber = apartmentAndPrice.theApartment.number;
+
                 Country theCountry = db.Countries.Single(a => a.name == Country);
-                if (apartmentAndPrice.availability != Availability.AVAILABLE)  
+                if (apartmentAndPrice.availability != Availability.AVAILABLE)
                 {
                     //the apartment is not available, although it seemed to be available. Perhaps it was taken in the last minutes
                     return PartialView("p27bookingFailure");
@@ -389,8 +395,8 @@ namespace cityLife.Controllers
                 {
                     //Complete the booking
                     TranslateBox tBox = ViewBag.tBox;
-                    Order theOrder = PublicController.p27createOrder(db, theBookingRequest, apartmentAndPrice, theOrderData, theCountry, tBox);
-                   
+                    Order theOrder = PublicController.p27createUpdateOrder(db, theBookingRequest, apartmentAndPrice, theOrderData, theCountry, tBox);
+
                     ViewBag.theOrder = theOrder;
                     ViewBag.apartmentAndPrice = apartmentAndPrice;
 
@@ -409,7 +415,7 @@ namespace cityLife.Controllers
             }
         }
 
-        public static Order p27createOrder(cityLifeDBContainer1 db, BookingRequest theBookingRequest, ApartmentPrice apartmentAndPrice,
+        public static Order p27createUpdateOrder(cityLifeDBContainer1 db, BookingRequest theBookingRequest, ApartmentPrice apartmentAndPrice,
             OrderData theOrderData, Country theCountry, TranslateBox tBox)
         {
             DateTime checkIn = (DateTime)theBookingRequest.checkinDate;
@@ -418,9 +424,9 @@ namespace cityLife.Controllers
             Currency theCurrency = db.Currencies.Single(a => a.currencyCode == apartmentAndPrice.pricePerStay.currency);
 
             Guest theGuest = db.Guests.FirstOrDefault
-                (aGuest => aGuest.email == theOrderData.email && 
-                aGuest.name == theOrderData.name && 
-                aGuest.phone == theOrderData.phone && 
+                (aGuest => aGuest.email == theOrderData.email &&
+                aGuest.name == theOrderData.name &&
+                aGuest.phone == theOrderData.phone &&
                 aGuest.Country.name == theOrderData.country);
 
             if (theGuest == null)
@@ -428,7 +434,7 @@ namespace cityLife.Controllers
                 //there is no such guest - create new
                 theGuest = new Guest()
                 {
-                    name =  theOrderData.name,
+                    name = theOrderData.name,
                     phone = theOrderData.phone,
                     email = theOrderData.email,
                     Country = theCountry
@@ -436,28 +442,50 @@ namespace cityLife.Controllers
                 db.Guests.Add(theGuest);
             }
 
-            Order theOrder = new Order()
+            Order theOrder;
+            if (theOrderData.orderId == 0)
             {
-                adultCount = (int)theBookingRequest.adults,
-                amountPaid = 0,
-                Apartment = apartmentAndPrice.theApartment,
-                bookedBy = theOrderData.bookedBy,
-                checkinDate = (DateTime)theBookingRequest.checkinDate,
-                checkoutDate = (DateTime)theBookingRequest.checkoutDate,
-                childrenCount = theBookingRequest.children ?? 0,
-                confirmationNumber = theOrderData.confirmationNumber,    
-                expectedArrival = theOrderData.expectedArrival,
-                specialRequest = theOrderData.comments,
-                status = OrderStatus.Created,
-                dayCount = dayCount,
-                price = apartmentAndPrice.pricePerStay.toCents(),
-                Guest = theGuest,
-                Currency = theCurrency
-            };
-            db.Orders.Add(theOrder);
+                //This is a new order that should be added
+                theOrder = new Order();
+            }
+            else
+            {
+                //This is an existing order that should be updated. 
+                theOrder = db.Orders.Single(a => a.Id == theOrderData.orderId);
 
-           
+                //Change all existing ApartmentDays records to be "free"
+                var theApartmentDays = from anApartmentDays in db.ApartmentDays
+                                       where anApartmentDays.Order.Id == theOrderData.orderId
+                                       select anApartmentDays;
+                foreach(var anApartmentDays in theApartmentDays)
+                {
+                    anApartmentDays.status = ApartOccuStatus.Free;
+                }
+            }
+            //At this point we have an order record (either new or existing) and apartment days records, if already exist - are changed to be 
+            //in "free" status. Now we can add/update the order record and add/update the apartment days records.
 
+            theOrder.adultCount = (int)theBookingRequest.adults;
+            theOrder.amountPaid = theOrderData.paid.toCents();
+            theOrder.Apartment = apartmentAndPrice.theApartment;
+            theOrder.bookedBy = theOrderData.bookedBy;
+            theOrder.checkinDate = (DateTime)theBookingRequest.checkinDate;
+            theOrder.checkoutDate = (DateTime)theBookingRequest.checkoutDate;
+            theOrder.childrenCount = theBookingRequest.children ?? 0;
+            theOrder.confirmationNumber = theOrderData.confirmationNumber;
+            theOrder.expectedArrival = theOrderData.expectedArrival;
+            theOrder.specialRequest = theOrderData.comments;
+            theOrder.status = theOrderData.status;
+            theOrder.dayCount = dayCount;
+            theOrder.price = theOrderData.price.toCents();   //Note that we take the price from orderData and not from apartmentAndPrice. IN the staff app - the 
+                                                             //price is determined by the admin and it can be different than the automatic calculation
+            theOrder.Guest = theGuest;
+            theOrder.Currency = theCurrency;
+
+            if (theOrderData.orderId == 0)
+            {
+                db.Orders.Add(theOrder);
+            }
 
             //Create or update the apartment day records (a record for each apartment-day)
             for (var aDay = checkIn; aDay < checkOut; aDay = aDay.AddDays(1))
@@ -530,8 +558,8 @@ namespace cityLife.Controllers
         {
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
             var theGuests = from aGuest in db.Guests
-                                           where aGuest.email == email
-                                           select new {aGuest.name, aGuest.phone, country=aGuest.Country.name};
+                            where aGuest.email == email
+                            select new { aGuest.name, aGuest.phone, country = aGuest.Country.name };
             JsonResult jResult;
             if (theGuests.Count() == 1)
             {
@@ -540,7 +568,7 @@ namespace cityLife.Controllers
             }
             else
             {
-                jResult = Json(new { name = "",phone="",country="" }, JsonRequestBehavior.AllowGet);
+                jResult = Json(new { name = "", phone = "", country = "" }, JsonRequestBehavior.AllowGet);
             }
             return jResult;
         }
@@ -673,7 +701,7 @@ namespace cityLife.Controllers
         /// <returns>apartment availability and price information</returns>
         public static ApartmentPrice calculatePricePerStayForApartment(Apartment anApartment, cityLifeDBContainer1 db, BookingRequest theBookingRequest, Currency theCurrency, int originalOrderId = 0)
         {
-     
+
             ApartmentPrice apartmentAndPrice;
             //Look for apartment days for that apartment and these dates. Note that we exclude from the list records belonging to the same order ID (in case of update)
             //For example: we had an order for 1/12 until 3/12. If we added another day - we are only interestsed to know if the new day is free or not.
@@ -763,7 +791,7 @@ namespace cityLife.Controllers
         /// </summary>
         /// <param name="language">language code, if set by the user</param>
         /// <returns>the translation box</returns>
-        public  TranslateBox setTbox(string language)
+        public TranslateBox setTbox(string language)
         {
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
 
@@ -796,7 +824,7 @@ namespace cityLife.Controllers
         /// </summary>
         /// <param name="currency">Currency code if entered by the user or null</param>
         /// <returns>the currency currency object</returns>
-        private Currency setCurrency(string currency) 
+        private Currency setCurrency(string currency)
         {
 
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
@@ -819,7 +847,7 @@ namespace cityLife.Controllers
             }
 
             Currency theCurrency = db.Currencies.SingleOrDefault(aCurrency => aCurrency.currencyCode == currency);
-            if (theCurrency == null)   
+            if (theCurrency == null)
             {
                 throw new AppException(105, null, "Currency not found in DB:" + currency);
             }
@@ -877,26 +905,26 @@ namespace cityLife.Controllers
             }
         }
 
-       
 
-        
 
-        
 
-            public  String RenderViewToString(ControllerContext context, String viewPath, object model = null)
+
+
+
+        public String RenderViewToString(ControllerContext context, String viewPath, object model = null)
+        {
+            context.Controller.ViewData.Model = model;
+            using (var sw = new StringWriter())
             {
-                context.Controller.ViewData.Model = model;
-                using (var sw = new StringWriter())
-                {
-                    var viewResult = ViewEngines.Engines.FindView(context, viewPath, null);
-                    var viewContext = new ViewContext(context, viewResult.View, context.Controller.ViewData, context.Controller.TempData, sw);
-                    viewResult.View.Render(viewContext, sw);
-                    viewResult.ViewEngine.ReleaseView(context, viewResult.View);
-                    return sw.GetStringBuilder().ToString();
-                }
+                var viewResult = ViewEngines.Engines.FindView(context, viewPath, null);
+                var viewContext = new ViewContext(context, viewResult.View, context.Controller.ViewData, context.Controller.TempData, sw);
+                viewResult.View.Render(viewContext, sw);
+                viewResult.ViewEngine.ReleaseView(context, viewResult.View);
+                return sw.GetStringBuilder().ToString();
             }
-       
-        
+        }
+
+
 
     }
 }

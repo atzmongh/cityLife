@@ -11,6 +11,9 @@
     }
 
     <style>
+        table th td{
+            font-size:14px;
+        }
         .dash01 {
             /*position: absolute;
         top: 100px;
@@ -27,6 +30,7 @@
             height: 33px;
             width: 50px;
             overflow: hidden;
+            white-space:nowrap;
         }
 
         .dash02 {
@@ -61,7 +65,9 @@
             width: 50px;
             height: 33px;
             overflow: hidden;
-            text-align: center
+            text-align: center;
+            white-space:nowrap;
+            line-height:15px;
         }
 
         .orderCreated {
@@ -157,7 +163,7 @@
                                             backgroundColor = "orderCheckedout";
                                             break;
                                     }
-                                    <td class="dash02td @backgroundColor" colspan="@aDAyBlock.days" data-order-id="@aDAyBlock.orderId" onclick="showOrder(this)">@aDAyBlock.name</td>
+                                    <td class="dash02td @backgroundColor" colspan="@aDAyBlock.days" data-order-id="@aDAyBlock.orderId" onclick="showOrder(this)">@aDAyBlock.name <br /> @aDAyBlock.price.toMoneyString()</td>
                                 }
                             }
                         </tr>
