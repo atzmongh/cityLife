@@ -173,6 +173,8 @@ namespace cityLife.Controllers
         public OrderData()
         {
             status = OrderStatus.Created;
+            paid = new Money(0m,"UAH");
+            confirmationNumber = "0";
         }
         public OrderData(Order anOrder)
         {
@@ -481,6 +483,7 @@ namespace cityLife.Controllers
                                                              //price is determined by the admin and it can be different than the automatic calculation
             theOrder.Guest = theGuest;
             theOrder.Currency = theCurrency;
+            
 
             if (theOrderData.orderId == 0)
             {

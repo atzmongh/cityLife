@@ -180,7 +180,7 @@
     <Property Name="priceFactor" Type="decimal" Nullable="false" DefaultValue="1" Precision="10" Scale="4" />
     <Property Name="Currency_currencyCode" Type="nchar" MaxLength="3" Nullable="true" />
     <Property Name="Apartment_Id" Type="int" Nullable="false" />
-    <Property Name="Order_Id" Type="int" Nullable="false" />
+    <Property Name="Order_Id" Type="int" Nullable="true" />
   </EntityType>
   <EntityType Name="unitTests">
     <Key>
@@ -398,7 +398,7 @@
     </ReferentialConstraint>
   </Association>
   <Association Name="OrderApartmentDay">
-    <End Role="Order" Type="cityLifeDB.Store.Orders" Multiplicity="1" />
+    <End Role="Order" Type="cityLifeDB.Store.Orders" Multiplicity="0..1" />
     <End Role="ApartmentDay" Type="cityLifeDB.Store.ApartmentDays" Multiplicity="*" />
     <ReferentialConstraint>
       <Principal Role="Order">
@@ -800,7 +800,7 @@
           <End Type="cityLifeDB.Order" Role="Order" Multiplicity="*" />
         </Association>
         <Association Name="OrderApartmentDay">
-          <End Type="cityLifeDB.Order" Role="Order" Multiplicity="1" />
+          <End Type="cityLifeDB.Order" Role="Order" Multiplicity="0..1" />
           <End Type="cityLifeDB.ApartmentDay" Role="ApartmentDay" Multiplicity="*" />
         </Association>
         <Association Name="ApartmentOrder">
@@ -1130,6 +1130,7 @@
       <EndProperty Name="ApartmentDay">
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
+      <Condition ColumnName="Order_Id" IsNull="false" />
     </AssociationSetMapping>
     <AssociationSetMapping Name="ApartmentOrder" TypeName="cityLifeDB.ApartmentOrder" StoreEntitySet="Orders">
       <EndProperty Name="Apartment">

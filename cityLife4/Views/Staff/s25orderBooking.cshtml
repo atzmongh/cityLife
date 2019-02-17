@@ -128,8 +128,8 @@
         </div>
         @Html.inputField("confirmationNumber", theOrderData.confirmationNumber, theOrderData.errorMessageOf("confirmationNumber", tBox), tBox, style: "width:48%")
     </div>
-    <input type="submit" class="btn" value='@tBox.translate("OK")' />
-    <input type="button" class="btn" value='@tBox.translate("Cancel")' />
+    <input type="submit" class="btn small-button" value='@tBox.translate("Update")' />
+    <a class="btn" style=" min-width: 90px;height: auto;margin: 5px;" href="/staff/s21Dashboard">@tBox.translate("Cancel")</a>
     <br />
     <span style="color:red" id="notAvailable"></span>
 
@@ -148,7 +148,7 @@
         bookingParameters.apartmentNumber = $("#apartmentNumber").val();
         bookingParameters.orderId = $("#orderId").val();
 
-        $.getJSON("/staff/s26checkBookingPrice", bookingParameters).done(updatePrice);
+        $.getJSON("/staff/s27checkBookingPrice", bookingParameters).done(updatePrice);
     }
 
     function updatePrice(priceInfo) {

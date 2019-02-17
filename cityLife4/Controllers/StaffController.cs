@@ -517,14 +517,41 @@ namespace cityLife.Controllers
                     return View("s28bookingSuccess");
                 }
             }
-
-
-
-            return View();
         }
 
+        [HttpPost]
+        public string s26deleteOrder(int orderId)
+        {
+            var tBox = setTbox("RU");
+            try
+            {
+                cityLifeDBContainer1 db = new cityLifeDBContainer1();
+               
+                var theApartmentDays = from anApartmentDays in db.ApartmentDays
+                                       where anApartmentDays.Order.Id == orderId
+                                       select anApartmentDays;
+                foreach (var anApartmentDays in theApartmentDays)
+                {
+                    anApartmentDays.Order = null;
+                    anApartmentDays.status = ApartOccuStatus.Free;
+                }
+
+                //Delete the order record
+                var theOrder = db.Orders.Single(a => a.Id == orderId);
+                db.Orders.Remove(theOrder);
+                db.SaveChanges();
+
+                return tBox.translate("order") + " " + orderId + " " + tBox.translate("deleted");
+            }
+            catch(Exception e)
+            {
+                AppException.writeException(119, e, e.StackTrace, orderId);
+                return tBox.translate("order") + " " + orderId + " " + tBox.translate("could not be deleted");
+            }
+           
+        }
         [HttpGet]
-        public JsonResult s26checkBookingPrice(DateTime checkinDate, DateTime checkoutDate, int adults, int children, int apartmentNumber, int orderId)
+        public JsonResult s27checkBookingPrice(DateTime checkinDate, DateTime checkoutDate, int adults, int children, int apartmentNumber, int orderId)
         {
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
             Apartment theApartment = db.Apartments.Single(a => a.number == apartmentNumber);

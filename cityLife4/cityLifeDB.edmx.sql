@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 01/26/2019 21:38:03
+-- Date Created: 02/17/2019 17:58:42
 -- Generated from EDMX file: C:\software\cityLife\cityLife4\cityLifeDB.edmx
 -- --------------------------------------------------
 
@@ -215,7 +215,7 @@ CREATE TABLE [dbo].[ApartmentDays] (
     [priceFactor] decimal(10,4)  NOT NULL,
     [Currency_currencyCode] nchar(3)  NULL,
     [Apartment_Id] int  NOT NULL,
-    [Order_Id] int  NOT NULL
+    [Order_Id] int  NULL
 );
 --GO
 

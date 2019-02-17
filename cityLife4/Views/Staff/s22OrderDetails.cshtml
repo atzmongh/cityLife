@@ -43,6 +43,55 @@
 <span style="float:left">@tBox.translate("Status")</span>
 <span style="float:right">@tBox.translate(theOrderData.status.ToString())</span>
 <br />
-<a class="btn" name="Update" style="float:left" href="/staff/s23updateOrder?orderId=@theOrderData.orderId">@tBox.translate("Update")</a>
+<a class="btn small-button" name="Update" style=" min-width: 90px;height: auto;margin: 5px;float:left" href="/staff/s23updateOrder?orderId=@theOrderData.orderId">@tBox.translate("Update")</a>
 
-<btn class="btn" name="Delete" style="float:right">@tBox.translate("Delete")</btn>
+<btn class="btn small-button" name="Delete" style="float:right" onclick="deleteOrderPopup()">@tBox.translate("Delete")</btn>
+
+<div id="deleteConfirmation" class="popup">
+    <div class="popup-box" style="top:200px;">
+        <div>
+            @tBox.translate("Are you sure you want to delete the order?")
+        </div>
+        <div style="display:flex">
+            <button class="btn small-button"  value="Confirm" onclick="deleteOrder(@theOrderData.orderId)">
+                @tBox.translate("Confirm")
+            </button>
+            <button class="btn small-button"  value="Cancel" onclick="cancelDelete()">@tBox.translate("Cancel")</button>
+        </div>
+    </div>
+</div>
+
+<div id="deleteMessage" class="popup">
+    <div class="popup-box" style="top:200px;">
+        <div id="deleteMessageDiv">
+            
+        </div>
+        <div style="display:flex">
+            <button class="btn small-button"  value="Confirm" onclick="closeDeleteMessage()">
+                @tBox.translate("OK")
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function deleteOrderPopup() {
+        $("#deleteConfirmation").addClass("open");
+    }
+    function deleteOrder(orderId) {
+        var orderIdJson = { orderId: orderId };
+        $.post("/staff/s26deleteOrder", orderIdJson, orderDeleted);
+    }
+    function cancelDelete() {
+        $("#deleteConfirmation").removeClass("open");
+    }
+    function orderDeleted(deleteMessage) {
+        $("#deleteConfirmation").removeClass("open");
+        $("#deleteMessageDiv").html(deleteMessage);
+        $("#deleteMessage").addClass("open");
+    }
+    function closeDeleteMessage() {
+        $("#deleteMessage").removeClass("open");
+        $("#fromDateForm").submit();  //Refresh the dashboard
+    }
+</script>

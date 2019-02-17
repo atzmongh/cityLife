@@ -1415,15 +1415,18 @@ aside.main-sidebar .currency .dropdown-toggle .name:before {
   background: rgba(0, 0, 0, 0.6);
   overflow: auto;
   z-index: 10;
-  transition: opacity 0s ease 0.4s, visibility 0s ease 0.4s; }
+  transition: opacity 0s ease 0.4s,
+ visibility 0s ease 0.4s; }
   .popup.open {
     opacity: 1;
     visibility: visible;
-    transition: opacity 0s ease 0s, visibility 0s ease 0s; }
+    transition: opacity 0s ease 0s,
+ visibility 0s ease 0s; }
     .popup.open .popup-box {
       opacity: 1;
       visibility: visible;
-      transition: opacity 0.4s ease 0s, visibility 0s ease 0s; }
+      transition: opacity 0.4s ease 0s,
+ visibility 0s ease 0s; }
 
 .popup-centered {
   display: flex;
@@ -1440,7 +1443,8 @@ aside.main-sidebar .currency .dropdown-toggle .name:before {
   padding: 80px 55px 50px;
   text-align: center;
   background: #ffffff;
-  transition: opacity 0.4s ease 0s, visibility 0s ease 0.4s; }
+  transition: opacity 0.4s ease 0s,
+ visibility 0s ease 0.4s; }
   .popup-box .close-btn {
     position: absolute;
     top: 20px;
