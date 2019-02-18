@@ -152,7 +152,6 @@
     }
 
     function updatePrice(priceInfo) {
-        confirm(priceInfo.price + " " + priceInfo.availability + " " + priceInfo.nights);
         if (priceInfo.availability == "AVAILABLE") {
             //Update the price and nights
             $("#nights").html(priceInfo.nights + " " + '@tBox.translate("nights")');

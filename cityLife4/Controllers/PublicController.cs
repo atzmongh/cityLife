@@ -402,16 +402,16 @@ namespace cityLife.Controllers
                     ViewBag.theOrder = theOrder;
                     ViewBag.apartmentAndPrice = apartmentAndPrice;
 
-                    if (theOrder.Guest.email != null && theOrder.Guest.email != "")
-                    {
-                        EmailMessage mailToCustomer = new EmailMessage(
-                        to: theOrder.Guest.email,
-                        subject: tBox.translate("Welcome to Kharkov Apartments City Life"),
-                        mailName: "t10welcomeMail",
-                        theController: this
-                        );
-                        mailToCustomer.send();
-                    }
+                    //if (theOrder.Guest.email != null && theOrder.Guest.email != "")
+                    //{
+                    //    EmailMessage mailToCustomer = new EmailMessage(
+                    //    to: theOrder.Guest.email,
+                    //    subject: tBox.translate("Welcome to Kharkov Apartments City Life"),
+                    //    mailName: "t10welcomeMail",
+                    //    theController: this
+                    //    );
+                    //    mailToCustomer.send();
+                    //}
                     return PartialView("p28bookingSuccess");
                 }
             }
@@ -535,26 +535,26 @@ namespace cityLife.Controllers
 
         private void sendMail(Order theOrder, ApartmentPrice apartmentAndPrice)
         {
-            var message = new MailMessage();
-            message.To.Add(new MailAddress(theOrder.Guest.email));  // replace with valid value 
-            message.From = new MailAddress("apart.citylife@gmail.com");  // replace with valid value
-            message.Subject = "Your email subject";
-            message.Body = "hello world";
-            message.IsBodyHtml = true;
+            //var message = new MailMessage();
+            //message.To.Add(new MailAddress(theOrder.Guest.email));  // replace with valid value 
+            //message.From = new MailAddress("apart.citylife@gmail.com");  // replace with valid value
+            //message.Subject = "Your email subject";
+            //message.Body = "hello world";
+            //message.IsBodyHtml = true;
 
-            using (var smtp = new SmtpClient())
-            {
-                var credential = new NetworkCredential
-                {
-                    UserName = "apart.citylife@gmail.com",  // replace with valid value
-                    Password = "456ertksenia"  // replace with valid value
-                };
-                smtp.Credentials = credential;
-                smtp.Host = "smtp.gmail.com";
-                smtp.Port = 587;
-                smtp.EnableSsl = true;
-                smtp.Send(message);
-            }
+            //using (var smtp = new SmtpClient())
+            //{
+            //    var credential = new NetworkCredential
+            //    {
+            //        UserName = "apart.citylife@gmail.com",  // replace with valid value
+            //        Password = "456ertksenia"  // replace with valid value
+            //    };
+            //    smtp.Credentials = credential;
+            //    smtp.Host = "smtp.gmail.com";
+            //    smtp.Port = 587;
+            //    smtp.EnableSsl = true;
+            //    smtp.Send(message);
+            //}
         }
 
         public JsonResult p29checkEmailExists(string email)

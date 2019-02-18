@@ -499,21 +499,22 @@ namespace cityLife.Controllers
                 else
                 {
                     //Complete the booking
+                    apartmentAndPrice.pricePerStay = priceM;  //enter the actual price to be paid, rather than the calculated price.
                     Order theOrder = PublicController.p27createUpdateOrder(db, theBookingRequest, apartmentAndPrice, theOrderData, theCountry, tBox);
 
                     ViewBag.theOrder = theOrder;
                     ViewBag.apartmentAndPrice = apartmentAndPrice;
 
-                    if (theOrder.Guest.email != null && theOrder.Guest.email != "")
-                    {
-                        EmailMessage mailToCustomer = new EmailMessage(
-                        to: theOrder.Guest.email,
-                        subject: tBox.translate("Welcome to Kharkov Apartments City Life"),
-                        mailName: "t10welcomeMail",
-                        theController: this
-                        );
-                        mailToCustomer.send();
-                    }
+                    //if (theOrder.Guest.email != null && theOrder.Guest.email != "")
+                    //{
+                    //    EmailMessage mailToCustomer = new EmailMessage(
+                    //    to: theOrder.Guest.email,
+                    //    subject: tBox.translate("Welcome to Kharkov Apartments City Life"),
+                    //    mailName: "t10welcomeMail",
+                    //    theController: this
+                    //    );
+                    //    mailToCustomer.send();
+                    //}
                     return View("s28bookingSuccess");
                 }
             }

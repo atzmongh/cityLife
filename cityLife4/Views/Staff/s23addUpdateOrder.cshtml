@@ -49,7 +49,6 @@
     </header>
     <form method="post" action="/staff/s25addUpdateOrder">
         <input type="hidden" id="orderId" name="orderId" value="@theOrderData.orderId" />
-        <input type="hidden" id="apartmentNumber" name="apartmentNumber" value="@theOrderData.apartmentNumber" />
         <div id="divPersonal" style="max-width:500px;margin:10px;">
             @Html.Partial("s24orderPersonal")
         </div>
