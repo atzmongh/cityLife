@@ -97,7 +97,7 @@
                         <h2>@tBox.translate("booking")</h2>
                         <form method="get" action="/public/p20checkAvailability">
                             <div class="field-box datepicker-box">
-                                <input type="text" id="fromDate" name="fromDate" value="@checkinDate" onchange="enableAvailabilityButton()">
+                                <input type="text" readonly="readonly" id="fromDate" name="fromDate" value="@checkinDate" onchange="enableAvailabilityButton()">
                                 <label for="fromDate">
                                     <span class="field-name">@tBox.translate("Check in date")</span>
                                     <span class="calendar-ico"></span>
@@ -105,7 +105,7 @@
                                 <span class="field-error"></span>
                             </div>
                             <div class="field-box datepicker-box">
-                                <input type="text" id="toDate" name="toDate" value="@checkoutDate" onchange="enableAvailabilityButton()">
+                                <input type="text" readonly="readonly" id="toDate" name="toDate" value="@checkoutDate" onchange="enableAvailabilityButton()">
                                 <label for="toDate">
                                     <span class="field-name">@tBox.translate("Check out date")</span>
                                     <span class="calendar-ico"></span>
