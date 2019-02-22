@@ -37,14 +37,14 @@ namespace cityLife.Controllers
             return View();
         }
         [HttpGet]
-        public ActionResult uploadDB()
+        public ActionResult a10uploadDB()
         {
             var connectionString = ConfigurationManager.ConnectionStrings["cityLifeDBContainer1"];
             ViewBag.connectionString = connectionString.ConnectionString;
-            return View();
+            return View("a10uploadDB");
         }
         [HttpPost]
-        public ActionResult uploadDB(HttpPostedFileBase dbCSV)
+        public ActionResult a10uploadDB(HttpPostedFileBase dbCSV)
         {
             //drop all DB tables and create a new DB schema with empty DB
             StreamReader sqlReader = new StreamReader(Server.MapPath("/cityLifeDB.edmx.sql"));
@@ -59,11 +59,11 @@ namespace cityLife.Controllers
 
           
 
-            return View("uploadDB");
+            return View("a10uploadDB");
         }
 
         [HttpGet]
-        public ActionResult unitTests(string theAction, bool? skipCorrectTests)
+        public ActionResult a20unitTests(string theAction, bool? skipCorrectTests)
         {
             if (theAction == null)
             {
@@ -89,7 +89,7 @@ namespace cityLife.Controllers
 
 
             }
-            return View("unitTests");
+            return View("a20unitTests");
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace cityLife.Controllers
         /// <param name="checkBoxName">the name contains testSeries-number (for example: money-23  </param>
         /// <param name="checkBoxValue"> either "correct" or "incorrect"</param>
         [HttpPost]
-        public void unitTestsResult(string checkBoxName, string checkBoxValue)
+        public void a21unitTestsResult(string checkBoxName, string checkBoxValue)
         {
             string series;
             int number;
@@ -120,12 +120,33 @@ namespace cityLife.Controllers
             Test.updateTestResult(series, number, isCorrect);
         }
 
+        [HttpGet]
+        public ActionResult a30fakeTime()
+        {
+            return View("a30fakeTime");
+        }
+
+        [HttpPost]
+        public ActionResult a30fakeTime (string fakeDate, string fakeTime, string setFakeTime)
+        {
+            if (setFakeTime == "Set")
+            {
+                DateTime fakeDateTime = DateTime.Parse(fakeDate + " " + fakeTime);
+                FakeDateTime.SetFakeTime(fakeDateTime);
+            }
+            else if (setFakeTime == "Reset")
+            {
+                FakeDateTime.DisableFakeTime();
+            }
+            ViewBag.fakeTime = FakeDateTime.Now;
+            return View("a30fakeTime");
+        }
         /// <summary>
         /// The method displays the translation screen which lets the user see which translations exist and add/edit translations in various languages
         /// </summary>
         /// <returns>A starting screen - without the actual translations, as they will be added by an ajax call</returns>
         [HttpGet]
-        public ActionResult translations()
+        public ActionResult a40translations()
         {
             //Read the languages available - remove the XX language if exists
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
@@ -135,7 +156,7 @@ namespace cityLife.Controllers
 
             ViewBag.languages = languages;
 
-            return View("translations");
+            return View("a40translations");
         }
         [HttpGet]
         public JsonResult getTranslations(string fromLanguage, string toLanguage, bool showOnlyMissing)
@@ -232,7 +253,7 @@ namespace cityLife.Controllers
                 }
 
             }
-            return this.translations();
+            return this.a40translations();
         }
         /// <summary>
         /// The function reads the CSV file that contains the DB content and creates SQL statements to populate it
@@ -513,7 +534,8 @@ namespace cityLife.Controllers
         {
             Test.startTestSeries("s21dashboard");
             StaffController theStaffController = new StaffController();
-            var apartmentDayBlocks = theStaffController.s21dashboardPreparation(new DateTime(2018,9,20));
+            List<Money> revenuePerDay = null;
+            var apartmentDayBlocks = theStaffController.s21dashboardPreparation(new DateTime(2018,9,20), ref revenuePerDay);
             int testNumber = 1;
             foreach(var anApartment in apartmentDayBlocks)
             {
@@ -522,6 +544,19 @@ namespace cityLife.Controllers
                     Test.checkJson(testNumber, aDayBlock);
                     testNumber++;
                 }
+            }
+            testNumber = 200;
+            var theDate = new DateTime(2018, 9, 20);
+            var zeroMoney = new Money(0m, "UAH");
+            foreach(var aRevenue in revenuePerDay)
+            {
+                if (!aRevenue.isZero())
+                {
+                    Test.check(testNumber, theDate.ToShortDateString() + " " + aRevenue.toMoneyString());
+                    testNumber++;
+                }
+               
+                theDate = theDate.AddDays(1);
             }
 
 

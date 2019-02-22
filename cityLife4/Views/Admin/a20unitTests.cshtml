@@ -13,12 +13,12 @@
         var result = {};
         result.checkBoxName = theCheckBox.name;
         result.checkBoxValue = theCheckBox.value;
-        $.post("/admin/unitTestsResult", result);
+        $.post("/admin/a21unitTestsResult", result);
 
     }
 </script>
 <h2>Unit Tests</h2><br />
-<form action="/admin/unitTests" method="get">
+<form action="/admin/a20unitTests" method="get">
     <input type="submit" name="theAction" value="run Tests" />
     <input type="submit" name="theAction" value="show Tests" />
     <input type="checkbox" name="skipCorrectTests" value="TRUE" checked />Skip correct tests

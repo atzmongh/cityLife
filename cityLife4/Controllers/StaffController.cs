@@ -201,10 +201,11 @@ namespace cityLife.Controllers
             }
             else
             {
-                FakeDateTime.SetFakeTime(new DateTime(2018, 09, 20));  //DEBUGGING!!!!!!
-                DateTime fromDateOrNow = fromDate ?? FakeDateTime.Now;
-                var apartmentDayBlocks = s21dashboardPreparation(fromDateOrNow);
+                DateTime fromDateOrNow = fromDate ?? FakeDateTime.DateNow;
+                List<Money> revenuePerDay = null;
+                var apartmentDayBlocks = s21dashboardPreparation(fromDateOrNow, ref revenuePerDay);
                 ViewBag.apartmentDayBlocks = apartmentDayBlocks;
+                ViewBag.revenuePerDay = revenuePerDay;
                 TranslateBox tBox = this.setTbox("RU");
                 ViewBag.tBox = tBox;
                 ViewBag.fromDate = fromDateOrNow;
@@ -219,12 +220,13 @@ namespace cityLife.Controllers
         /// <summary>
         /// The function reads the orders for all apartments starting from the date set by the user and for 31 days.
         /// </summary>
-        /// <param name="fromDateOrNull"></param>
+        ///<param name="fromDate">starting date of the dashboard</param>
+        ///<param name="revenuePerDay">An output parameter - will contain the list of revenues per day</param>
         /// <returns>List of apartment orders. For each apartment:
         /// list of DayBlocks.
         /// A dayBlock is either a single free day, or an order which can span 1 or more days. Note that a day block may not 
         /// be identical to the corresponding order because the order may start before the "fromDate" or end after the "fromDate+31".</returns>
-        public List<List<DayBlock>> s21dashboardPreparation(DateTime fromDate)
+        public List<List<DayBlock>> s21dashboardPreparation(DateTime fromDate, ref List<Money> revenuePerDay)
         {
             //for each apartment
             //for each day from from_date to from_date+3
@@ -242,12 +244,19 @@ namespace cityLife.Controllers
             //where each day block is either a free day or an order.
 
             var apartmentDayBlocks = new List<List<DayBlock>>();
+            revenuePerDay = new List<Money>(32);
+            for(int i = 0; i < 32; i++)
+            {
+                revenuePerDay.Add(new Money(0m, "UAH"));
+            }
+            
             var lastDate = fromDate.AddDays(31);
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
             foreach (var anApartment in db.Apartments)
             {
                 var dayBlocks = new List<DayBlock>();
                 DayBlock aDayBlock = null;
+                int dayNumber = 0;
                 for (var aDate = fromDate; aDate <= lastDate; aDate = aDate.AddDays(1))
                 {
                     var anApartmentDay = db.ApartmentDays.SingleOrDefault(record => record.Apartment.Id == anApartment.Id && record.date == aDate);
@@ -268,6 +277,8 @@ namespace cityLife.Controllers
                     {
                         //this is a busy day. Read the order record
                         var anOrder = db.Orders.Single(record => record.Id == anApartmentDay.Order.Id);
+                        //Add the revenue of that day to the total revenu per day
+                        revenuePerDay[dayNumber] += anApartmentDay.revenueAsMoney();
                         if (aDayBlock == null)
                         {
                             //This is the first time we see this order - open a new DayBlock object. Note that if the report starts from 
@@ -296,6 +307,7 @@ namespace cityLife.Controllers
                             aDayBlock = null;
                         }
                     }
+                    dayNumber++;
                 }
                 //At this point we finished going on all dates for a specific apartment. It is possible that the last DayBlock was not yet written
                 //if its checkout date is beyond the last day of the report (our report is from 1/12/2019 till 31/12/2019, but the checkout date

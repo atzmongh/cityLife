@@ -40,5 +40,24 @@ namespace cityLife4
                 return fakeTime;
             }
         }
+
+        /// <summary>
+        /// returns only the date component of the fake time now (sets time to be all 0). This is important to make a date comparison
+        /// without the time component
+        /// </summary>
+        public static DateTime DateNow
+        {
+            get
+            {
+                DateTime dateTimeNow = Now;
+                DateTime dateNow = new DateTime(dateTimeNow.Year, dateTimeNow.Month, dateTimeNow.Day);
+                return dateNow;
+            }
+        }
+
+        public static bool isFakeTimeEnabled()
+        {
+            return deltaTime != new TimeSpan(0);
+        }
     }
 }

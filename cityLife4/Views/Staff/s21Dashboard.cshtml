@@ -8,6 +8,7 @@
     string fromDateSt = fromDate.ToString("dd/MM/yyyy");
     DateTime today = ViewBag.today;
     List<List<DayBlock>> apartmentDayBlocks = ViewBag.apartmentDayBlocks;
+    List<Money> revenuePerDay = ViewBag.revenuePerDay;
 }
 
 <style>
@@ -91,6 +92,19 @@
     .hidden {
         display: none;
     }
+    .highlight{
+        background-color:darkslateblue;
+    }
+    .selectedLeft {
+        border-left: 2px solid darkslateBlue;
+        border-top: 2px solid darkslateBlue;
+        border-bottom: 2px solid darkslateBlue;
+    }
+    .selectedRight {
+        border-right: 2px solid darkslateBlue;
+        border-top: 2px solid darkslateBlue;
+        border-bottom: 2px solid darkslateBlue;
+    }
 </style>
 <div class="main-wrapper reset-indent">
     <form id="fromDateForm" method="get" action="s21Dashboard">
@@ -115,6 +129,7 @@
                     int apartmentNumber = anApartment.First().apartmentNumber;
                     <tr><td class="dash01td">@apartmentNumber</td></tr>
                 }
+                <tr><td>rev.</td></tr>
             </table>
         </div>
         <div class="dash02">
@@ -169,10 +184,28 @@
                         }
                     </tr>
                 }
+                <tr>
+                    @{ var totalRevenue = new Money(0m, "UAH");}
+                    @foreach(var aRevenue in revenuePerDay)
+                    {
+                        if (aRevenue.isZero())
+                        {
+                            <td class="dash02td"></td>
+                        }
+                        else
+                        {
+                            <td class="dash02td">@aRevenue.toMoneyString(showCents: false)</td>
+                            totalRevenue += aRevenue;
+                            
+
+                        }
+                    }
+                </tr>
 
             </table>
         </div>
     </div>
+    <div style="padding:2px;">@tBox.translate("Total revenue"):@totalRevenue.toMoneyString(showCents:false)</div>
     <div style="padding:4px" id="s22OrderDetails">
 
 
@@ -209,9 +242,15 @@
     }
 
     function showOrder(td) {
-       // var orderId = td.dataset.orderId;
+        // var orderId = td.dataset.orderId;
+        if (lastSelectedTd != null) {
+            $(lastSelectedTd).removeClass("highlight");
+        }
+        $(td).addClass("highlight");
+        lastSelectedTd = td;
         var orderIdJson = { orderId: td.dataset.orderId };
-        $.get("/staff/s22OrderDetails", orderIdJson).done(displayOrderDetails)
+        $.get("/staff/s22OrderDetails", orderIdJson).done(displayOrderDetails);
+
        // $.getJSON("/staff/s22OrderDetails", orderIdJson).done(displayOrderDetails);
     }
 
@@ -220,6 +259,9 @@
         $("#s22OrderDetails").append(orderDetailsHTML);
     }
 
+    var lastSelectedTd = null;
+    var lastSelectedLeft = null;
+    var lastSelectedRight = null;
     var apartmentNumber = "0";
     var checkinDate = new Date();
     var checkoutDate = new Date();
@@ -231,6 +273,14 @@
         if (cellClickCounter % 2 == 1) {
             //The user clicked odd number of times on a free cell - it means we need to collect apartment number and checkin date
             //We assume a one night stay
+            if (lastSelectedLeft != null) {
+                $(lastSelectedLeft).removeClass("selectedLeft");
+            }
+            if (lastSelectedRight != null) {
+                $(lastSelectedRight).removeClass("selectedRight");
+            }
+            $(td).addClass("selectedLeft");
+            lastSelectedLeft = td;
             apartmentNumber = td.dataset.apartmentId;
             checkinDate = new Date(td.dataset.date);
             nights = 1;
@@ -238,21 +288,29 @@
             displayCheckinOutDates(apartmentNumber, checkinDate, checkoutDate, nights);
         }
         else {
-            //The user clicked even number of times on a cell = collect the checkout date
-            checkoutDate = new Date(td.dataset.date);
+            //The user clicked even number of times on a cell = collect the checkout date. Note that the user presses the 
+            //last date - not the checkout date (which is one day later.)
+            var secondApartmentNumber = td.dataset.apartmentId;
+            if (apartmentNumber != secondApartmentNumber) {
+                //The second click was for a different apartment number - start the process again. 
+                //perform this by a recursive call to addOrder
+                addOrder(td);
+                return;
+            }
+            $(td).addClass("selectedRight");
+            lastSelectedRight = td;
+            lastDate = new Date(td.dataset.date);  
+            checkoutDate = nextDate(lastDate);
             nights = diffDays(checkinDate, checkoutDate);
-            if (nights < 0) {
-                //reverse between checkin and checkout dates
-                var temporary = checkinDate;
-                checkinDate = checkoutDate;
-                checkoutDate = temporary;
-                nights = -nights;
+            if (nights <= 0) {
+                //The second click was for a day before the first click - reverse the checkin and checkout dates
+                //We do it by a recursive call to "addOrder"
+                var leftTD = lastSelectedRight;
+                var rightTD = lastSelectedLeft;
+                addOrder(leftTD);
+                addOrder(rightTD);
             }
-            else if (nights == 0) {
-                //The user clicked the same cell twice - assume 1 night.
-                checkoutDate = nextDate(checkinDate);
-                nights = 1;
-            }
+            
             displayCheckinOutDates(apartmentNumber, checkinDate, checkoutDate, nights);
         }
     }

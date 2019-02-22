@@ -462,6 +462,7 @@ namespace cityLife.Controllers
                 foreach(var anApartmentDays in theApartmentDays)
                 {
                     anApartmentDays.status = ApartOccuStatus.Free;
+                    anApartmentDays.revenue = 0;
                 }
             }
             //At this point we have an order record (either new or existing) and apartment days records, if already exist - are changed to be 
@@ -505,9 +506,14 @@ namespace cityLife.Controllers
                         Currency = theCurrency,
                         priceFactor = 1.0m,
                         isCleaned = false,
-                        revenue = (apartmentAndPrice.pricePerStay / dayCount).toCents(),
+                        revenue = 0,
                         status = ApartOccuStatus.Reserved
                     };
+                    if (aDay == checkIn)
+                    {
+                        //this is the first day of the booking - add the revenue to this day
+                        anApartmentDay.revenue = apartmentAndPrice.pricePerStay.toCents();
+                    }
                     db.ApartmentDays.Add(anApartmentDay);
                 }
                 else
@@ -518,7 +524,11 @@ namespace cityLife.Controllers
                         anApartmentDay.Order = theOrder;
                         anApartmentDay.Apartment = apartmentAndPrice.theApartment;
                         anApartmentDay.Currency = theCurrency;
-                        anApartmentDay.revenue = (apartmentAndPrice.pricePerStay / dayCount).toCents();
+                        if (aDay == checkIn)
+                        {
+                            anApartmentDay.revenue = apartmentAndPrice.pricePerStay.toCents();
+                        }
+                        
                         anApartmentDay.status = ApartOccuStatus.Reserved;
                     }
                     else

@@ -266,9 +266,9 @@
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="cityLifeDB.csv" />
     <Content Include="cityLifeDB.xlsx" />
-    <Content Include="Views\Admin\uploadDB.cshtml" />
-    <Content Include="Views\Admin\unitTests.cshtml" />
-    <Content Include="Views\Admin\translations.cshtml" />
+    <Content Include="Views\Admin\a10uploadDB.cshtml" />
+    <Content Include="Views\Admin\a20unitTests.cshtml" />
+    <Content Include="Views\Admin\a40translations.cshtml" />
     <Content Include="css\parts\styles.scss" />
     <Content Include="css\parts\_buttons.scss" />
     <Content Include="css\parts\_extend.scss" />
@@ -379,6 +379,7 @@
       <DependentUpon>cityLife.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Apartment.cs" />
+    <Compile Include="Models\ApartmentDays.cs" />
     <Compile Include="Models\ApartmentPhoto.cs" />
     <Compile Include="Models\Order.cs" />
     <Compile Include="Models\Pricing.cs" />
@@ -443,6 +444,7 @@
     <Content Include="Views\Staff\s21dashboard.cshtml" />
     <Content Include="Views\Staff\t10welcomeMail.cshtml" />
     <Content Include="Views\Staff\s28bookingSuccess.cshtml" />
+    <Content Include="Views\Admin\a30fakeTime.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
       <SubType>Designer</SubType>

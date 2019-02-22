@@ -1,0 +1,16 @@
+﻿@using cityLife4
+@{
+    ViewBag.Title = "a30fakeTime";
+    Layout = "~/Views/sharing/_adminLayout.cshtml";
+    string fakeTimeStatus = FakeDateTime.isFakeTimeEnabled() ? "enabled" : "disabled";
+}
+
+<h2>Fake Time is now: @FakeDateTime.Now.ToShortDateString() @FakeDateTime.Now.ToShortTimeString()</h2>
+<h3>fake time now: @fakeTimeStatus</h3>
+<form method="post" action="/admin/a30fakeTime">
+    <input type="date" name="fakeDate" /> <input type="time" name="fakeTime" /><br/>
+    <input type="submit" name="setFakeTime" value="Set"/> 
+    <input type="submit" name="setFakeTime" value="Reset" />
+</form>
+
+

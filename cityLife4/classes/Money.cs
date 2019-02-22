@@ -111,6 +111,10 @@ namespace cityLife4
         //{
         //    return m1.amount != m2.amount || m1.currencyCode != m2.currencyCode;
         //}
+        public bool isZero()
+        {
+            return amount == 0m;
+        }
         public static bool operator <=(Money m1, Money m2)
         {
             return m1.amount <= m2.amount && m1.currencyCode == m2.currencyCode;
