@@ -2,13 +2,13 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 02/17/2019 17:58:42
+-- Date Created: 02/23/2019 20:02:21
 -- Generated from EDMX file: C:\software\cityLife\cityLife4\cityLifeDB.edmx
 -- --------------------------------------------------
 
 SET QUOTED_IDENTIFIER OFF;
 --GO
---USE [C:\SOFTWARE\CITYLIFEDB8.MDF];
+USE [C:\SOFTWARE\CITYLIFEDB8.MDF];
 --GO
 IF SCHEMA_ID(N'dbo') IS NULL EXECUTE(N'CREATE SCHEMA [dbo]');
 --GO
@@ -62,6 +62,12 @@ IF OBJECT_ID(N'[dbo].[FK_GuestOrder]', 'F') IS NOT NULL
 IF OBJECT_ID(N'[dbo].[FK_CountryGuest]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[Guests] DROP CONSTRAINT [FK_CountryGuest];
 --GO
+IF OBJECT_ID(N'[dbo].[FK_EmployeeEmployeeWorkDay]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[EmployeeWorkDays] DROP CONSTRAINT [FK_EmployeeEmployeeWorkDay];
+--GO
+IF OBJECT_ID(N'[dbo].[FK_CurrencyEmployeeWorkDay]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[EmployeeWorkDays] DROP CONSTRAINT [FK_CurrencyEmployeeWorkDay];
+--GO
 
 -- --------------------------------------------------
 -- Dropping existing tables
@@ -114,6 +120,9 @@ IF OBJECT_ID(N'[dbo].[Employees]', 'U') IS NOT NULL
 --GO
 IF OBJECT_ID(N'[dbo].[Countries]', 'U') IS NOT NULL
     DROP TABLE [dbo].[Countries];
+--GO
+IF OBJECT_ID(N'[dbo].[EmployeeWorkDays]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[EmployeeWorkDays];
 --GO
 
 -- --------------------------------------------------
@@ -266,6 +275,8 @@ CREATE TABLE [dbo].[Orders] (
     [price] int  NOT NULL,
     [amountPaid] int  NOT NULL,
     [bookedBy] nvarchar(max)  NULL,
+    [OrderColor] int  NOT NULL,
+    [staffComments] nvarchar(max)  NULL,
     [Currency_currencyCode] nchar(3)  NOT NULL,
     [Apartment_Id] int  NOT NULL,
     [Guest_Id] int  NOT NULL
@@ -298,6 +309,18 @@ CREATE TABLE [dbo].[Employees] (
 CREATE TABLE [dbo].[Countries] (
     [code] nchar(3)  NOT NULL,
     [name] nvarchar(max)  NOT NULL
+);
+--GO
+
+-- Creating table 'EmployeeWorkDays'
+CREATE TABLE [dbo].[EmployeeWorkDays] (
+    [Id] int IDENTITY(1,1) NOT NULL,
+    [dateAndTime] datetime  NOT NULL,
+    [hours] int  NOT NULL,
+    [salaryCents] int  NOT NULL,
+    [isSalaryDay] bit  NOT NULL,
+    [Employee_Id] int  NOT NULL,
+    [Currency_currencyCode] nchar(3)  NOT NULL
 );
 --GO
 
@@ -399,6 +422,12 @@ ADD CONSTRAINT [PK_Employees]
 ALTER TABLE [dbo].[Countries]
 ADD CONSTRAINT [PK_Countries]
     PRIMARY KEY CLUSTERED ([code] ASC);
+--GO
+
+-- Creating primary key on [Id] in table 'EmployeeWorkDays'
+ALTER TABLE [dbo].[EmployeeWorkDays]
+ADD CONSTRAINT [PK_EmployeeWorkDays]
+    PRIMARY KEY CLUSTERED ([Id] ASC);
 --GO
 
 -- --------------------------------------------------
@@ -628,6 +657,36 @@ ADD CONSTRAINT [FK_CountryGuest]
 CREATE INDEX [IX_FK_CountryGuest]
 ON [dbo].[Guests]
     ([Country_code]);
+--GO
+
+-- Creating foreign key on [Employee_Id] in table 'EmployeeWorkDays'
+ALTER TABLE [dbo].[EmployeeWorkDays]
+ADD CONSTRAINT [FK_EmployeeEmployeeWorkDay]
+    FOREIGN KEY ([Employee_Id])
+    REFERENCES [dbo].[Employees]
+        ([Id])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+--GO
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_EmployeeEmployeeWorkDay'
+CREATE INDEX [IX_FK_EmployeeEmployeeWorkDay]
+ON [dbo].[EmployeeWorkDays]
+    ([Employee_Id]);
+--GO
+
+-- Creating foreign key on [Currency_currencyCode] in table 'EmployeeWorkDays'
+ALTER TABLE [dbo].[EmployeeWorkDays]
+ADD CONSTRAINT [FK_CurrencyEmployeeWorkDay]
+    FOREIGN KEY ([Currency_currencyCode])
+    REFERENCES [dbo].[Currencies]
+        ([currencyCode])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+--GO
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_CurrencyEmployeeWorkDay'
+CREATE INDEX [IX_FK_CurrencyEmployeeWorkDay]
+ON [dbo].[EmployeeWorkDays]
+    ([Currency_currencyCode]);
 --GO
 
 -- --------------------------------------------------

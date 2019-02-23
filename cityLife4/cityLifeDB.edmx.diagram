@@ -31,11 +31,14 @@
         <AssociationConnector Association="cityLifeDB.CurrencyOrder" />
         <AssociationConnector Association="cityLifeDB.OrderApartmentDay" />
         <AssociationConnector Association="cityLifeDB.ApartmentOrder" />
-        <EntityTypeShape EntityType="cityLifeDB.Guest" Width="1.5" PointX="6.625" PointY="9.75" />
+        <EntityTypeShape EntityType="cityLifeDB.Guest" Width="1.5" PointX="6.625" PointY="10" />
         <AssociationConnector Association="cityLifeDB.GuestOrder" />
         <EntityTypeShape EntityType="cityLifeDB.Employee" Width="1.5" PointX="4.125" PointY="9.625" />
         <EntityTypeShape EntityType="cityLifeDB.Country" Width="1.5" PointX="9.5" PointY="9.875" />
         <AssociationConnector Association="cityLifeDB.CountryGuest" />
+        <EntityTypeShape EntityType="cityLifeDB.EmployeeWorkDay" Width="1.5" PointX="1.5" PointY="9.625" />
+        <AssociationConnector Association="cityLifeDB.EmployeeEmployeeWorkDay" />
+        <AssociationConnector Association="cityLifeDB.CurrencyEmployeeWorkDay" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

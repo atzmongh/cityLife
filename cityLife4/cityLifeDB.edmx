@@ -22,6 +22,7 @@
     <EntitySet Name="Guests" EntityType="cityLifeDB.Store.Guests" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="Employees" EntityType="cityLifeDB.Store.Employees" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="Countries" EntityType="cityLifeDB.Store.Countries" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="EmployeeWorkDays" EntityType="cityLifeDB.Store.EmployeeWorkDays" store:Type="Tables" Schema="dbo" />
     <AssociationSet Name="ApartmentApartmentPhoto" Association="cityLifeDB.Store.ApartmentApartmentPhoto">
       <End Role="Apartment" EntitySet="Apartments" />
       <End Role="ApartmentPhoto" EntitySet="ApartmentPhotoes" />
@@ -81,6 +82,14 @@
     <AssociationSet Name="CountryGuest" Association="cityLifeDB.Store.CountryGuest">
       <End Role="Country" EntitySet="Countries" />
       <End Role="Guest" EntitySet="Guests" />
+    </AssociationSet>
+    <AssociationSet Name="EmployeeEmployeeWorkDay" Association="cityLifeDB.Store.EmployeeEmployeeWorkDay">
+      <End Role="Employee" EntitySet="Employees" />
+      <End Role="EmployeeWorkDay" EntitySet="EmployeeWorkDays" />
+    </AssociationSet>
+    <AssociationSet Name="CurrencyEmployeeWorkDay" Association="cityLifeDB.Store.CurrencyEmployeeWorkDay">
+      <End Role="Currency" EntitySet="Currencies" />
+      <End Role="EmployeeWorkDay" EntitySet="EmployeeWorkDays" />
     </AssociationSet>
   </EntityContainer>
   <EntityType Name="Apartments">
@@ -232,6 +241,8 @@
     <Property Name="price" Type="int" Nullable="false" />
     <Property Name="amountPaid" Type="int" Nullable="false" />
     <Property Name="bookedBy" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="OrderColor" Type="int" Nullable="false" />
+    <Property Name="staffComments" Type="nvarchar(max)" Nullable="true" />
     <Property Name="Currency_currencyCode" Type="nchar" MaxLength="3" Nullable="false" />
     <Property Name="Apartment_Id" Type="int" Nullable="false" />
     <Property Name="Guest_Id" Type="int" Nullable="false" />
@@ -264,6 +275,18 @@
     </Key>
     <Property Name="code" Type="nchar" Nullable="false" MaxLength="3" />
     <Property Name="name" Type="nvarchar(max)" Nullable="false" />
+  </EntityType>
+  <EntityType Name="EmployeeWorkDays">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="dateAndTime" Type="datetime" Nullable="false" />
+    <Property Name="hours" Type="int" Nullable="false" />
+    <Property Name="salaryCents" Type="int" Nullable="false" />
+    <Property Name="isSalaryDay" Type="bit" Nullable="false" DefaultValue="false" />
+    <Property Name="Employee_Id" Type="int" Nullable="false" />
+    <Property Name="Currency_currencyCode" Type="nchar" MaxLength="3" Nullable="false" />
   </EntityType>
   <Association Name="ApartmentApartmentPhoto">
     <End Role="Apartment" Type="cityLifeDB.Store.Apartments" Multiplicity="1" />
@@ -445,6 +468,30 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
+  <Association Name="EmployeeEmployeeWorkDay">
+    <End Role="Employee" Type="cityLifeDB.Store.Employees" Multiplicity="1" />
+    <End Role="EmployeeWorkDay" Type="cityLifeDB.Store.EmployeeWorkDays" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Employee">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="EmployeeWorkDay">
+        <PropertyRef Name="Employee_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="CurrencyEmployeeWorkDay">
+    <End Role="Currency" Type="cityLifeDB.Store.Currencies" Multiplicity="1" />
+    <End Role="EmployeeWorkDay" Type="cityLifeDB.Store.EmployeeWorkDays" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Currency">
+        <PropertyRef Name="currencyCode" />
+      </Principal>
+      <Dependent Role="EmployeeWorkDay">
+        <PropertyRef Name="Currency_currencyCode" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
 </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
@@ -525,6 +572,15 @@
           <AssociationSet Name="CountryGuest" Association="cityLifeDB.CountryGuest">
             <End Role="Country" EntitySet="Countries" />
             <End Role="Guest" EntitySet="Guests" />
+          </AssociationSet>
+          <EntitySet Name="EmployeeWorkDays" EntityType="cityLifeDB.EmployeeWorkDay" />
+          <AssociationSet Name="EmployeeEmployeeWorkDay" Association="cityLifeDB.EmployeeEmployeeWorkDay">
+            <End Role="Employee" EntitySet="Employees" />
+            <End Role="EmployeeWorkDay" EntitySet="EmployeeWorkDays" />
+          </AssociationSet>
+          <AssociationSet Name="CurrencyEmployeeWorkDay" Association="cityLifeDB.CurrencyEmployeeWorkDay">
+            <End Role="Currency" EntitySet="Currencies" />
+            <End Role="EmployeeWorkDay" EntitySet="EmployeeWorkDays" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="Apartment">
@@ -666,6 +722,7 @@
           <NavigationProperty Name="ToCurrencyExchanges" Relationship="cityLifeDB.CurrencyCurrencyExchangeTo" FromRole="Currency" ToRole="CurrencyExchange" />
           <NavigationProperty Name="ApartmentDays" Relationship="cityLifeDB.CurrencyApartmentDay" FromRole="Currency" ToRole="ApartmentDay" />
           <NavigationProperty Name="Orders" Relationship="cityLifeDB.CurrencyOrder" FromRole="Currency" ToRole="Order" />
+          <NavigationProperty Name="EmployeeWorkDays" Relationship="cityLifeDB.CurrencyEmployeeWorkDay" FromRole="Currency" ToRole="EmployeeWorkDay" />
         </EntityType>
         <Association Name="CurrencyPricing">
           <End Type="cityLifeDB.Currency" Role="Currency" Multiplicity="1" />
@@ -788,6 +845,8 @@
           <NavigationProperty Name="ApartmentDays" Relationship="cityLifeDB.OrderApartmentDay" FromRole="Order" ToRole="ApartmentDay" />
           <NavigationProperty Name="Apartment" Relationship="cityLifeDB.ApartmentOrder" FromRole="Order" ToRole="Apartment" />
           <NavigationProperty Name="Guest" Relationship="cityLifeDB.GuestOrder" FromRole="Order" ToRole="Guest" />
+          <Property Name="OrderColor" Type="cityLifeDB.Color" Nullable="false" />
+          <Property Name="staffComments" Type="String" Nullable="true" />
         </EntityType>
         <EnumType Name="OrderStatus">
           <Member Name="Created" />
@@ -833,6 +892,7 @@
           <Property Name="passwordHash" Type="String" Nullable="false" />
           <Property Name="email" Type="String" Nullable="false" />
           <Property Name="userName" Type="String" Nullable="false" />
+          <NavigationProperty Name="EmployeeWorkDays" Relationship="cityLifeDB.EmployeeEmployeeWorkDay" FromRole="Employee" ToRole="EmployeeWorkDay" />
         </EntityType>
         <EntityType Name="Country">
           <Key>
@@ -845,6 +905,33 @@
         <Association Name="CountryGuest">
           <End Type="cityLifeDB.Country" Role="Country" Multiplicity="1" />
           <End Type="cityLifeDB.Guest" Role="Guest" Multiplicity="*" />
+        </Association>
+        <EnumType Name="Color">
+          <Member Name="Red" />
+          <Member Name="Orange" />
+          <Member Name="Green" />
+          <Member Name="Blue" />
+          <Member Name="Gray" />
+        </EnumType>
+        <EntityType Name="EmployeeWorkDay">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="dateAndTime" Type="DateTime" Nullable="false" />
+          <Property Name="hours" Type="Int32" Nullable="false" />
+          <Property Name="salaryCents" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Employee" Relationship="cityLifeDB.EmployeeEmployeeWorkDay" FromRole="EmployeeWorkDay" ToRole="Employee" />
+          <NavigationProperty Name="Currency" Relationship="cityLifeDB.CurrencyEmployeeWorkDay" FromRole="EmployeeWorkDay" ToRole="Currency" />
+          <Property Name="isSalaryDay" Type="Boolean" Nullable="false" DefaultValue="false" />
+        </EntityType>
+        <Association Name="EmployeeEmployeeWorkDay">
+          <End Type="cityLifeDB.Employee" Role="Employee" Multiplicity="1" />
+          <End Type="cityLifeDB.EmployeeWorkDay" Role="EmployeeWorkDay" Multiplicity="*" />
+        </Association>
+        <Association Name="CurrencyEmployeeWorkDay">
+          <End Type="cityLifeDB.Currency" Role="Currency" Multiplicity="1" />
+          <End Type="cityLifeDB.EmployeeWorkDay" Role="EmployeeWorkDay" Multiplicity="*" />
         </Association>
       </Schema>
     </edmx:ConceptualModels>
@@ -1000,6 +1087,8 @@
           <ScalarProperty Name="price" ColumnName="price" />
           <ScalarProperty Name="amountPaid" ColumnName="amountPaid" />
           <ScalarProperty Name="bookedBy" ColumnName="bookedBy" />
+          <ScalarProperty Name="OrderColor" ColumnName="OrderColor" />
+          <ScalarProperty Name="staffComments" ColumnName="staffComments" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -1031,6 +1120,17 @@
         <MappingFragment StoreEntitySet="Countries">
           <ScalarProperty Name="code" ColumnName="code" />
           <ScalarProperty Name="name" ColumnName="name" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="EmployeeWorkDays">
+      <EntityTypeMapping TypeName="IsTypeOf(cityLifeDB.EmployeeWorkDay)">
+        <MappingFragment StoreEntitySet="EmployeeWorkDays">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="dateAndTime" ColumnName="dateAndTime" />
+          <ScalarProperty Name="hours" ColumnName="hours" />
+          <ScalarProperty Name="salaryCents" ColumnName="salaryCents" />
+          <ScalarProperty Name="isSalaryDay" ColumnName="isSalaryDay" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -1153,6 +1253,22 @@
         <ScalarProperty Name="code" ColumnName="Country_code" />
       </EndProperty>
       <EndProperty Name="Guest">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="EmployeeEmployeeWorkDay" TypeName="cityLifeDB.EmployeeEmployeeWorkDay" StoreEntitySet="EmployeeWorkDays">
+      <EndProperty Name="Employee">
+        <ScalarProperty Name="Id" ColumnName="Employee_Id" />
+      </EndProperty>
+      <EndProperty Name="EmployeeWorkDay">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="CurrencyEmployeeWorkDay" TypeName="cityLifeDB.CurrencyEmployeeWorkDay" StoreEntitySet="EmployeeWorkDays">
+      <EndProperty Name="Currency">
+        <ScalarProperty Name="currencyCode" ColumnName="Currency_currencyCode" />
+      </EndProperty>
+      <EndProperty Name="EmployeeWorkDay">
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
     </AssociationSetMapping>

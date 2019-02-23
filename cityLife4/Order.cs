@@ -36,6 +36,8 @@ namespace cityLife4
         public int price { get; set; }
         public int amountPaid { get; set; }
         public string bookedBy { get; set; }
+        public Color OrderColor { get; set; }
+        public string staffComments { get; set; }
     
         public virtual Currency Currency { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

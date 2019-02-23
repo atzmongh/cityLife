@@ -348,6 +348,9 @@
     <Compile Include="classes\Test.cs" />
     <Compile Include="classes\TranslateBox.cs" />
     <Compile Include="classes\Version.cs" />
+    <Compile Include="Color.cs">
+      <DependentUpon>cityLife.tt</DependentUpon>
+    </Compile>
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\PublicController.cs" />
     <Compile Include="Controllers\StaffController.cs" />
@@ -361,6 +364,9 @@
       <DependentUpon>cityLife.tt</DependentUpon>
     </Compile>
     <Compile Include="Employee.cs">
+      <DependentUpon>cityLife.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EmployeeWorkDay.cs">
       <DependentUpon>cityLife.tt</DependentUpon>
     </Compile>
     <Compile Include="ErrorCode.cs">

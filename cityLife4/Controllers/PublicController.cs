@@ -169,12 +169,15 @@ namespace cityLife.Controllers
         public int apartmentNumber;
         public string confirmationNumber;
         public OrderStatus status;
+        public Color orderColor;
+        public string staffComments;
 
         public OrderData()
         {
             status = OrderStatus.Created;
             paid = new Money(0m,"UAH");
             confirmationNumber = "0";
+            orderColor = Color.Red;
         }
         public OrderData(Order anOrder)
         {
@@ -196,6 +199,8 @@ namespace cityLife.Controllers
             apartmentNumber = anOrder.Apartment.number;
             confirmationNumber = anOrder.confirmationNumber;
             status = anOrder.status;
+            orderColor = anOrder.OrderColor;
+            staffComments = anOrder.staffComments;
         }
         private static bool IsValidEmail(string email)
         {

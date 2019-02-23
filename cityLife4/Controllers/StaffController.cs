@@ -6,6 +6,7 @@ using System.Web.Configuration;
 using System.Web.Mvc;
 using cityLife;
 using cityLife4;
+
 using System.Text.RegularExpressions;
 
 namespace cityLife.Controllers
@@ -59,75 +60,13 @@ namespace cityLife.Controllers
         public int orderId;
         public string firstDate;
         public Money price;
+        public Color orderColor;
+        public string comments;
     }
 
 
 
-    /// <summary>
-    /// The class contains additional fields that do not exist in the booking form data
-    /// </summary>
-    //public class StaffBookingFormData : BookingFormData
-    //{
-    //    public FieldData checkinDate;
-    //    public FieldData checkoutDate;
-    //    public FieldData nights;
-    //    public FieldData adults;
-    //    public FieldData children;
-    //    public FieldData price;
-    //    public FieldData paidAmount;
-    //    public FieldData apartmentNumber;
-    //    public FieldData confirmationNumber;
-    //    public FieldData orderId;
-
-    //    public StaffBookingFormData():base()
-    //    {
-    //         this.checkinDate = new FieldData("Checkin Date");
-    //    this.checkoutDate = new FieldData("Checkout Date");
-    //    this.nights = new FieldData("Nights");
-    //    this.adults = new FieldData("Adults");
-    //    this.children = new FieldData("Children");
-    //    this.price = new FieldData("Price");
-    //    this.paidAmount = new FieldData("Paid Amount");
-    //    this.apartmentNumber = new FieldData("Apartment Number");
-    //    this.confirmationNumber = new FieldData("Confirmation Number");
-    //    this.orderId = new FieldData("Order ID");
-    //    }
-    //    public StaffBookingFormData(string name, string country, string email, string phone, string arrivalTime, 
-    //        string specialRequest, string bookedBy,
-    //        string checkin, string checkout, string nights, string adults, 
-    //        string children, string price, string paidAmount, string apartmentNumber, string orderId):base(name,country,email,phone,arrivalTime,specialRequest,bookedBy)
-    //    {
-    //        this.checkinDate = new FieldData("Checkin Date", checkin);
-    //        this.checkoutDate = new FieldData("Checkout Date", checkout);
-    //        this.nights = new FieldData("Nights", nights);
-    //        this.adults = new FieldData("Adults", adults);
-    //        this.children = new FieldData("Children", children);
-    //        this.price = new FieldData("Price", price);
-    //        this.paidAmount = new FieldData("Paid Amount", paidAmount);
-    //        this.apartmentNumber = new FieldData("Apartment Number", apartmentNumber);
-    //       // this.confirmationNumber = new FieldData("Confirmation Number", confirmationNumber);
-    //        this.orderId = new FieldData("Order Id", orderId);
-    //    }
-    //    public override bool isValid()  
-    //    {
-    //        if (base.isValid())   //TBD - should be changted
-    //            return true;
-
-    //        if (checkinDate.errorMessage != "" ||
-    //            checkoutDate.errorMessage != "" ||
-    //            nights.errorMessage != "" ||
-    //            adults.errorMessage != "" ||
-    //            children.errorMessage != "" ||
-    //            price.errorMessage != "" ||
-    //            paidAmount.errorMessage != "" ||
-    //            apartmentNumber.errorMessage != "" ||
-    //            confirmationNumber.errorMessage != "" ||
-    //            orderId.errorMessage != "")
-    //            return true;
-
-    //        return false;
-    //    }
-    //}
+   
     public class StaffController : Controller
     {
         // GET: Staff
@@ -292,7 +231,9 @@ namespace cityLife.Controllers
                                 orderId = anOrder.Id,
                                 orderStatus = anOrder.status,
                                 firstDate = aDate.ToString("yyyy-MM-dd"),
-                                price = anOrder.priceAsMoney()
+                                price = anOrder.priceAsMoney(),
+                                orderColor = anOrder.OrderColor,
+                                comments = anOrder.staffComments
                             };
                         }
                         else

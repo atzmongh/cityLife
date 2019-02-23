@@ -41,5 +41,6 @@ namespace cityLife4
         public virtual DbSet<Guest> Guests { get; set; }
         public virtual DbSet<Employee> Employees { get; set; }
         public virtual DbSet<Country> Countries { get; set; }
+        public virtual DbSet<EmployeeWorkDay> EmployeeWorkDays { get; set; }
     }
 }

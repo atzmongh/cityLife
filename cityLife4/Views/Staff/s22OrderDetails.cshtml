@@ -4,17 +4,28 @@
     ViewBag.Title = "s22OrderDetails";
     TranslateBox tBox = ViewBag.tBox;
     OrderData theOrderData = ViewBag.orderData;
+    List<string> staffComments = new List<string>();
+    if (theOrderData.staffComments != null)
+    {
+        staffComments = theOrderData.staffComments.Split('\n').ToList();
+    }
+
 }
 
 
+
+@foreach(string comment in staffComments)
+{
+    <div style="background-color:aliceblue">@comment</div>
+}
 <span style="float:left">@tBox.translate("Name")</span>
 <span style="float:right">@theOrderData.name</span>
 <br />
 <span style="float:left">@tBox.translate("Phone")</span>
-<span style="float:right">@theOrderData.phone</span>
+<a style="float:right" class="hyperlink" href="tel:@theOrderData.phone">@theOrderData.phone</a>
 <br />
 <span style="float:left">@tBox.translate("Email")</span>
-<span style="float:right">@theOrderData.email</span>
+<a style="float:right" class="hyperlink" href="mailto:@theOrderData.email">@theOrderData.email</a>
 <br />
 <span style="float:left">@tBox.translate("Country")</span>
 <span style="float:right">@theOrderData.country</span>
@@ -37,7 +48,7 @@
 <span style="float:left">@tBox.translate("Expected Arrival")</span>
 <span style="float:right">@theOrderData.expectedArrival</span>
 <br />
-<span style="float:left">@tBox.translate("Comments")</span>
+<span style="float:left">@tBox.translate("special requests")</span>
 <span style="float:right">@theOrderData.comments</span>
 <br />
 <span style="float:left">@tBox.translate("Status")</span>
@@ -53,10 +64,10 @@
             @tBox.translate("Are you sure you want to delete the order?")
         </div>
         <div style="display:flex">
-            <button class="btn small-button"  value="Confirm" onclick="deleteOrder(@theOrderData.orderId)">
+            <button class="btn small-button" value="Confirm" onclick="deleteOrder(@theOrderData.orderId)">
                 @tBox.translate("Confirm")
             </button>
-            <button class="btn small-button"  value="Cancel" onclick="cancelDelete()">@tBox.translate("Cancel")</button>
+            <button class="btn small-button" value="Cancel" onclick="cancelDelete()">@tBox.translate("Cancel")</button>
         </div>
     </div>
 </div>
@@ -64,10 +75,10 @@
 <div id="deleteMessage" class="popup">
     <div class="popup-box" style="top:200px;">
         <div id="deleteMessageDiv">
-            
+
         </div>
         <div style="display:flex">
-            <button class="btn small-button"  value="Confirm" onclick="closeDeleteMessage()">
+            <button class="btn small-button" value="Confirm" onclick="closeDeleteMessage()">
                 @tBox.translate("OK")
             </button>
         </div>

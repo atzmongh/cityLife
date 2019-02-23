@@ -12,23 +12,21 @@ namespace cityLife4
     using System;
     using System.Collections.Generic;
     
-    public partial class Employee
+    public partial class EmployeeWorkDay
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Employee()
+        public EmployeeWorkDay()
         {
-            this.EmployeeWorkDays = new HashSet<EmployeeWorkDay>();
+            this.isSalaryDay = false;
         }
     
         public int Id { get; set; }
-        public string name { get; set; }
-        public string phone { get; set; }
-        public string role { get; set; }
-        public string passwordHash { get; set; }
-        public string email { get; set; }
-        public string userName { get; set; }
+        public System.DateTime dateAndTime { get; set; }
+        public int hours { get; set; }
+        public int salaryCents { get; set; }
+        public bool isSalaryDay { get; set; }
     
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<EmployeeWorkDay> EmployeeWorkDays { get; set; }
+        public virtual Employee Employee { get; set; }
+        public virtual Currency Currency { get; set; }
     }
 }

@@ -72,17 +72,27 @@
         line-height: 15px;
     }
 
-    .orderCreated {
+    .orderRed {
         background-color: crimson;
         color: white;
     }
 
-    .orderCheckedin {
+    .orderOrange {
         background-color: darkorange;
+        color:white;
     }
 
-    .orderCheckedout {
+    .orderGreen {
         background-color: aquamarine;
+    }
+
+    .orderBlue{
+        background-color:lightblue;
+        color:black;
+    }
+    .orderGray {
+        background-color: darkgray;
+        color: white;
     }
 
     .today {
@@ -94,6 +104,7 @@
     }
     .highlight{
         background-color:darkslateblue;
+        color:white;
     }
     .selectedLeft {
         border-left: 2px solid darkslateBlue;
@@ -104,6 +115,10 @@
         border-right: 2px solid darkslateBlue;
         border-top: 2px solid darkslateBlue;
         border-bottom: 2px solid darkslateBlue;
+    }
+    .hyperlink{
+        color:darkblue;
+        text-decoration:underline;
     }
 </style>
 <div class="main-wrapper reset-indent">
@@ -166,20 +181,22 @@
                             else
                             {
                                 //This is a busy day (or days)
-                                var backgroundColor = "";
-                                switch (aDAyBlock.orderStatus)
-                                {
-                                    case OrderStatus.Created:
-                                        backgroundColor = "orderCreated";
-                                        break;
-                                    case OrderStatus.CheckedIn:
-                                        backgroundColor = "orderCheckedin";
-                                        break;
-                                    case OrderStatus.CheckedOut:
-                                        backgroundColor = "orderCheckedout";
-                                        break;
-                                }
-                                <td class="dash02td @backgroundColor" colspan="@aDAyBlock.days" data-order-id="@aDAyBlock.orderId" onclick="showOrder(this)">@aDAyBlock.name <br /> @aDAyBlock.price.toMoneyString()</td>
+                                string color = aDAyBlock.orderColor.ToString();
+                                string cssColor = "order" + color;   //e.g. orderRed, orderGreen - we prepared such CSS classes
+                                                                     //var backgroundColor = "";
+                                                                     //switch (aDAyBlock.orderStatus)
+                                                                     //{
+                                                                     //    case OrderStatus.Created:
+                                                                     //        backgroundColor = "orderCreated";
+                                                                     //        break;
+                                                                     //    case OrderStatus.CheckedIn:
+                                                                     //        backgroundColor = "orderCheckedin";
+                                                                     //        break;
+                                                                     //    case OrderStatus.CheckedOut:
+                                                                     //        backgroundColor = "orderCheckedout";
+                                                                     //        break;
+                                                                     //}
+                                <td class="dash02td @cssColor" colspan="@aDAyBlock.days" data-order-id="@aDAyBlock.orderId" onclick="showOrder(this)">@aDAyBlock.name <br /> @aDAyBlock.price.toMoneyString()</td>
                             }
                         }
                     </tr>
@@ -241,6 +258,16 @@
             });
     }
 
+    var lastSelectedTd = null;
+    var lastSelectedLeft = null;
+    var lastSelectedRight = null;
+    var apartmentNumber = "0";
+    var checkinDate = new Date();
+    var checkoutDate = new Date();
+    var nights = 0;
+    var cellClickCounter = 0;
+
+
     function showOrder(td) {
         // var orderId = td.dataset.orderId;
         if (lastSelectedTd != null) {
@@ -259,17 +286,15 @@
         $("#s22OrderDetails").append(orderDetailsHTML);
     }
 
-    var lastSelectedTd = null;
-    var lastSelectedLeft = null;
-    var lastSelectedRight = null;
-    var apartmentNumber = "0";
-    var checkinDate = new Date();
-    var checkoutDate = new Date();
-    var nights = 0;
-    var cellClickCounter = 0;
+    
 
     function addOrder(td) {
         cellClickCounter++;
+        if (lastSelectedTd != null) {
+            //remove highlighting from a previous booking that was selected
+            $(lastSelectedTd).removeClass("highlight");
+            lastSelectedTd = null;
+        }
         if (cellClickCounter % 2 == 1) {
             //The user clicked odd number of times on a free cell - it means we need to collect apartment number and checkin date
             //We assume a one night stay
@@ -309,6 +334,7 @@
                 var rightTD = lastSelectedLeft;
                 addOrder(leftTD);
                 addOrder(rightTD);
+                return;
             }
             
             displayCheckinOutDates(apartmentNumber, checkinDate, checkoutDate, nights);
