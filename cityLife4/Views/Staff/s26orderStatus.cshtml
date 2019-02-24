@@ -1,0 +1,69 @@
+﻿@using cityLife4;
+@using cityLife.Controllers;
+@using System.Data.Entity;
+@{
+    //The view is used for both adding new orders an updating existing orders.
+    //New orders have an order record which contains only checkin, checkout, number of nights and apartment number.
+    //The order id of a new order is 0.
+    //Existing orders contain all data belonging to that order
+    ViewBag.Title = "s26 order status";
+    TranslateBox tBox = ViewBag.tBox;
+    OrderData theOrderData = ViewBag.orderData;
+    string action = ViewBag.action;   //Add or Update
+
+}
+
+<div class='inputBox' style="height:200px;">
+    <textarea id="staffComments" name="staffComments" class="inputElement" style="height:165px;">@theOrderData.staffComments</textarea>
+    <label for="staffComments" class="label">@tBox.translate("Comments")</label>
+</div>
+
+<div class="form-box-wrap">
+    <div class="field-box select-box">
+        <select id="orderColor" name="orderColor">
+            @{
+                Array colorValues = Enum.GetValues(typeof(Color));
+
+                foreach (Color theColor in colorValues)
+                {
+                    string colorName = tBox.translate(theColor.ToString());
+                    string selected = "";
+                    if (theOrderData.orderColor == theColor)
+                    {
+                        selected = "selected";
+                    }
+                    <option value="@theColor" @selected>@colorName</option>
+                }
+            }
+        </select>
+        <label>
+            <span class="field-name">@tBox.translate("Order Color")</span>
+        </label>
+    </div>
+    <div class="field-box select-box">
+        <select id="status" name="status">
+            @foreach (OrderStatus aStatus in Enum.GetValues(typeof(OrderStatus)))
+            {
+                string statusName = tBox.translate(aStatus.ToString());
+                string selected = "";
+                if (aStatus == theOrderData.status)
+                {
+                    selected = "selected";
+                }
+                <option value="@aStatus" @selected>@statusName</option>
+            }
+        </select>
+        <label>
+            <span class="field-name">@tBox.translate("Status")</span>
+        </label>
+    </div>
+</div>
+
+@Html.inputField("paid", theOrderData.paid.toMoneyString(), theOrderData.errorMessageOf("paid", tBox), tBox, style: "width:48%")
+
+<input type="submit" class="btn small-button" value='@tBox.translate(action)' />
+<a class="btn" style=" min-width: 90px;height: auto;margin: 5px;" href="/staff/s21Dashboard">@tBox.translate("Cancel")</a>
+
+
+
+

@@ -44,7 +44,7 @@
         <ul class="wizard">
             <li id="liPersonal" class="active" onclick="activate('Personal')">@tBox.translate("Personal")</li>
             <li id="liBooking" class="nonActive" onclick="activate('Booking')">@tBox.translate("Booking")</li>
-            <li id="liOther" class="nonActive" onclick="activate('Other')">@tBox.translate("Other")</li>
+            <li id="liStatus" class="nonActive" onclick="activate('Status')">@tBox.translate("Status")</li>
         </ul>
     </header>
     <form method="post" action="/staff/s25addUpdateOrder">
@@ -55,8 +55,8 @@
         <div id="divBooking" style="display:none">
             @Html.Partial("s25orderBooking")
         </div>
-        <div id="divOther" style="display:none">
-            @Html.Partial("s26orderOther")
+        <div id="divStatus" style="display:none">
+            @Html.Partial("s26orderStatus")
         </div>
     </form>
 </div>
@@ -66,7 +66,7 @@
     function activate(screen) {
         $("#divPersonal").hide();
         $("#divBooking").hide();
-        $("#divOther").hide();
+        $("#divStatus").hide();
         $("#div" + screen).show();
 
         $(".wizard li").removeClass("active").addClass("nonActive");

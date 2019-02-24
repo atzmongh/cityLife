@@ -444,7 +444,7 @@
     <Content Include="Views\Staff\s23addUpdateOrder.cshtml" />
     <Content Include="Views\Staff\s24orderPersonal.cshtml" />
     <Content Include="Views\Staff\s25orderBooking.cshtml" />
-    <Content Include="Views\Staff\s26orderOther.cshtml" />
+    <Content Include="Views\Staff\s26orderStatus.cshtml" />
     <Content Include="Views\Staff\s10login.cshtml" />
     <Content Include="Views\sharing\cityLifeLogoSvg.cshtml" />
     <Content Include="Views\Staff\s21dashboard.cshtml" />

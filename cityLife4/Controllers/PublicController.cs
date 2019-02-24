@@ -489,6 +489,8 @@ namespace cityLife.Controllers
                                                              //price is determined by the admin and it can be different than the automatic calculation
             theOrder.Guest = theGuest;
             theOrder.Currency = theCurrency;
+            theOrder.OrderColor = theOrderData.orderColor;
+            theOrder.staffComments = theOrderData.staffComments;
             
 
             if (theOrderData.orderId == 0)

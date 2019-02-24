@@ -69,25 +69,7 @@
     </div>
 </div>
 <div class="form-box-wrap">
-    <div class="field-box select-box">
-        <select id="status" name="status">
-            @foreach (OrderStatus aStatus in Enum.GetValues(typeof(OrderStatus)))
-            {
-                string statusName = Enum.GetName(typeof(OrderStatus), aStatus);
-                if (aStatus == theOrderData.status)
-                {
-                    <option value="@aStatus" selected>@statusName</option>
-                }
-                else
-                {
-                    <option value="@aStatus">@statusName</option>
-                }
-            }
-        </select>
-        <label>
-            <span class="field-name">@tBox.translate("Status")</span>
-        </label>
-    </div>
+  
 
     <div class="field-box select-box">
         <select id="apartmentNumber" name="apartmentNumber" onchange="bookingChanged(this)">
@@ -111,7 +93,7 @@
 <div>
     <div class="form-box-wrap">
         @Html.inputField("price", theOrderData.price.toMoneyString(), theOrderData.errorMessageOf("price", tBox), tBox, style: "width:48%")
-        @Html.inputField("paid", theOrderData.paid.toMoneyString(), theOrderData.errorMessageOf("paid", tBox), tBox, style: "width:48%")
+       
     </div>
     <div class="form-box-wrap">
         <div class="field-box select-box">
@@ -128,8 +110,7 @@
         </div>
         @Html.inputField("confirmationNumber", theOrderData.confirmationNumber, theOrderData.errorMessageOf("confirmationNumber", tBox), tBox, style: "width:48%")
     </div>
-    <input type="submit" class="btn small-button" value='@tBox.translate("Update")' />
-    <a class="btn" style=" min-width: 90px;height: auto;margin: 5px;" href="/staff/s21Dashboard">@tBox.translate("Cancel")</a>
+    <btn class="btn" onclick="activate('Status')">@tBox.translate("Next")</btn>
     <br />
     <span style="color:red" id="notAvailable"></span>
 

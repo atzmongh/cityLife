@@ -305,6 +305,7 @@ namespace cityLife.Controllers
             ViewBag.countries = db.Countries;
             var theEmployee = (Employee)Session["loggedinUser"];
             ViewBag.employee = theEmployee;
+            ViewBag.action = "Update";
             return View("s23addUpdateOrder");
         }
 
@@ -368,6 +369,7 @@ namespace cityLife.Controllers
             ViewBag.tBox = tBox;
             ViewBag.countries = db.Countries;
             ViewBag.orderData = theOrderData;
+            ViewBag.action = "Add";
             return View("s23addUpdateOrder");
         }
 
@@ -379,7 +381,7 @@ namespace cityLife.Controllers
         [HttpPost]
         public ActionResult s25addUpdateOrder(int orderId, int apartmentNumber, string Email, string Name, string Country, string Phone, string ArrivalTime,
             string SpecialRequest, DateTime CheckinDate, DateTime CheckoutDate, int Adults, int Children,  string Price, string Paid,
-            string BookedBy, string confirmationNumber, OrderStatus status)
+            string BookedBy, string confirmationNumber, OrderStatus status, Color orderColor, string staffComments)
         {
             //Perform validity checks on the input
 
@@ -424,7 +426,9 @@ namespace cityLife.Controllers
                 orderId = orderId,
                 paid = paidAmountM,
                 price = priceM,
-                status = status
+                status = status,
+                orderColor = orderColor,
+                staffComments = staffComments
             };
            
             var apartmentNumbers = from anApartment in db.Apartments
