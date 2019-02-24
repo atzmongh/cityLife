@@ -9,6 +9,7 @@
     DateTime today = ViewBag.today;
     List<List<DayBlock>> apartmentDayBlocks = ViewBag.apartmentDayBlocks;
     List<Money> revenuePerDay = ViewBag.revenuePerDay;
+    EmployeeWorkDay[] empWorkDaysArray = ViewBag.empWorkDaysArray;
 }
 
 <style>
@@ -183,24 +184,12 @@
                                 //This is a busy day (or days)
                                 string color = aDAyBlock.orderColor.ToString();
                                 string cssColor = "order" + color;   //e.g. orderRed, orderGreen - we prepared such CSS classes
-                                                                     //var backgroundColor = "";
-                                                                     //switch (aDAyBlock.orderStatus)
-                                                                     //{
-                                                                     //    case OrderStatus.Created:
-                                                                     //        backgroundColor = "orderCreated";
-                                                                     //        break;
-                                                                     //    case OrderStatus.CheckedIn:
-                                                                     //        backgroundColor = "orderCheckedin";
-                                                                     //        break;
-                                                                     //    case OrderStatus.CheckedOut:
-                                                                     //        backgroundColor = "orderCheckedout";
-                                                                     //        break;
-                                                                     //}
                                 <td class="dash02td @cssColor" colspan="@aDAyBlock.days" data-order-id="@aDAyBlock.orderId" onclick="showOrder(this)">@aDAyBlock.name <br /> @aDAyBlock.price.toMoneyString()</td>
                             }
                         }
                     </tr>
                 }
+                @*Revenu total line*@
                 <tr>
                     @{ var totalRevenue = new Money(0m, "UAH");}
                     @foreach(var aRevenue in revenuePerDay)
@@ -215,6 +204,26 @@
                             totalRevenue += aRevenue;
                             
 
+                        }
+                    }
+                </tr>
+
+                @*Maid on duty line*@
+                <tr>
+                    @foreach (var anEmpWorkDay in empWorkDaysArray)
+                    {
+                        if (anEmpWorkDay == null)
+                        {
+                            <td class="dash02td"></td>
+                        }
+                        else
+                        {
+                            string greenCss = "";
+                            if (anEmpWorkDay.isSalaryDay)
+                            {
+                                greenCss = "orderGreen";
+                            }
+                            <td class="dash02td @greenCss">@anEmpWorkDay.Employee.name</td>
                         }
                     }
                 </tr>

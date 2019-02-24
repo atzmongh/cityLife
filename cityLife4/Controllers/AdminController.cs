@@ -535,7 +535,10 @@ namespace cityLife.Controllers
             Test.startTestSeries("s21dashboard");
             StaffController theStaffController = new StaffController();
             List<Money> revenuePerDay = null;
-            var apartmentDayBlocks = theStaffController.s21dashboardPreparation(new DateTime(2018,9,20), ref revenuePerDay);
+            EmployeeWorkDay[] empWorkDaysArray = null;
+            var apartmentDayBlocks = theStaffController.s21dashboardPreparation(new DateTime(2018,9,20), 
+                ref revenuePerDay, 
+                ref empWorkDaysArray);
             int testNumber = 1;
             foreach(var anApartment in apartmentDayBlocks)
             {
@@ -552,11 +555,28 @@ namespace cityLife.Controllers
             {
                 if (!aRevenue.isZero())
                 {
-                    Test.check(testNumber, theDate.ToShortDateString() + " " + aRevenue.toMoneyString());
-                    testNumber++;
+                    Test.check(testNumber++, theDate.ToShortDateString() + " " + aRevenue.toMoneyString());
                 }
                
                 theDate = theDate.AddDays(1);
+            }
+            testNumber = 300;
+            foreach (var anEmpWorkDay in empWorkDaysArray)
+            {
+                
+                if (anEmpWorkDay != null)
+                {
+                    var empWorkDay = new
+                    {
+                        date = anEmpWorkDay.dateAndTime.ToShortDateString(),
+                        hours = anEmpWorkDay.hours,
+                        salary = anEmpWorkDay.salaryCents,
+                        isAlaryDay = anEmpWorkDay.isSalaryDay,
+                        empName = anEmpWorkDay.Employee.name
+                    };
+                    Test.checkJson(testNumber++, empWorkDay);
+                        
+                }
             }
 
 

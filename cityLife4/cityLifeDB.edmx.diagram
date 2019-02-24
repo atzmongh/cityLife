@@ -4,14 +4,14 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="413d876f0084455baeaf7d87ac2e25da" Name="Diagram1" >
+      <Diagram DiagramId="413d876f0084455baeaf7d87ac2e25da" Name="Diagram1" ZoomLevel="11" >
         <EntityTypeShape EntityType="cityLifeDB.Apartment" Width="1.5" PointX="4.125" PointY="0.75" />
         <EntityTypeShape EntityType="cityLifeDB.ApartmentPhoto" Width="1.75" PointX="4.625" PointY="4.5" />
         <AssociationConnector Association="cityLifeDB.ApartmentApartmentPhoto" />
         <EntityTypeShape EntityType="cityLifeDB.Pricing" Width="1.5" PointX="0.5" PointY="0.75" />
         <AssociationConnector Association="cityLifeDB.ApartmentPricing" />
         <EntityTypeShape EntityType="cityLifeDB.Language" Width="1.5" PointX="8.75" PointY="1" />
-        <EntityTypeShape EntityType="cityLifeDB.TranslationKey" Width="1.5" PointX="8.75" PointY="3.25" />
+        <EntityTypeShape EntityType="cityLifeDB.TranslationKey" Width="1.5" PointX="8.75" PointY="3.25" FillColor="255, 224, 192" />
         <EntityTypeShape EntityType="cityLifeDB.Translation" Width="1.5" PointX="6.5" PointY="1.125" />
         <AssociationConnector Association="cityLifeDB.TranslationKeyTranslatio" />
         <AssociationConnector Association="cityLifeDB.LanguageTranslation" />

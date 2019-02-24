@@ -142,9 +142,11 @@ namespace cityLife.Controllers
             {
                 DateTime fromDateOrNow = fromDate ?? FakeDateTime.DateNow;
                 List<Money> revenuePerDay = null;
-                var apartmentDayBlocks = s21dashboardPreparation(fromDateOrNow, ref revenuePerDay);
+                EmployeeWorkDay[] empWorkDaysArray = null;
+                var apartmentDayBlocks = s21dashboardPreparation(fromDateOrNow, ref revenuePerDay, ref empWorkDaysArray);
                 ViewBag.apartmentDayBlocks = apartmentDayBlocks;
                 ViewBag.revenuePerDay = revenuePerDay;
+                ViewBag.empWorkDaysArray = empWorkDaysArray;
                 TranslateBox tBox = this.setTbox("RU");
                 ViewBag.tBox = tBox;
                 ViewBag.fromDate = fromDateOrNow;
@@ -161,11 +163,16 @@ namespace cityLife.Controllers
         /// </summary>
         ///<param name="fromDate">starting date of the dashboard</param>
         ///<param name="revenuePerDay">An output parameter - will contain the list of revenues per day</param>
+        ///<param name="empWorkDaysArray">An array containing an employeeWorkDay record for each day in the month.
+        ///Days for which no record found - will be null. Days for which more than one recrod found - will contain
+        ///the last record. </param>
         /// <returns>List of apartment orders. For each apartment:
         /// list of DayBlocks.
         /// A dayBlock is either a single free day, or an order which can span 1 or more days. Note that a day block may not 
         /// be identical to the corresponding order because the order may start before the "fromDate" or end after the "fromDate+31".</returns>
-        public List<List<DayBlock>> s21dashboardPreparation(DateTime fromDate, ref List<Money> revenuePerDay)
+        public List<List<DayBlock>> s21dashboardPreparation(DateTime fromDate, 
+            ref List<Money> revenuePerDay, 
+            ref EmployeeWorkDay[] empWorkDaysArray)
         {
             //for each apartment
             //for each day from from_date to from_date+3
@@ -262,6 +269,20 @@ namespace cityLife.Controllers
                 apartmentDayBlocks.Add(dayBlocks);
             }
             //At this point the apartmentDayBlocks variable contaiins a list of list of day blocks 
+
+            //Calculate the list of employee work days. The list contains a single record for each day (or null, if no employee is assigned
+            //for that day). If 2 employees are assigned for the same day - only one is taken (the last one)
+            //empWorkDaysList = new List<EmployeeWorkDay>();
+            empWorkDaysArray = new EmployeeWorkDay[32];
+            var empWorkDays = from anEmpWorkDay in db.EmployeeWorkDays
+                              where anEmpWorkDay.dateAndTime >= fromDate && anEmpWorkDay.dateAndTime <= lastDate
+                              orderby anEmpWorkDay.dateAndTime
+                              select anEmpWorkDay;
+            foreach(var anEmpWorkDays in empWorkDays)
+            {
+                int dayNumber = (int)Math.Round((anEmpWorkDays.dateAndTime.Date - fromDate).TotalDays, 0);
+                empWorkDaysArray[dayNumber] = anEmpWorkDays;
+            }
             return apartmentDayBlocks;
 
         }
