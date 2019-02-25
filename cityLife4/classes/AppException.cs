@@ -30,7 +30,8 @@ namespace cityLife4
             {116, "the message contains either empty variable [], or something like: [asd[ (an open bracket inside a variable name). message is:{0}" },
             {117,"the money string contains an invalid currency symbol. money string is:{0}" },
             {118,"the money string could not be converted to decimal value. String is: {0}" },
-            {119, "order {0} could not be deleted." }
+            {119, "order {0} could not be deleted." },
+            {120, "translation box got a null translation key" }
 
 
         };

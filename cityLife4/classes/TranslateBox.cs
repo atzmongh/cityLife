@@ -66,6 +66,11 @@ namespace cityLife4
                                [CallerLineNumber] int lineNumber = 0,
                                [CallerFilePath]   string filePath = null)
         {
+            if (translationKey == null)
+            {
+                AppException.writeException(120, null, Environment.StackTrace);
+                return "";
+            }
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
             TranslationKey theTranslationKey =  db.TranslationKeys.SingleOrDefault(record => record.transKey == translationKey);
             if (theTranslationKey==null)

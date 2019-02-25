@@ -224,7 +224,7 @@ namespace cityLife.Controllers
 
             if (this.country == null || this.country == "")
             {
-                this.errorMessage.Add("country", "Please select country");
+                //this.errorMessage.Add("country", "Please select country");   //Country is not a mandatory field
             }
             else
             {
@@ -235,10 +235,10 @@ namespace cityLife.Controllers
                     this.errorMessage.Add("country", "This country does not exist in our country list");
                 }
             }
-            if (!OrderData.IsValidEmail(this.email))
-            {
-                this.errorMessage.Add("email", "Please enter a valid email address");
-            }
+            //if (!OrderData.IsValidEmail(this.email))    //email is not mandatory for now
+            //{
+            //    this.errorMessage.Add("email", "Please enter a valid email address");
+            //}
             if (!Regex.Match(this.phone, @"^(\+?[0-9]{10,13})$").Success)
             {
                 this.errorMessage.Add("phone", "Please enter a valid phone number");

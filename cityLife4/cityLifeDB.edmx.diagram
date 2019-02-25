@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="413d876f0084455baeaf7d87ac2e25da" Name="Diagram1" ZoomLevel="11" >
+      <Diagram DiagramId="413d876f0084455baeaf7d87ac2e25da" Name="Diagram1" ZoomLevel="100" >
         <EntityTypeShape EntityType="cityLifeDB.Apartment" Width="1.5" PointX="4.125" PointY="0.75" />
         <EntityTypeShape EntityType="cityLifeDB.ApartmentPhoto" Width="1.75" PointX="4.625" PointY="4.5" />
         <AssociationConnector Association="cityLifeDB.ApartmentApartmentPhoto" />

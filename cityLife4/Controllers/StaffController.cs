@@ -356,7 +356,8 @@ namespace cityLife.Controllers
                 apartmentNumber = apartmentNumber,
                 nights = Order.dateDifference(checkout, checkin),
                 adults = 2,
-                children = 0
+                children = 0,
+                country = "Not Specified"
             };
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
 
@@ -411,7 +412,7 @@ namespace cityLife.Controllers
             Money paidAmountM = new Money(Paid, "UAH");
 
             
-            TranslateBox tBox = new TranslateBox("UAH", "UAH", "dontShowAsterisks");
+            TranslateBox tBox = new TranslateBox("RU", "RU", "dontShowAsterisks");
             ViewBag.tBox = tBox;
 
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
