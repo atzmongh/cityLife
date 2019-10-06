@@ -255,6 +255,55 @@ namespace cityLife.Controllers
             }
             return this.a40translations();
         }
+
+        /// <summary>
+        /// This is an auxiliary method that uploads the country list from a CSV file into the country table. It gets a CSV file 
+        /// containing country name and code
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public string a50uploadCountries()
+        {
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+            StreamReader csvCountryFile = new StreamReader(Server.MapPath("/App_Data/country list.csv"));
+            using (TextFieldParser parser = new TextFieldParser(csvCountryFile))
+            {
+                parser.Delimiters = new string[]{","};
+                //Read all lines until end of file. Each line is expected to contain 2 fields - country name and country code
+                int addedCountries = 0;
+                int existingCountries = 0;
+                for (string[] lineFields = parser.ReadFields();
+                    lineFields!=null; 
+                    lineFields = parser.ReadFields())
+                {
+                    if (lineFields.Count() != 2)
+                    {
+                        throw new AppException(121, null, lineFields.Count(), lineFields.ToString());
+                    }
+                    string countryName = lineFields[0];
+                    string countryCode = lineFields[1];
+                    Country theCountry = new Country()
+                    {
+                        code = countryCode,
+                        name = countryName
+                    };
+                    if (db.Countries.Find(countryCode)!=null)
+                    {
+                        existingCountries++;
+                    }
+                    else
+                    {
+                        db.Countries.Add(theCountry);
+                        addedCountries++;
+                        db.SaveChanges();
+                    }
+                   
+                }
+                return "countries added:" + addedCountries + " coungtries existing:"+existingCountries;
+            }
+            
+
+        }
         /// <summary>
         /// The function reads the CSV file that contains the DB content and creates SQL statements to populate it
         /// Then it executes this SQL and populates the DB

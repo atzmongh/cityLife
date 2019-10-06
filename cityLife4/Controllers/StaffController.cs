@@ -484,16 +484,16 @@ namespace cityLife.Controllers
                     ViewBag.theOrder = theOrder;
                     ViewBag.apartmentAndPrice = apartmentAndPrice;
 
-                    //if (theOrder.Guest.email != null && theOrder.Guest.email != "")
-                    //{
-                    //    EmailMessage mailToCustomer = new EmailMessage(
-                    //    to: theOrder.Guest.email,
-                    //    subject: tBox.translate("Welcome to Kharkov Apartments City Life"),
-                    //    mailName: "t10welcomeMail",
-                    //    theController: this
-                    //    );
-                    //    mailToCustomer.send();
-                    //}
+                    if (theOrder.Guest.email != null && theOrder.Guest.email != "")
+                    {
+                        EmailMessage mailToCustomer = new EmailMessage(
+                        to: theOrder.Guest.email,
+                        subject: tBox.translate("Welcome to Kharkov Apartments City Life"),
+                        mailName: "t10welcomeMail",
+                        theController: this
+                        );
+                        mailToCustomer.send();
+                    }
                     return View("s28bookingSuccess");
                 }
             }
@@ -555,6 +555,7 @@ namespace cityLife.Controllers
 
 
         }
+       
         /// <summary>
         /// This method is an auxiliary method to create the translation box and to insert it if needed to the Session variable
         /// It was copied from the public controller. A more elegant solution would be to create one method that will get the 
@@ -572,7 +573,7 @@ namespace cityLife.Controllers
             {
                 //Create a new translateBox object and save in session
                 tBox = new TranslateBox(targetLanguageCode: "EN",
-                                        defaultLanguageCode: "RU",
+                                        defaultLanguageCode: "EN",
                                         noTranslation: WebConfigurationManager.AppSettings["noTranslations"]);
                 Session["tBox"] = tBox;
             }

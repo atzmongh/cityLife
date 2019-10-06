@@ -44,20 +44,21 @@
 <body>
     <main>
         <h2>Admin panel</h2>
-        <aside class="main-sidebar">
+        @*<aside class="main-sidebar">
             <div class="holder">
-                <div class="helper-outer">
+                <div class="helper-outer">*@
                     <header>
                         <ul class="main-menu">
                             <li class="active"><a href="/admin/a10uploadDB">upload DB</a></li>
                             <li><a href="/admin/a20unitTests">Unit Tests</a></li>
                             <li><a href="/admin/a30fakeTime">Fake Time</a></li>
                             <li><a href="/admin/a40translations">Translations</a></li>
+                            <li><a href="/admin/a50uploadCountries">upload countries</a></li>
                         </ul>
                     </header>
-                </div>
+                @*</div>
             </div>
-        </aside>
+        </aside>*@
         <div class="main-wrapper">
             @RenderBody()
         </div>
