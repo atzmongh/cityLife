@@ -34,11 +34,19 @@ namespace cityLife4
         /// <summary>
         /// The constructor gets a string containing: $1,234.56. If currencyCode exists - uses it as the currency, regardless if thre is a currency symbol 
         /// or not. If not - creates the currency based on the symbol. If symbol does not exist, or it is an unknown symbol - aborts
+        /// Note that empty string will be converted to 0
         /// </summary>
         /// <param name="moneyString"></param>
         /// <param name="currencyCode"></param>
         public Money (string moneyString, string currencyCode=null)
         {
+            if (moneyString == "" || moneyString == null)
+            {
+                this.amount = 0;
+                this.currencyCode = currencyCode;
+                return;
+            }
+            //The string is not empty
             char firstChar = moneyString[0];
             if (firstChar<'0' || firstChar > '9')
             {

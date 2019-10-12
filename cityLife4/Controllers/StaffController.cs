@@ -357,7 +357,7 @@ namespace cityLife.Controllers
                 nights = Order.dateDifference(checkout, checkin),
                 adults = 2,
                 children = 0,
-                country = "Not Specified"
+                country = ""
             };
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
 
@@ -375,14 +375,14 @@ namespace cityLife.Controllers
             if (thePrice.availability != Availability.AVAILABLE)
             {
                 //The apartment is not available for that period. 
-                theOrderData.price = new Money(0m, "UAH");
+                theOrderData.price = "0";
             }
             else
             {
-                theOrderData.price = thePrice.pricePerStay;
+                theOrderData.price = thePrice.pricePerStay.toMoneyString();
             }
 
-            theOrderData.paid = new Money(0m, "UAH");
+            theOrderData.paid = "0";
             var apartmentNumbers = from anApartment in db.Apartments
                                    select anApartment.number;
             ViewBag.apartmentNumbers = apartmentNumbers;
@@ -408,8 +408,8 @@ namespace cityLife.Controllers
             //Perform validity checks on the input
 
 
-            Money priceM = new Money(Price, "UAH");  //Default currency is UAH, if the currency symbol does not exist.
-            Money paidAmountM = new Money(Paid, "UAH");
+
+          
 
             
             TranslateBox tBox = new TranslateBox("RU", "RU", "dontShowAsterisks");
@@ -446,8 +446,8 @@ namespace cityLife.Controllers
                 confirmationNumber = confirmationNumber,
                 nights = nights,
                 orderId = orderId,
-                paid = paidAmountM,
-                price = priceM,
+                paid = Paid,
+                price = Price,
                 status = status,
                 orderColor = orderColor,
                 staffComments = staffComments
@@ -465,10 +465,12 @@ namespace cityLife.Controllers
             {
                 //The form is valid - create the booking order
                 //Check if the booking request is still valid.
+                Money priceM = new Money(Price, "UAH");  //Default currency is UAH, if the currency symbol does not exist.
+                Money paidAmountM = new Money(Paid, "UAH");
 
                 Currency currentCurrency = db.Currencies.Single(a => a.currencyCode == "UAH");   //The staff application works currently only with UAH
                 ApartmentPrice apartmentAndPrice = PublicController.calculatePricePerStayForApartment(theAparatment, db, theBookingRequest, currentCurrency,orderId);
-                Country theCountry = db.Countries.Single(a => a.name == Country);
+                Country theCountry = db.Countries.SingleOrDefault(a => a.name == Country);
                 if (apartmentAndPrice.availability == Availability.OCCUPIED)
                 {
                     //the apartment is not available, although it seemed to be available. Perhaps it was taken in the last minutes

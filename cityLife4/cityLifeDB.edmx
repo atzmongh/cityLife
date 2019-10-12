@@ -255,7 +255,7 @@
     <Property Name="name" Type="nvarchar(max)" Nullable="false" />
     <Property Name="phone" Type="nvarchar(max)" Nullable="false" />
     <Property Name="email" Type="nvarchar(max)" Nullable="false" />
-    <Property Name="Country_code" Type="nchar" MaxLength="3" Nullable="false" />
+    <Property Name="Country_code" Type="nchar" MaxLength="3" Nullable="true" />
   </EntityType>
   <EntityType Name="Employees">
     <Key>
@@ -457,7 +457,7 @@
     </ReferentialConstraint>
   </Association>
   <Association Name="CountryGuest">
-    <End Role="Country" Type="cityLifeDB.Store.Countries" Multiplicity="1" />
+    <End Role="Country" Type="cityLifeDB.Store.Countries" Multiplicity="0..1" />
     <End Role="Guest" Type="cityLifeDB.Store.Guests" Multiplicity="*" />
     <ReferentialConstraint>
       <Principal Role="Country">
@@ -903,7 +903,7 @@
           <NavigationProperty Name="Guests" Relationship="cityLifeDB.CountryGuest" FromRole="Country" ToRole="Guest" />
         </EntityType>
         <Association Name="CountryGuest">
-          <End Type="cityLifeDB.Country" Role="Country" Multiplicity="1" />
+          <End Type="cityLifeDB.Country" Role="Country" Multiplicity="0..1" />
           <End Type="cityLifeDB.Guest" Role="Guest" Multiplicity="*" />
         </Association>
         <EnumType Name="Color">
@@ -1255,6 +1255,7 @@
       <EndProperty Name="Guest">
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
+      <Condition ColumnName="Country_code" IsNull="false" />
     </AssociationSetMapping>
     <AssociationSetMapping Name="EmployeeEmployeeWorkDay" TypeName="cityLifeDB.EmployeeEmployeeWorkDay" StoreEntitySet="EmployeeWorkDays">
       <EndProperty Name="Employee">

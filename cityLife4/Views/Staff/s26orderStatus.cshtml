@@ -59,7 +59,7 @@
     </div>
 </div>
 
-@Html.inputField("paid", theOrderData.paid.toMoneyString(), theOrderData.errorMessageOf("paid", tBox), tBox, style: "width:48%")
+@Html.inputField("paid", theOrderData.paid, theOrderData.errorMessageOf("paid", tBox), tBox, style: "width:48%")
 
 <input type="submit" class="btn small-button" value='@tBox.translate(action)' />
 <a class="btn" style=" min-width: 90px;height: auto;margin: 5px;" href="/staff/s21Dashboard">@tBox.translate("Cancel")</a>

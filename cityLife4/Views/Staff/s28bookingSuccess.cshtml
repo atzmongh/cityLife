@@ -21,13 +21,16 @@
     <br />
     <div style="border-bottom: 2px solid #EEF3F7;"></div>
     <br />
+    <span style="float:left">@tBox.translate("Name")</span>
+    <span style="float:right">@theOrder.Guest.name </span>
+    <br />
     <span style="float:left">@tBox.translate("Checkin Date")</span>
     <span style="float:right">@theOrder.checkinDate.ToShortDateString() </span>
     <br />
     <span style="float:left">@tBox.translate("Checkout Date")</span>
     <span style="float:right">@theOrder.checkoutDate.ToShortDateString() </span>
     <br />
-    
+
     <span style="float:left">@tBox.translate("Guests")</span>
     <span style="float:right">@theOrder.adultCount </span>
     <br />

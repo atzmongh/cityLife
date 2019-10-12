@@ -161,8 +161,8 @@ namespace cityLife.Controllers
         public DateTime checkin;
         public DateTime checkout;
         public int nights;
-        public Money price;
-        public Money paid;
+        public string price;
+        public string paid;
         public string expectedArrival;
         public string comments;
         public string bookedBy;
@@ -175,7 +175,7 @@ namespace cityLife.Controllers
         public OrderData()
         {
             status = OrderStatus.Created;
-            paid = new Money(0m,"UAH");
+            paid = "0";
             confirmationNumber = "0";
             orderColor = Color.Red;
         }
@@ -191,8 +191,8 @@ namespace cityLife.Controllers
             checkin = anOrder.checkinDate;
             checkout = anOrder.checkoutDate;
             nights = anOrder.nights;
-            price = anOrder.priceAsMoney();
-            paid = anOrder.amountPaidAsMoney();
+            price = anOrder.priceAsMoney().toMoneyString();
+            paid = anOrder.amountPaidAsMoney().toMoneyString();
             expectedArrival = anOrder.expectedArrival;
             comments = anOrder.specialRequest;
             bookedBy = anOrder.bookedBy;
@@ -255,6 +255,25 @@ namespace cityLife.Controllers
             {
                 this.errorMessage.Add("checkin", "Checkout date cannot be before or equal to checkin date");
             }
+            try
+            {
+                Money priceM = new Money(this.price);
+            }
+            catch(AppException)
+            {
+                //The price amount could not be converted to Money - it is not legal as money (either the currency does not exist or non numeric
+                this.errorMessage.Add("price", "Invalid price");
+            }
+            try
+            {
+                Money paidM = new Money(this.paid);
+            }
+            catch (AppException)
+            {
+                //The paid amount could not be converted to Money - it is not legal as money (either the currency does not exist or non numeric
+                this.errorMessage.Add("paid", "Invalid amount");
+            }
+
             return errorMessage.Count() == 0;
         }
     }
@@ -389,7 +408,7 @@ namespace cityLife.Controllers
 
                 Currency currentCurrency = (Currency)Session["currentCurrency"];
                 ApartmentPrice apartmentAndPrice = calculatePricePerStayForApartment(theAparatment, db, theBookingRequest, currentCurrency);
-                theOrderData.price = apartmentAndPrice.pricePerStay;
+                theOrderData.price = apartmentAndPrice.pricePerStay.toMoneyString();
                 theOrderData.apartmentNumber = apartmentAndPrice.theApartment.number;
 
                 Country theCountry = db.Countries.Single(a => a.name == Country);
@@ -474,7 +493,7 @@ namespace cityLife.Controllers
             //in "free" status. Now we can add/update the order record and add/update the apartment days records.
 
             theOrder.adultCount = (int)theBookingRequest.adults;
-            theOrder.amountPaid = theOrderData.paid.toCents();
+            theOrder.amountPaid = new Money(theOrderData.paid,"UAH").toCents();  //Convert to Money and then to integer in cents.
             theOrder.Apartment = apartmentAndPrice.theApartment;
             theOrder.bookedBy = theOrderData.bookedBy;
             theOrder.checkinDate = (DateTime)theBookingRequest.checkinDate;
@@ -485,7 +504,7 @@ namespace cityLife.Controllers
             theOrder.specialRequest = theOrderData.comments;
             theOrder.status = theOrderData.status;
             theOrder.dayCount = dayCount;
-            theOrder.price = theOrderData.price.toCents();   //Note that we take the price from orderData and not from apartmentAndPrice. IN the staff app - the 
+            theOrder.price = new Money(theOrderData.price,"UAH").toCents();   //Note that we take the price from orderData and not from apartmentAndPrice. IN the staff app - the 
                                                              //price is determined by the admin and it can be different than the automatic calculation
             theOrder.Guest = theGuest;
             theOrder.Currency = theCurrency;

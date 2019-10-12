@@ -32,7 +32,9 @@ namespace cityLife4
             {118,"the money string could not be converted to decimal value. String is: {0}" },
             {119, "order {0} could not be deleted." },
             {120, "translation box got a null translation key" },
-            {121, "country list file should have exactly 2 fields. Line contains {0} fields. Line content:{1}" }
+            {121, "country list file should have exactly 2 fields. Line contains {0} fields. Line content:{1}" },
+            {122, "mail could not be sent. to:{0} mail name:{1}" }
+
 
 
         };

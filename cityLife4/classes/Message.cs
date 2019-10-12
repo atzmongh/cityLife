@@ -106,11 +106,13 @@ namespace cityLife4
     {
         private string to;
         private string subject;
+        private string mailName;
         private string body;
         public EmailMessage(string to, string subject, string mailName, Controller theController) 
         {
             this.to = to;
             this.subject = subject;
+            this.mailName = mailName;
             var context = theController.ControllerContext;
             context.Controller.ViewData.Model = null;
             using (var sw = new StringWriter())
@@ -142,7 +144,16 @@ namespace cityLife4
                 smtp.Host = "smtp.gmail.com";
                 smtp.Port = 587;
                 smtp.EnableSsl = true;
-                smtp.Send(message);
+                try
+                {
+                    smtp.Send(message);
+                }
+                catch(Exception e)
+                {
+                    //Send mail failed - continue working, but write error message to the log
+                    AppException.writeException(122, e, null, this.to, this.mailName);
+                }
+                
             }
         }
     }

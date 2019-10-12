@@ -2,13 +2,13 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 02/23/2019 20:02:21
+-- Date Created: 10/12/2019 20:01:17
 -- Generated from EDMX file: C:\software\cityLife\cityLife4\cityLifeDB.edmx
 -- --------------------------------------------------
 
 SET QUOTED_IDENTIFIER OFF;
 --GO
---USE [C:\SOFTWARE\CITYLIFEDB8.MDF];
+USE [C:\SOFTWARE\CITYLIFEDB8.MDF];
 --GO
 IF SCHEMA_ID(N'dbo') IS NULL EXECUTE(N'CREATE SCHEMA [dbo]');
 --GO
@@ -289,7 +289,7 @@ CREATE TABLE [dbo].[Guests] (
     [name] nvarchar(max)  NOT NULL,
     [phone] nvarchar(max)  NOT NULL,
     [email] nvarchar(max)  NOT NULL,
-    [Country_code] nchar(3)  NOT NULL
+    [Country_code] nchar(3)  NULL
 );
 --GO
 
