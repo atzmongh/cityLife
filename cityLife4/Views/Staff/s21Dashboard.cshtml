@@ -10,6 +10,7 @@
     List<List<DayBlock>> apartmentDayBlocks = ViewBag.apartmentDayBlocks;
     List<Money> revenuePerDay = ViewBag.revenuePerDay;
     EmployeeWorkDay[] empWorkDaysArray = ViewBag.empWorkDaysArray;
+    int highlightOrderId = ViewBag.highlightOrderId;
 }
 
 <style>
@@ -128,13 +129,15 @@
             @tBox.translate("Dashboard")
             <span>(@fromDateSt)</span>
             <label for="datepickerBtn" class="datepicker-btn">
-                <input type="text" readonly="readonly" id="datepickerBtn" name="fromDate" class="call-datepicker" onchange="changeFromDate()">
+                <input type="text" readonly="readonly" id="datepickerBtn" name="fromDate" class="call-datepicker" 
+                       onchange="$('#fromDateForm').submit()">
             </label>
         </div>
     </form>
 
 
-
+    
+    <span id="highlightOrderId" data-order-id="@highlightOrderId"></span>  <!--keep the order which needs to be highlighted (or 0 if none -->
     <div style="display:flex">
         <div class="dash01">
             <table>
@@ -184,7 +187,8 @@
                                 //This is a busy day (or days)
                                 string color = aDAyBlock.orderColor.ToString();
                                 string cssColor = "order" + color;   //e.g. orderRed, orderGreen - we prepared such CSS classes
-                                <td class="dash02td @cssColor" colspan="@aDAyBlock.days" data-order-id="@aDAyBlock.orderId" onclick="showOrder(this)">@aDAyBlock.name <br /> @aDAyBlock.price.toMoneyString()</td>
+                                <td class="dash02td @cssColor" colspan="@aDAyBlock.days" data-order-id="@aDAyBlock.orderId" id="@aDAyBlock.orderId" 
+                                    onclick="showOrder(this)">@aDAyBlock.name <br /> @aDAyBlock.price.toMoneyString()</td>
                             }
                         }
                     </tr>
@@ -252,12 +256,10 @@
 </div>
 
 <script>
-    function changeFromDate() {
-        $("#fromDateForm").submit();
-    }
-    $(document).ready(initializeDatePicker);
+    $(document).ready(initialize);
 
-    function initializeDatePicker() {
+    function initialize() {
+        //Initialize date picker
         $("#fromDate")
             .datepicker({
                 defaultDate: "+0d",
@@ -265,6 +267,13 @@
                 dateFormat: "d MM, yy",
                 firstDay: 1
             });
+        //highlight the default order (if it should be highlighted)
+        var orderId = document.getElementById("highlightOrderId").dataset.orderId;
+        if (orderId != 0) {
+            var td = document.getElementById(orderId);
+            showOrder(td);  //We do the same as if a user would click on an occupied cell.
+        }
+
     }
 
     var lastSelectedTd = null;

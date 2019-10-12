@@ -132,6 +132,15 @@ namespace cityLife.Controllers
         [HttpGet]
         public ActionResult s21Dashboard(DateTime? fromDate)
         {
+            //Keep the starting date of the dashboard. It will be used when updating the dashboard.
+            if (fromDate != null)
+            {
+                Session["fromDate"] = fromDate;
+            }
+            else
+            {
+                Session["fromDate"] = FakeDateTime.DateNow;
+            }
             Employee theEmployee = (Employee)Session["loggedinUser"];
             if (theEmployee == null)
             {
@@ -153,8 +162,17 @@ namespace cityLife.Controllers
                 ViewBag.today = FakeDateTime.Now;
 
                 ViewBag.employee = theEmployee;
+                if (Session["lastOrderDetails"] != null){
+                    ViewBag.highlightOrderId = (int)Session["lastOrderDetails"];
+                }
+                else
+                {
+                    ViewBag.highlightOrderId = 0;
+                }
                 return View("s21Dashboard");
             }
+            
+
 
         }
 
@@ -289,6 +307,7 @@ namespace cityLife.Controllers
         [HttpGet]
         public PartialViewResult s22OrderDetails(int orderId)
         {
+            Session["lastOrderDetails"] = orderId;  //Keep the data so we know which order to highlight
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
             var theOrder = db.Orders.Single(a => a.Id == orderId);
             OrderData theOrderData = new OrderData(theOrder);
@@ -406,12 +425,6 @@ namespace cityLife.Controllers
             string BookedBy, string confirmationNumber, OrderStatus status, Color orderColor, string staffComments)
         {
             //Perform validity checks on the input
-
-
-
-          
-
-            
             TranslateBox tBox = new TranslateBox("RU", "RU", "dontShowAsterisks");
             ViewBag.tBox = tBox;
 
@@ -496,7 +509,20 @@ namespace cityLife.Controllers
                         );
                         mailToCustomer.send();
                     }
-                    return View("s28bookingSuccess");
+
+                    if (orderId == 0)
+                    {
+                        //This is a new order - display the "booking success" screen
+                        return View("s28bookingSuccess");
+                    }
+                    else
+                    {
+                        //This is an order update - show the grid, where this order will be highlighted. (TBD)
+                        string fromDate = ((DateTime)Session["fromDate"]).ToString("yyyy/MM/dd");
+                        Response.Redirect("/staff/s21Dashboard?fromDate="+fromDate);
+                        return View();   //fictitious, as the server.transfer moves control to another controller
+                    }
+                    
                 }
             }
         }

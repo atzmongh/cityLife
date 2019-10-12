@@ -185,7 +185,15 @@ namespace cityLife.Controllers
             name = anOrder.Guest.name;
             phone = anOrder.Guest.phone;
             email = anOrder.Guest.email;
-            country = anOrder.Guest.Country.name;
+            Country guestCountry = anOrder.Guest.Country;
+            if (guestCountry == null)
+            {
+                country = null;
+            }
+            else
+            {
+                country = guestCountry.name;
+            }
             adults = anOrder.adultCount;
             children = anOrder.childrenCount;
             checkin = anOrder.checkinDate;
