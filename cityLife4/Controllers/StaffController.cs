@@ -398,10 +398,10 @@ namespace cityLife.Controllers
             }
             else
             {
-                theOrderData.price = thePrice.pricePerStay.toMoneyString();
+                theOrderData.price = thePrice.pricePerStay.toMoneyString(showCents:false);
             }
 
-            theOrderData.paid = "0";
+            theOrderData.paid = "";
             var apartmentNumbers = from anApartment in db.Apartments
                                    select anApartment.number;
             ViewBag.apartmentNumbers = apartmentNumbers;
@@ -586,7 +586,7 @@ namespace cityLife.Controllers
             
             //If the apartment is occupied, the price will be null. Replace it with 0
             Money thePrice = apartmentAndPrice.pricePerStay == null ? new Money(0m, "UAH") : apartmentAndPrice.pricePerStay;
-            var priceInfo = new { price = thePrice.toMoneyString(), availability = availabilityName, nights = apartmentAndPrice.nightCount };
+            var priceInfo = new { price = thePrice.toMoneyString(showCents:false), availability = availabilityName, nights = apartmentAndPrice.nightCount };
             JsonResult jResult = Json(priceInfo, JsonRequestBehavior.AllowGet);
             return jResult;
 

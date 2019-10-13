@@ -89,6 +89,14 @@
             firstDay: 1
         });
     });
+
+    function statusChanged(select) {
+        if (select.value == "@OrderStatus.CheckedIn.ToString()" || select.value == "@OrderStatus.CheckedOut.ToString()") {
+            //The status has changed to checked in or checked out - change the "paid" amount to be equal to the price amount
+            var price = $("#price").val();
+            $("#paid").val(price);
+        }
+    }
     
 </script>
 

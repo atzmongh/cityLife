@@ -31,13 +31,13 @@
 <span style="float:right">@theOrderData.country</span>
 <br />
 <span style="float:left">@tBox.translate("Guests")</span>
-<span style="float:right">@theOrderData.adults,@theOrderData.children</span>
+<span style="float:right">@theOrderData.adults+@theOrderData.children</span>
 <br />
 <span style="float:left">@tBox.translate("Checkn")</span>
-<span style="float:right">@theOrderData.checkin.ToShortDateString()</span>
+<span style="float:right">@theOrderData.checkin.ToString("dd/MM/yyyy")</span>
 <br />
 <span style="float:left">@tBox.translate("Checkout")</span>
-<span style="float:right">@theOrderData.checkout.ToShortDateString()</span>
+<span style="float:right">@theOrderData.checkout.ToString("dd/MM/yyyy")</span>
 <br />
 <span style="float:left">@tBox.translate("Price")</span>
 <span style="float:right">@theOrderData.price</span>

@@ -100,6 +100,9 @@
     .today {
         background-color: brown;
     }
+    .weekend {
+        background-color: orange
+    }
 
     .hidden {
         display: none;
@@ -159,7 +162,15 @@
                     @for (DateTime aDate = fromDate; aDate < lastDate; aDate = aDate.AddDays(1))
                     {
                         string todaysBackground = (aDate.Date == today.Date ? "today" : "");  //Check if the date is today - put a different color
-                        <th class="dash02th @todaysBackground">@aDate.ToString("dd/MM")</th>
+                        string weekendBackground = "";
+                        if (aDate.Date.DayOfWeek == DayOfWeek.Sunday || aDate.Date.DayOfWeek == DayOfWeek.Saturday)
+                        {
+                            //This is a weekend - highlight the column header in orange
+                            weekendBackground = "weekend";
+                        }
+                        DayOfWeek d;
+
+                        <th class="dash02th @weekendBackground @todaysBackground">@aDate.ToString("dd/MM")</th>
                     }
                 </tr>
                 <tr>
@@ -188,7 +199,7 @@
                                 string color = aDAyBlock.orderColor.ToString();
                                 string cssColor = "order" + color;   //e.g. orderRed, orderGreen - we prepared such CSS classes
                                 <td class="dash02td @cssColor" colspan="@aDAyBlock.days" data-order-id="@aDAyBlock.orderId" id="@aDAyBlock.orderId" 
-                                    onclick="showOrder(this)">@aDAyBlock.name <br /> @aDAyBlock.price.toMoneyString()</td>
+                                    onclick="showOrder(this)">@aDAyBlock.name <br /> @aDAyBlock.price.toMoneyString(showCents:false)</td>
                             }
                         }
                     </tr>
@@ -236,7 +247,7 @@
         </div>
     </div>
     <div style="padding:2px;">@tBox.translate("Total revenue"):@totalRevenue.toMoneyString(showCents:false)</div>
-    <div style="padding:4px" id="s22OrderDetails">
+    <div style="padding:4px;max-width:400px;" id="s22OrderDetails">
 
 
     </div>

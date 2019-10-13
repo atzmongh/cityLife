@@ -199,8 +199,8 @@ namespace cityLife.Controllers
             checkin = anOrder.checkinDate;
             checkout = anOrder.checkoutDate;
             nights = anOrder.nights;
-            price = anOrder.priceAsMoney().toMoneyString();
-            paid = anOrder.amountPaidAsMoney().toMoneyString();
+            price = anOrder.priceAsMoney().toMoneyString(showCents:false);
+            paid = anOrder.amountPaidAsMoney().toMoneyString(showCents:false);
             expectedArrival = anOrder.expectedArrival;
             comments = anOrder.specialRequest;
             bookedBy = anOrder.bookedBy;
@@ -224,6 +224,11 @@ namespace cityLife.Controllers
             }
         }
 
+        /// <summary>
+        /// The function checks the booking data for validity. There is a difference if the booking was made by a guest or by admin.
+        /// If by guest - there will be more checks then if done by admin.
+        /// </summary>
+        /// <returns></returns>
         public override bool isValid()
         {
             this.errorMessage.Clear();
@@ -232,28 +237,37 @@ namespace cityLife.Controllers
                 this.errorMessage.Add("name", "Please enter name");
             }
 
-            if (this.country == null || this.country == "")
+            if (this.country == "" && this.bookedBy == "Guest")
             {
-                //this.errorMessage.Add("country", "Please select country");   //Country is not a mandatory field
+                //A guest must specify country
+                this.errorMessage.Add("country", "Please select country");   
+            }
+            else if (this.country == "")
+            {
+                //Booking was done by admin and not by a guest - it is OK not to have country
             }
             else
             {
+                //Cuntry is not empty - check that it exists in our DB
                 cityLifeDBContainer1 db = new cityLifeDBContainer1();
                 Country theCountry = db.Countries.SingleOrDefault(a => a.name == this.country);
                 if (theCountry == null)
                 {
+                    //Although we do not expect such a case, as our country list contains all countries, and the user can only choose from the list
                     this.errorMessage.Add("country", "This country does not exist in our country list");
                 }
             }
-            if (this.email != null && this.email != "" && !OrderData.IsValidEmail(this.email))    //email was entered but it is invalid
+            if (this.bookedBy == "Guest" && !OrderData.IsValidEmail(this.email))    //Email is mandatory for a guest, but not for admin
             {
                 this.errorMessage.Add("email", "Please enter a valid email address");
             }
-            if (!Regex.Match(this.phone, @"^(\+?[0-9]{10,13})$").Success)
+            //When a guest enters a phone number - it should be between 10 to 13 digits. no special characters allowed in the number.
+            //THIS IS AN INTERIM SOLUTION - WE SHOULD LOOK FOR A SUITABLE LIBRARY TO VALIDATE PHONE NUMBER
+            if (this.bookedBy == "Guest" && !Regex.Match(this.phone, @"^(\+?[0-9]{10,13})$").Success)
             {
                 this.errorMessage.Add("phone", "Please enter a valid phone number");
             }
-            if (adults <= 1)
+            if (adults < 1)
             {
                 this.errorMessage.Add("adults", "Number of adults must be at least 1");
             }
