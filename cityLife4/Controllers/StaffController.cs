@@ -427,6 +427,15 @@ namespace cityLife.Controllers
             //Perform validity checks on the input
             TranslateBox tBox = new TranslateBox("RU", "RU", "dontShowAsterisks");
             ViewBag.tBox = tBox;
+            if (orderId == 0)
+            {
+                //This is a new order
+                ViewBag.action = "Add";
+            }
+            else
+            {
+                ViewBag.action = "Update";
+            }
 
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
             Apartment theAparatment = db.Apartments.Single(anApartment => anApartment.number == apartmentNumber);

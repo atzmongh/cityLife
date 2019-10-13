@@ -210,6 +210,7 @@ namespace cityLife.Controllers
             orderColor = anOrder.OrderColor;
             staffComments = anOrder.staffComments;
         }
+
         private static bool IsValidEmail(string email)
         {
             try
@@ -222,6 +223,7 @@ namespace cityLife.Controllers
                 return false;
             }
         }
+
         public override bool isValid()
         {
             this.errorMessage.Clear();
@@ -243,10 +245,10 @@ namespace cityLife.Controllers
                     this.errorMessage.Add("country", "This country does not exist in our country list");
                 }
             }
-            //if (!OrderData.IsValidEmail(this.email))    //email is not mandatory for now
-            //{
-            //    this.errorMessage.Add("email", "Please enter a valid email address");
-            //}
+            if (this.email != null && this.email != "" && !OrderData.IsValidEmail(this.email))    //email was entered but it is invalid
+            {
+                this.errorMessage.Add("email", "Please enter a valid email address");
+            }
             if (!Regex.Match(this.phone, @"^(\+?[0-9]{10,13})$").Success)
             {
                 this.errorMessage.Add("phone", "Please enter a valid phone number");
