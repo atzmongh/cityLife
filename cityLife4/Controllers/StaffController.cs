@@ -46,22 +46,20 @@ namespace cityLife.Controllers
     }
     /// <summary>
     /// A day block is either a single free day, or a group of occupied days for a single apartment and a single guest.
-    /// OrderStatus - Created (guest did not arrive yet), checkedIn (guest is now in the apartment), checkedOut (guest left the apartment), null (free)
-    /// name - gueset name or empty (if free)
-    /// days - number of days of that order.
-    /// orderId - 
+    /// it adds 2 properties:
+    /// days - that may be different than the "nights" property of OrderData, because if the report starts after the beginning or ends before the
+    /// end of the order - the "days" property will reflect the number of days the order will be shown in the report.
+    /// firstDate - the first date in the report. May not be the same as checkIn property
+    ///  
     /// </summary>
-    public class DayBlock
+    public class DayBlock:OrderData
     {
-        public int apartmentNumber;
-        public OrderStatus? orderStatus;
-        public string name;
+        public DayBlock()
+        { }
+        public DayBlock(Order anOrder) : base(anOrder)
+        { }
         public int days;
-        public int orderId;
         public string firstDate;
-        public Money price;
-        public Color orderColor;
-        public string comments;
     }
 
 
@@ -128,9 +126,12 @@ namespace cityLife.Controllers
         /// or since today. (the default)
         /// </summary>
         /// <param name="fromDate">Date entered in the date picker, or null</param>
+        /// <param name="wideDashboard">When "on" means that the user wants to get the wide version of the dashboard.
+        /// In this mode, each column is wider (about 4 normal columns), we show only 3 days, and we put more data into\
+        /// each order element.</param>
         /// <returns></returns>
         [HttpGet]
-        public ActionResult s21Dashboard(DateTime? fromDate)
+        public ActionResult s21Dashboard(DateTime? fromDate, string wideDashboard="off")
         {
             //Keep the starting date of the dashboard. It will be used when updating the dashboard.
             if (fromDate != null)
@@ -139,7 +140,18 @@ namespace cityLife.Controllers
             }
             else
             {
-                Session["fromDate"] = FakeDateTime.DateNow;
+                Session["fromDate"] = FakeDateTime.DateNow.AddDays(-1);  //The default starting date of the dashboard is yesterday. So we can see
+                                                                         //people who check out today
+            }
+            //In normal mode - we display a full month. In wide mode - we display only 3 days (by default - yesterday, today and tomorrow)
+            int dashboardDays;
+            if (wideDashboard == "off")
+            {
+                dashboardDays = 31;
+            }
+            else
+            {
+                dashboardDays = 3;
             }
             Employee theEmployee = (Employee)Session["loggedinUser"];
             if (theEmployee == null)
@@ -149,10 +161,10 @@ namespace cityLife.Controllers
             }
             else
             {
-                DateTime fromDateOrNow = fromDate ?? FakeDateTime.DateNow;
+                DateTime fromDateOrNow = fromDate ?? FakeDateTime.DateNow.AddDays(-1);   //start from yesterday by default
                 List<Money> revenuePerDay = null;
                 EmployeeWorkDay[] empWorkDaysArray = null;
-                var apartmentDayBlocks = s21dashboardPreparation(fromDateOrNow, ref revenuePerDay, ref empWorkDaysArray);
+                var apartmentDayBlocks = s21dashboardPreparation(fromDateOrNow, dashboardDays, ref revenuePerDay, ref empWorkDaysArray);
                 ViewBag.apartmentDayBlocks = apartmentDayBlocks;
                 ViewBag.revenuePerDay = revenuePerDay;
                 ViewBag.empWorkDaysArray = empWorkDaysArray;
@@ -160,6 +172,8 @@ namespace cityLife.Controllers
                 ViewBag.tBox = tBox;
                 ViewBag.fromDate = fromDateOrNow;
                 ViewBag.today = FakeDateTime.Now;
+                ViewBag.wideDashboard = wideDashboard == "on" ? "checked" : "";
+                ViewBag.dashboardDays = dashboardDays;
 
                 ViewBag.employee = theEmployee;
                 if (Session["lastOrderDetails"] != null){
@@ -177,9 +191,11 @@ namespace cityLife.Controllers
         }
 
         /// <summary>
-        /// The function reads the orders for all apartments starting from the date set by the user and for 31 days.
+        /// The function reads the orders for all apartments starting from the date set by the user and for 31 days and 3 days (depending on 
+        /// dashboard type)
         /// </summary>
         ///<param name="fromDate">starting date of the dashboard</param>
+        ///<param name="days">the number of days we wish to display.(depends on dashboard type - normal or wide)</param>
         ///<param name="revenuePerDay">An output parameter - will contain the list of revenues per day</param>
         ///<param name="empWorkDaysArray">An array containing an employeeWorkDay record for each day in the month.
         ///Days for which no record found - will be null. Days for which more than one recrod found - will contain
@@ -189,6 +205,7 @@ namespace cityLife.Controllers
         /// A dayBlock is either a single free day, or an order which can span 1 or more days. Note that a day block may not 
         /// be identical to the corresponding order because the order may start before the "fromDate" or end after the "fromDate+31".</returns>
         public List<List<DayBlock>> s21dashboardPreparation(DateTime fromDate, 
+            int days,
             ref List<Money> revenuePerDay, 
             ref EmployeeWorkDay[] empWorkDaysArray)
         {
@@ -208,13 +225,13 @@ namespace cityLife.Controllers
             //where each day block is either a free day or an order.
 
             var apartmentDayBlocks = new List<List<DayBlock>>();
-            revenuePerDay = new List<Money>(32);
-            for(int i = 0; i < 32; i++)
+            revenuePerDay = new List<Money>();
+            for(int i = 0; i < days + 1; i++)
             {
                 revenuePerDay.Add(new Money(0m, "UAH"));
             }
             
-            var lastDate = fromDate.AddDays(31);
+            var lastDate = fromDate.AddDays(days);
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
             foreach (var anApartment in db.Apartments)
             {
@@ -233,7 +250,7 @@ namespace cityLife.Controllers
                             //But anyway - we will write the dayBlock to the list
                             dayBlocks.Add(aDayBlock);
                         }
-                        aDayBlock = new DayBlock() { apartmentNumber = anApartment.number, orderStatus = null, firstDate = aDate.ToString("yyyy-MM-dd") };//null order status denotes a free day
+                        aDayBlock = new DayBlock() { apartmentNumber = anApartment.number, status = OrderStatus.Free, firstDate = aDate.ToString("yyyy-MM-dd") };//"Free" status denotes a free day
                         dayBlocks.Add(aDayBlock);
                         aDayBlock = null;
                     }
@@ -248,17 +265,10 @@ namespace cityLife.Controllers
                             //This is the first time we see this order - open a new DayBlock object. Note that if the report starts from 
                             //1/12/2019 and we have an order that started on 39/11/2019 and continued to 4/12/2019 - then the first time we 
                             //encounted this order is not in the checkin date of it.
-                            aDayBlock = new DayBlock()
+                            aDayBlock = new DayBlock(anOrder)
                             {
-                                apartmentNumber = anApartment.number,
                                 days = 1,
-                                name = anOrder.Guest.name,
-                                orderId = anOrder.Id,
-                                orderStatus = anOrder.status,
                                 firstDate = aDate.ToString("yyyy-MM-dd"),
-                                price = anOrder.priceAsMoney(),
-                                orderColor = anOrder.OrderColor,
-                                comments = anOrder.staffComments
                             };
                         }
                         else
@@ -291,7 +301,7 @@ namespace cityLife.Controllers
             //Calculate the list of employee work days. The list contains a single record for each day (or null, if no employee is assigned
             //for that day). If 2 employees are assigned for the same day - only one is taken (the last one)
             //empWorkDaysList = new List<EmployeeWorkDay>();
-            empWorkDaysArray = new EmployeeWorkDay[32];
+            empWorkDaysArray = new EmployeeWorkDay[days + 1];
             var empWorkDays = from anEmpWorkDay in db.EmployeeWorkDays
                               where anEmpWorkDay.dateAndTime >= fromDate && anEmpWorkDay.dateAndTime <= lastDate
                               orderby anEmpWorkDay.dateAndTime

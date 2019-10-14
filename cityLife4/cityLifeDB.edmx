@@ -853,6 +853,7 @@
           <Member Name="CheckedIn" />
           <Member Name="CheckedOut" />
           <Member Name="Cancelled" />
+          <Member Name="Free" Value="9" />
         </EnumType>
         <Association Name="CurrencyOrder">
           <End Type="cityLifeDB.Currency" Role="Currency" Multiplicity="1" />

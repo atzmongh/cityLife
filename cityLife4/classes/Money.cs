@@ -104,6 +104,16 @@ namespace cityLife4
             Money result = new Money(m1.amount + m2.amount, m1.currencyCode);
             return result;
         }
+        public static Money operator -(Money m1, Money m2)
+        {
+            if (m1.currencyCode != m2.currencyCode)
+            {
+                throw new AppException(103, null, " Subtraction of money objects - the 2 objects have different currency, which is not supported. " +
+                                       m1.ToString() + " " + m2.ToString());
+            }
+            Money result = new Money(m1.amount - m2.amount, m1.currencyCode);
+            return result;
+        }
 
         public static Money operator *(Money m1, decimal d2)
         {
@@ -147,7 +157,7 @@ namespace cityLife4
         /// </summary>
         /// <param name="showCents">when true will show cents as 123.45 When false will round to the closest integral value</param>
         /// <returns>$1,234.56 orf $1235 bsaed on the showCents param</returns>
-        public string toMoneyString(bool showCents = true)
+        public string toMoneyString(bool showCents = false)
         {
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
             var theCurrency = db.Currencies.SingleOrDefault(aCurrency => aCurrency.currencyCode == this.currencyCode);

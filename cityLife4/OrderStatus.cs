@@ -16,6 +16,7 @@ namespace cityLife4
         Created = 0,
         CheckedIn = 1,
         CheckedOut = 2,
-        Cancelled = 3
+        Cancelled = 3,
+        Free = 9
     }
 }

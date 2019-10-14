@@ -438,8 +438,6 @@
     <Content Include="Views\Public\p50OurRulesEnglish.cshtml" />
     <Content Include="Views\Public\t10welcomeMail.cshtml" />
     <Content Include="Views\sharing\_staffLayout.cshtml" />
-    <Content Include="Views\Staff\s20dashboard.cshtml" />
-    <Content Include="Views\Staff\s21Dashboard-old.cshtml" />
     <Content Include="Views\Staff\s22OrderDetails.cshtml" />
     <Content Include="Views\Staff\s23addUpdateOrder.cshtml" />
     <Content Include="Views\Staff\s24orderPersonal.cshtml" />

@@ -163,6 +163,7 @@ namespace cityLife.Controllers
         public int nights;
         public string price;
         public string paid;
+        public string unpaid;
         public string expectedArrival;
         public string comments;
         public string bookedBy;
@@ -199,8 +200,13 @@ namespace cityLife.Controllers
             checkin = anOrder.checkinDate;
             checkout = anOrder.checkoutDate;
             nights = anOrder.nights;
-            price = anOrder.priceAsMoney().toMoneyString(showCents:false);
-            paid = anOrder.amountPaidAsMoney().toMoneyString(showCents:false);
+            Money priceM = anOrder.priceAsMoney();
+            Money paidM = anOrder.amountPaidAsMoney();
+            Money unpaidM = priceM - paidM;
+
+            price = priceM.toMoneyString();
+            paid = paidM.toMoneyString();
+            unpaid = unpaidM.toMoneyString();
             expectedArrival = anOrder.expectedArrival;
             comments = anOrder.specialRequest;
             bookedBy = anOrder.bookedBy;
