@@ -90,7 +90,7 @@
     }
     .high {
         height: 45px;
-        line-height: 13px;
+        line-height: 15px;
     }
     .leftAlign {
         text-align: left;
@@ -223,13 +223,13 @@
                             {
                                 //This is a busy day (or days)
                                 string line1;
-    string line2;
-    string line3="";
+                                string line2;
+                                string line3="";
                                 if (wideDashboard == "checked")
                                 {
                                     //This is a wide dashboard. Prepare the data that should be displayed on the order line
-                                    line1 = aDAyBlock.name + " " + aDAyBlock.phone + " " + aDAyBlock.adults + "+" + aDAyBlock.children;
-                                    line2 = tBox.translate("unpaid") + ":" + aDAyBlock.unpaid + " " + tBox.translate("of") + " " + aDAyBlock.price;
+                                    line1 = aDAyBlock.phone + " (" + aDAyBlock.adults + "+" + aDAyBlock.children + ") "+ aDAyBlock.name;
+                                    line2 = aDAyBlock.price+"/"+aDAyBlock.paid+" - "+aDAyBlock.checkout.ToString("dd/MM/yyyy");
                                     line3 = aDAyBlock.expectedArrival + " " + aDAyBlock.staffComments;
                                 }
                                 else
@@ -238,7 +238,7 @@
                                     line2 = aDAyBlock.price;
                                 }
                                 string color = aDAyBlock.orderColor.ToString();
-    string cssColor = "order" + color;   //e.g. orderRed, orderGreen - we prepared such CSS classes
+                                string cssColor = "order" + color;   //e.g. orderRed, orderGreen - we prepared such CSS classes
                                 <td class="dash02td @wide @high @cssColor" colspan="@aDAyBlock.days" data-order-id="@aDAyBlock.orderId" id="@aDAyBlock.orderId" 
                                     onclick="showOrder(this)">@line1 <br /> @line2 <br />@line3</td>
                             }

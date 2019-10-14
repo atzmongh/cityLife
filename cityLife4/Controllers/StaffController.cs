@@ -151,7 +151,7 @@ namespace cityLife.Controllers
             }
             else
             {
-                dashboardDays = 3;
+                dashboardDays = 31;
             }
             Employee theEmployee = (Employee)Session["loggedinUser"];
             if (theEmployee == null)
