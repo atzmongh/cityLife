@@ -480,10 +480,9 @@ namespace cityLife.Controllers
             Currency theCurrency = db.Currencies.Single(a => a.currencyCode == apartmentAndPrice.pricePerStay.currency);
 
             Guest theGuest = db.Guests.FirstOrDefault
-                (aGuest => aGuest.email == theOrderData.email &&
+                (aGuest => 
                 aGuest.name == theOrderData.name &&
-                aGuest.phone == theOrderData.phone &&
-                aGuest.Country.name == theOrderData.country);
+                aGuest.phone == theOrderData.phone);
 
             if (theGuest == null)
             {

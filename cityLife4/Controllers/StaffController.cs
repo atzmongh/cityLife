@@ -133,17 +133,25 @@ namespace cityLife.Controllers
         [HttpGet]
         public ActionResult s21Dashboard(DateTime? fromDate, string wideDashboard="off")
         {
-            //Keep the starting date of the dashboard. It will be used when updating the dashboard.
-            if (fromDate != null)
+            if (fromDate == null && Session["fromDate"] == null)
             {
+                //Take yesterda's date as default
+                fromDate = FakeDateTime.DateNow.AddDays(-1);
                 Session["fromDate"] = fromDate;
+            }
+            else if (fromDate == null)
+            {
+                //fromDate is null but we have a date in the session - take it
+                fromDate = (DateTime)Session["fromDate"];
             }
             else
             {
-                Session["fromDate"] = FakeDateTime.DateNow.AddDays(-1);  //The default starting date of the dashboard is yesterday. So we can see
-                                                                         //people who check out today
+                //We have a date in "fromDate" - save it in the session variable
+                Session["fromDate"] = fromDate;
             }
-            //In normal mode - we display a full month. In wide mode - we display only 3 days (by default - yesterday, today and tomorrow)
+            //At this point fromDate contains a date (and also Session[fromDate"] - contains the same date
+
+            //Currntly for both normal mode and wide mode we dislay 31 days. The number of days can be set here.
             int dashboardDays;
             if (wideDashboard == "off")
             {
