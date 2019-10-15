@@ -73,8 +73,17 @@ namespace cityLife4
         /// <returns>apartment main photo or null if nont exists</returns>
         public ApartmentPhoto MainPhotoLandscape()
         {
-            ApartmentPhoto theMainPhoto = this.ApartmentPhotoes.FirstOrDefault(aPhoto => aPhoto.type == PhotoType.Main &&
-                                                                               aPhoto.orientation == OrientationType.Landscape);
+            ApartmentPhoto theMainPhoto;
+            if (this.ApartmentPhotoes.Count() == 0)
+            {
+                cityLifeDBContainer1 db = new cityLifeDBContainer1();
+                theMainPhoto = db.ApartmentPhotoes.Single(aPhoto => aPhoto.filePath == "/images/missing landscape photo.png");
+            }
+            else
+            {
+                theMainPhoto = this.ApartmentPhotoes.FirstOrDefault(aPhoto => aPhoto.type == PhotoType.Main &&
+                                                                            aPhoto.orientation == OrientationType.Landscape);
+            }
             return theMainPhoto;
         }
         /// <summary>
@@ -84,14 +93,28 @@ namespace cityLife4
         /// <returns>apartment main photo or null if nont exists</returns>
         public ApartmentPhoto MainPhotoPortrait()
         {
-            ApartmentPhoto theMainPhoto = this.ApartmentPhotoes.FirstOrDefault(aPhoto => aPhoto.type == PhotoType.Main &&
-                                                                               aPhoto.orientation == OrientationType.Portrait);
+            ApartmentPhoto theMainPhoto;
+            if (this.ApartmentPhotoes.Count() == 0)
+            {
+                theMainPhoto = this.ApartmentPhotoes.Single(aPhoto => aPhoto.filePath == "/images/missing portrait photo.jpg"); ;
+            }
+            else
+            {
+                cityLifeDBContainer1 db = new cityLifeDBContainer1();
+                theMainPhoto = db.ApartmentPhotoes.FirstOrDefault(aPhoto => aPhoto.type == PhotoType.Main &&
+                                                                            aPhoto.orientation == OrientationType.Portrait);
+            }
             return theMainPhoto;
         }
         public ApartmentPhoto mainPhoto(DisplayDevice preferredDevice = DisplayDevice.ANY)
         {
             ApartmentPhoto theMainPhoto;
-            if (preferredDevice == DisplayDevice.ANY)
+            if (this.ApartmentPhotoes.Count() == 0)
+            {
+                cityLifeDBContainer1 db = new cityLifeDBContainer1();
+                theMainPhoto = db.ApartmentPhotoes.Single(aPhoto => aPhoto.filePath == "/images/missing landscape photo.png");
+            }
+            else if (preferredDevice == DisplayDevice.ANY)
             {
                 //Find any main photo, regardless of device
                 theMainPhoto = this.ApartmentPhotoes.FirstOrDefault(aPhoto => aPhoto.type == PhotoType.Main);
@@ -113,7 +136,6 @@ namespace cityLife4
                 }
                 
             }
-           
             return theMainPhoto;
         }
         /// <summary>

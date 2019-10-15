@@ -261,6 +261,8 @@
     <Content Include="images\employee2.jpg" />
     <Content Include="images\marker.png" />
     <Content Include="App_Data\countryList.txt" />
+    <Content Include="images\missing landscape photo.png" />
+    <Content Include="images\missing portrait photo.jpg" />
     <Content Include="messages\m010NewOrder.html" />
     <Content Include="styles2.css" />
     <Content Include="Views\Admin\Index.cshtml" />
