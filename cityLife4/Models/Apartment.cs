@@ -76,8 +76,12 @@ namespace cityLife4
             ApartmentPhoto theMainPhoto;
             if (this.ApartmentPhotoes.Count() == 0)
             {
-                cityLifeDBContainer1 db = new cityLifeDBContainer1();
-                theMainPhoto = db.ApartmentPhotoes.Single(aPhoto => aPhoto.filePath == "/images/missing landscape photo.png");
+                theMainPhoto = new ApartmentPhoto()
+                {
+                    filePath = "/images/missing landscape photo.png",
+                     orientation = OrientationType.Landscape,
+                      type = PhotoType.Main
+                };
             }
             else
             {
@@ -96,7 +100,13 @@ namespace cityLife4
             ApartmentPhoto theMainPhoto;
             if (this.ApartmentPhotoes.Count() == 0)
             {
-                theMainPhoto = this.ApartmentPhotoes.Single(aPhoto => aPhoto.filePath == "/images/missing portrait photo.jpg"); ;
+                theMainPhoto = new ApartmentPhoto()
+                {
+                    filePath = "/images/missing portrait photo.jpg",
+                    orientation = OrientationType.Portrait,
+                    type = PhotoType.Main
+                };
+                //theMainPhoto = this.ApartmentPhotoes.Single(aPhoto => aPhoto.filePath == "/images/missing portrait photo.jpg"); ;
             }
             else
             {
@@ -111,8 +121,12 @@ namespace cityLife4
             ApartmentPhoto theMainPhoto;
             if (this.ApartmentPhotoes.Count() == 0)
             {
-                cityLifeDBContainer1 db = new cityLifeDBContainer1();
-                theMainPhoto = db.ApartmentPhotoes.Single(aPhoto => aPhoto.filePath == "/images/missing landscape photo.png");
+                theMainPhoto = new ApartmentPhoto()
+                {
+                    filePath = "/images/missing landscape photo.jpg",
+                    orientation = OrientationType.Landscape,
+                    type = PhotoType.Main
+                };
             }
             else if (preferredDevice == DisplayDevice.ANY)
             {
