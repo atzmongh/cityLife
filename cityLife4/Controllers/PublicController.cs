@@ -423,7 +423,8 @@ namespace cityLife.Controllers
                 adults = (int)theBookingRequest.adults,
                 children = (int)theBookingRequest.children,
                 checkin = (DateTime)theBookingRequest.checkinDate,
-                checkout = (DateTime)theBookingRequest.checkoutDate
+                checkout = (DateTime)theBookingRequest.checkoutDate,
+                 bookedBy = "Guest"
             };
 
             ViewBag.orderData = theOrderData;
@@ -456,16 +457,16 @@ namespace cityLife.Controllers
                     ViewBag.theOrder = theOrder;
                     ViewBag.apartmentAndPrice = apartmentAndPrice;
 
-                    //if (theOrder.Guest.email != null && theOrder.Guest.email != "")
-                    //{
-                    //    EmailMessage mailToCustomer = new EmailMessage(
-                    //    to: theOrder.Guest.email,
-                    //    subject: tBox.translate("Welcome to Kharkov Apartments City Life"),
-                    //    mailName: "t10welcomeMail",
-                    //    theController: this
-                    //    );
-                    //    mailToCustomer.send();
-                    //}
+                    if (theOrder.Guest.email != null && theOrder.Guest.email != "")
+                    {
+                        EmailMessage mailToCustomer = new EmailMessage(
+                        to: theOrder.Guest.email,
+                        subject: tBox.translate("Welcome to Kharkov Apartments City Life"),
+                        mailName: "t10welcomeMail",
+                        theController: this
+                        );
+                        mailToCustomer.send();
+                    }
                     return PartialView("p28bookingSuccess");
                 }
             }

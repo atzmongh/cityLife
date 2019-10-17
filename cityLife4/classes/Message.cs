@@ -7,6 +7,8 @@ using System.Net.Mail;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
+using SendGrid;
+using SendGrid.Helpers.Mail;
 
 namespace cityLife4
 {
@@ -104,6 +106,11 @@ namespace cityLife4
 
     public class EmailMessage 
     {
+        //sendgrid API key for atzmon.ghilai@gmail.com:
+        //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
+        //key ID: W2SRPWTySpeAx4Z5uKjsCw
+        //azure username: azure_ac88f5e7c309ea83f915e1706a18dec1@azure.com
+        //SMTP server: smtp.sendgrid.net
         private string to;
         private string subject;
         private string mailName;
