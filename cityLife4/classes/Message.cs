@@ -9,6 +9,7 @@ using System.Web;
 using System.Web.Mvc;
 using SendGrid;
 using SendGrid.Helpers.Mail;
+using System.Threading.Tasks;
 
 namespace cityLife4
 {
@@ -106,62 +107,67 @@ namespace cityLife4
 
     public class EmailMessage 
     {
-        //sendgrid API key for atzmon.ghilai@gmail.com:
-        //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
-        //key ID: W2SRPWTySpeAx4Z5uKjsCw
-        //azure username: azure_ac88f5e7c309ea83f915e1706a18dec1@azure.com
-        //SMTP server: smtp.sendgrid.net
-        private string to;
-        private string subject;
-        private string mailName;
-        private string body;
+        private SendGridMessage sgMessage;
         public EmailMessage(string to, string subject, string mailName, Controller theController) 
         {
-            this.to = to;
-            this.subject = subject;
-            this.mailName = mailName;
+            sgMessage = new SendGridMessage();
+            EmailAddress sender = new EmailAddress("apart.citylife@gmail.com", "Ksenia ghilai");
+            sgMessage.SetFrom(sender);
+            EmailAddress recepient = new EmailAddress(to, mailName);
+            sgMessage.AddTo(recepient);
+            sgMessage.SetSubject(subject);
+            
             var context = theController.ControllerContext;
             context.Controller.ViewData.Model = null;
+            string body = "";
             using (var sw = new StringWriter())
             {
                 var viewResult = ViewEngines.Engines.FindView(context, mailName, null);
                 var viewContext = new ViewContext(context, viewResult.View, context.Controller.ViewData, context.Controller.TempData, sw);
                 viewResult.View.Render(viewContext, sw);
                 viewResult.ViewEngine.ReleaseView(context, viewResult.View);
-                this.body = sw.GetStringBuilder().ToString();
+                body = sw.GetStringBuilder().ToString();
             }
+            sgMessage.AddContent(MimeType.Html, body);
         }
-        public void send()
+        public async Task sendAsync()
         {
-            var message = new MailMessage();
-            message.To.Add(new MailAddress(this.to));
-            message.From = new MailAddress("apart.citylife@gmail.com");
-            message.Subject = this.subject;
-            message.Body = this.body;
-            message.IsBodyHtml = true;
+            var apiKey = "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";  //System.Environment.GetEnvironmentVariable("SENDGRID_APIKEY");
+            var client = new SendGridClient(apiKey);
+            var response = await client.SendEmailAsync(sgMessage);
+            AppException.writeException(999, null, response.Body.ToString());
+            
 
-            using (var smtp = new SmtpClient())
-            {
-                var credential = new NetworkCredential
-                {
-                    UserName = "apart.citylife@gmail.com",
-                    Password = "456ertksenia"
-                };
-                smtp.Credentials = credential;
-                smtp.Host = "smtp.gmail.com";
-                smtp.Port = 587;
-                smtp.EnableSsl = true;
-                try
-                {
-                    smtp.Send(message);
-                }
-                catch(Exception e)
-                {
-                    //Send mail failed - continue working, but write error message to the log
-                    AppException.writeException(122, e, null, this.to, this.mailName);
-                }
-                
-            }
+            //var message = new MailMessage();
+            //message.To.Add(new MailAddress(this.to));
+            //message.From = new MailAddress("apart.citylife@gmail.com");
+            //message.Subject = this.subject;
+            //message.Body = this.body;
+            //message.IsBodyHtml = true;
+
+            //using (var smtp = new SmtpClient())
+            //{
+            //    var credential = new NetworkCredential
+            //    {
+            //        UserName = "apart.citylife@gmail.com",
+            //        Password = "456ertksenia"
+            //    };
+            //    smtp.Credentials = credential;
+            //    smtp.Host = "smtp.gmail.com";
+            //    smtp.Port = 587;
+            //    smtp.EnableSsl = true;
+            //    try
+            //    {
+            //        smtp.Send(message);
+            //    }
+            //    catch(Exception e)
+            //    {
+            //        //Send mail failed - continue working, but write error message to the log
+            //        AppException.writeException(122, e, null, this.to, this.mailName);
+            //    }
+
+            // }
+            
         }
     }
 }

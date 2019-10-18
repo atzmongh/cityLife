@@ -465,7 +465,7 @@ namespace cityLife.Controllers
                         mailName: "t10welcomeMail",
                         theController: this
                         );
-                        mailToCustomer.send();
+                        mailToCustomer.sendAsync();
                     }
                     return PartialView("p28bookingSuccess");
                 }

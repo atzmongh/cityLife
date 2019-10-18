@@ -534,7 +534,7 @@ namespace cityLife.Controllers
                         mailName: "t10welcomeMail",
                         theController: this
                         );
-                        mailToCustomer.send();
+                        mailToCustomer.sendAsync();
                     }
 
                     if (orderId == 0)
