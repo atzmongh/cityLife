@@ -1,14 +1,14 @@
 ﻿
 
 @{
-    ViewBag.Title = "uploadDB";
+    ViewBag.Title = "populate DB";
     Layout = "~/Views/sharing/_adminLayout.cshtml";
 }
 
 <h2>upload DB</h2>
 
-<p>@ViewBag.connectionString</p>
-<form method="post" action="/admin/a10uploadDB" enctype="multipart/form-data">
+
+<form method="post" action="/admin/a10populateDB" enctype="multipart/form-data">
     <input type="file" name="dbCSV" /><br /><br />
     <input type="submit" value="OK"/>
 

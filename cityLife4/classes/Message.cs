@@ -108,13 +108,17 @@ namespace cityLife4
     public class EmailMessage 
     {
         private SendGridMessage sgMessage;
-        public EmailMessage(string to, string subject, string mailName, Controller theController) 
+        public EmailMessage(string to, string subject, string mailName, Controller theController, string cc=null) 
         {
             sgMessage = new SendGridMessage();
             EmailAddress sender = new EmailAddress("apart.citylife@gmail.com", "Ksenia ghilai");
             sgMessage.SetFrom(sender);
             EmailAddress recepient = new EmailAddress(to, mailName);
             sgMessage.AddTo(recepient);
+            if (cc != null)
+            {
+                sgMessage.AddCc(cc);
+            }
             sgMessage.SetSubject(subject);
             
             var context = theController.ControllerContext;

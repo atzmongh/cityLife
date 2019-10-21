@@ -197,12 +197,12 @@
                         <div class="dropdown-toggle">
                             <span class="name">@ViewBag.currentLanguage</span>
                         </div>
-                        <ul class="dropdown">
+                        <ul class="dropdown" style="cursor:pointer">
                             @{
                                 foreach (var language in languages)
                                 {
                                     <li>
-                                        <a href="@pageURL?language=@language.languageCode">
+                                        <a onclick="languageChange('@language.languageCode')">
                                             <span class="name">@language.languageCode</span>
                                             <span class="dscr">@language.name</span>
                                         </a>
@@ -215,13 +215,13 @@
                         <div class="dropdown-toggle">
                             <span class="name">@currentCurrency.currencyCode</span>
                         </div>
-                        <ul class="dropdown">
+                        <ul class="dropdown" style="cursor:pointer">
                             @{
                                 foreach (var aCurrency in currencies)
                                 {
                                     <li>
-                                        <a href="@pageURL?currency=@aCurrency.currencyCode">
-                                            <span class="name">@aCurrency.currencyCode</span>
+                                        <a>
+                                            <span class="name" onclick="currencyChange('@aCurrency.currencyCode')">@aCurrency.currencyCode</span>
                                         </a>
                                     </li>
                                 }
@@ -270,6 +270,16 @@
                 //User entered data for both checkin and checkout dates - enable the "check availability" button
                 $("#checkAvailability").prop("disabled", false);
             }
+        }
+
+        //Send the new currency to the server. It will save it in Session["currentCurrency"]. Then refresh the page, so the new 
+        //currency will be visible
+        function currencyChange(currency) {
+            $.get("/public/p60CurrencyChange?currency=" + currency).done(document.location.reload(true));  //Refresh the page 
+        }
+
+        function languageChange(languageCode) {
+            $.get("/public/p61LanguageChange?language=" + languageCode).done(document.location.reload(true));  //Refresh the page 
         }
     </script>
     <script src="/js/libs.js?version=@AppVersion.current"></script>

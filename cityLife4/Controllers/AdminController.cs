@@ -36,30 +36,47 @@ namespace cityLife.Controllers
         {
             return View();
         }
+        /// <summary>
+        /// DB migtration is responsible for running an SQL script against the DB. It can recreate it from scratch (if using the 
+        /// //cityLifeDB.edmx.sql), or perform any schema changes.
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
-        public ActionResult a10uploadDB()
+        public ActionResult a05DBMigration()
         {
-            var connectionString = ConfigurationManager.ConnectionStrings["cityLifeDBContainer1"];
-            ViewBag.connectionString = connectionString.ConnectionString;
-            return View("a10uploadDB");
+            return View("a05DBMigration");
         }
+
         [HttpPost]
-        public ActionResult a10uploadDB(HttpPostedFileBase dbCSV)
+        public ActionResult a05DBMigration(HttpPostedFileBase dbSQL)
         {
-            //drop all DB tables and create a new DB schema with empty DB
-            StreamReader sqlReader = new StreamReader(Server.MapPath("/cityLifeDB.edmx.sql"));
-            string createDBsql = sqlReader.ReadToEnd();
+            //Execute the SQL commands
+            Stream dbSQLStream = dbSQL.InputStream;
+            StreamReader dbSQLReader = new StreamReader(dbSQLStream);
+            string dbSQLstring = dbSQLReader.ReadToEnd();
 
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
 
-            db.Database.ExecuteSqlCommand(createDBsql);
+            db.Database.ExecuteSqlCommand(dbSQLstring);
+
+            return View("a05DBMigration");
+        }
+        /// <summary>
+        /// The populate DB is responsible for adding records to the DB. (update and delete are not yet supported)
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public ActionResult a10populateDB()
+        {
+            return View("a10populateDB");
+        }
+        [HttpPost]
+        public ActionResult a10populateDB(HttpPostedFileBase dbCSV)
+        {
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
             Stream csvFileStream = dbCSV.InputStream;
-
             PopulateDB(db, csvFileStream);
-
-          
-
-            return View("a10uploadDB");
+            return View("a10populateDB");
         }
 
         [HttpGet]
@@ -320,37 +337,25 @@ namespace cityLife.Controllers
 
                 string[] lineFields = parser.ReadFields();
                 int columnCount = 0;
-                string setIdentityOn = "";
-                bool idExists = false;
-                int firstColumn= -1;  //This is the first "real" column, not including table name and id, if exists (id must be the first data column)
+                string lineType = "";  //add, upd, del
                 Dictionary<string, int> symbolicIdList = new Dictionary<string, int>();
 
                 while (lineFields != null)
                 {
-                    if (lineFields[0] != "")
+                    if (lineFields[0].Contains("//"))
+                    {
+                        //This is a comment line - ignore it
+                    }
+                    else if (lineFields[0] != "")
                     {
                         //This is a new table - the line contains the table name and then the field names
                         tableName = lineFields[0];
                         columnNames.Clear();
                         columnNames = new List<string>();
                        
-                        
-                        //copy all column names to the columnNames list - if the first column is "id" - skip it
-                        if (lineFields[1] == "id")
-                        {
-                            //setIdentityOn = "SET IDENTITY_INSERT " + tableName + " ON;";  //We changed the logic, so that we always use auto increment
-                            //and support symbolic values for ids and foreign keys in the form of *<name>
-                            idExists = true;
-                            firstColumn = 2;
-                        }
-                        else
-                        {
-                            idExists = false;
-                            firstColumn = 1;
-                        }
-
+                        //copy all column names to the columnNames list
                         int i;
-                        for (i = firstColumn; i < lineFields.Count(); i++)
+                        for (i = 1; i < lineFields.Count(); i++)
                         {
                             if (lineFields[i] == "")
                             {
@@ -359,36 +364,36 @@ namespace cityLife.Controllers
                             }
                             columnNames.Add(lineFields[i]);
                         }
-                        //At this point i contains the number of fields in the table
+                        //At this point columnNames contains all column names (including id if exists) 
+                        //i contains the number of fields in the table (including an id field, if exists)
                         columnCount = i;
-                    }
-                    else if (lineFields[0].Contains("//"))
-                    {
-                        //This is a comment line - ignore it
                     }
                     else
                     {
                         //this is a data line - create an insert command to insert it into the DB
                         //Copy all value names into the column value list
+                        //
                         columnValues.Clear();
-
+                        lineType = "add";
                         bool valuesExist = false;
                         string symbolicId = "";
-                        if (idExists && lineFields[1].StartsWith("*"))
+                        if (columnNames[0] == "id" && lineFields[1].StartsWith("*"))
                         {
-                            //The first column is id, and it is a symbolic value - keep it for later.
+                            //The first column is id, and it is a symbolic value - keep it for later. (columnNames[0] because we skipped the first column)
                             symbolicId = lineFields[1];
                         }
-                        for (int i = firstColumn; i < columnCount; i++)
+                        for (int i = 1; i < columnCount; i++)
                         {
                             if (lineFields[i] != "")
                             {
                                 valuesExist = true;
                             }
                             
-                            if (lineFields[i].StartsWith("*"))
+                            if (lineFields[i].StartsWith("*") && columnNames[i-1] != "id")
                             {
                                 //The column contains a symbolic reference (a foreign key) to a previously defined ID
+                                //But if columnNames[i-1] is "id" - then it is actually an id reference, which we already kept.
+                                //actually we expect this to happen only on column 1
                                 try
                                 {
                                     int foreignKey = symbolicIdList[lineFields[i]];
@@ -408,8 +413,8 @@ namespace cityLife.Controllers
                             
                         }
                         //At this point we have all column names in columnName list and valus in columnValues list
-                        //If the line starts with an ID - this column does not exist in either list. However, if the ID column
-                        //contains a symbolic value (*<name>) - then it will be kept.
+                        //If the line starts with an ID - this column exists in both lists. Note that  if the ID column
+                        //contains a symbolic value (*<name>) - it will be kept.
                         //If any column contains a symbolic refernece to an ID (a foreign key) - the foreign key has already been replaced instead 
                         //of the symbolic reference
                         if (valuesExist == false)
@@ -418,36 +423,94 @@ namespace cityLife.Controllers
                             lineFields = parser.ReadFields();
                             continue;
                         }
-                        //Create the SQL command to insert that record
-                        StringBuilder insertCommand = new StringBuilder("INSERT INTO ");
-                        insertCommand.Append(tableName);                       //INSERT INTO apartment
-                        insertCommand.Append("(");                             //INSERT INTO apartment(
-                        insertCommand.Append(columnNames[0]);                  //INSERT INTO apartment(number
-                        for (int i = 1; i < columnNames.Count(); i++)
+                        switch (lineType)
                         {
-                            insertCommand.Append(",");                          //INSERT INTO apartment(number,
-                            insertCommand.Append(columnNames[i]);               //INSERT INTO apartment(number,name
+                            case "add":
+                                addRecord(db, tableName, symbolicId, symbolicIdList, columnNames, columnValues);
+                                break;
+                            case "upd":
+                                updateRecord(db, tableName, columnNames, columnValues);
+                                break;
+                            case "del":
+                                break;
                         }
-                        insertCommand.Append(") VALUES (");                     //INSERT INTO apartment(number,name,description) VALUES (
-                        insertCommand.Append("N'" + columnValues[0] + "'");     //INSERT INTO apartment(number,name,description) VALUES (N'123'
-                        for (int i = 1; i < columnValues.Count(); i++)
-                        {
-                            insertCommand.Append(",");                          //INSERT INTO apartment(number,name,description) VALUES (N'123',
-                            insertCommand.Append("N'" + columnValues[i] + "'"); //INSERT INTO apartment(number,name,description) VALUES (N'123',N'nice'
-                        }
-                        insertCommand.Append(")");                              //INSERT INTO apartment(number,name,description) VALUES (N'123',N'nice')
-                        string insertCommandSt = insertCommand.ToString();
-                        db.Database.ExecuteSqlCommand(insertCommandSt);
-                        if (symbolicId != "")
-                        {
-                            //The ID column contains a symbolic name - keep the ID in a dictionary of (<symbolicID>,<id>) pair
-                            int identity = (db.Database.SqlQuery<int>("SELECT MAX(id) from "+tableName)).First();
-                            symbolicIdList.Add(symbolicId, identity);
-                        }
+                        
                     }
                     lineFields = parser.ReadFields();
                 }
                 return;
+            }
+        }
+
+        private void updateRecord(cityLifeDBContainer1 db, string tableName, List<string> columnNames, List<string> columnValues)
+        {
+            //Create the SQL command to update that record
+            StringBuilder updateCommand = new StringBuilder("UPDATE ");   //UPDATE 
+            //In an update operation we assume that the first column is the primary key (whether it is "id" or another key). 
+            //This will be used to identify the record to be updated
+            int firstColumn = 1;
+            updateCommand.Append(tableName);                       //UPDATE apartment
+            updateCommand.Append("(");                             //UPDATE apartment(
+            if (columnValues[firstColumn] != "")
+            {
+                //The cell contains a value - it should be updated. Note that an empty cell means "do not update this field"
+                //A cell containing "null" will set the field to null. A cell containing "" (empty apostrophes) - means 
+                //that we need to set the string field to be empty
+
+            }
+            updateCommand.Append(columnNames[firstColumn]);        //INSERT INTO apartment(number
+            for (int i = firstColumn + 1; i < columnNames.Count(); i++)
+            {
+                updateCommand.Append(",");                          //INSERT INTO apartment(number,
+                updateCommand.Append(columnNames[i]);               //INSERT INTO apartment(number,name
+            }
+            updateCommand.Append(") VALUES (");                     //INSERT INTO apartment(number,name,description) VALUES (
+            updateCommand.Append("N'" + columnValues[firstColumn] + "'");     //INSERT INTO apartment(number,name,description) VALUES (N'123'
+            for (int i = firstColumn + 1; i < columnValues.Count(); i++)
+            {
+                updateCommand.Append(",");                          //INSERT INTO apartment(number,name,description) VALUES (N'123',
+                updateCommand.Append("N'" + columnValues[i] + "'"); //INSERT INTO apartment(number,name,description) VALUES (N'123',N'nice'
+            }
+            updateCommand.Append(")");                              //INSERT INTO apartment(number,name,description) VALUES (N'123',N'nice')
+            string insertCommandSt = updateCommand.ToString();
+            db.Database.ExecuteSqlCommand(insertCommandSt);
+
+        }
+
+        private void addRecord(cityLifeDBContainer1 db, string tableName, string symbolicId, Dictionary<string,int> symbolicIdList, 
+            List<string> columnNames, List<string> columnValues)
+        {
+            //Create the SQL command to insert that record
+            StringBuilder insertCommand = new StringBuilder("INSERT INTO ");
+            int firstColumn = 0;
+            if (columnNames[0] == "id")
+            {
+                //the first column is an id - skip it
+                firstColumn = 1;
+            }
+            insertCommand.Append(tableName);                       //INSERT INTO apartment
+            insertCommand.Append("(");                             //INSERT INTO apartment(
+            insertCommand.Append(columnNames[firstColumn]);        //INSERT INTO apartment(number
+            for (int i = firstColumn + 1; i < columnNames.Count(); i++)
+            {
+                insertCommand.Append(",");                          //INSERT INTO apartment(number,
+                insertCommand.Append(columnNames[i]);               //INSERT INTO apartment(number,name
+            }
+            insertCommand.Append(") VALUES (");                     //INSERT INTO apartment(number,name,description) VALUES (
+            insertCommand.Append("N'" + columnValues[firstColumn] + "'");     //INSERT INTO apartment(number,name,description) VALUES (N'123'
+            for (int i = firstColumn + 1; i < columnValues.Count(); i++)
+            {
+                insertCommand.Append(",");                          //INSERT INTO apartment(number,name,description) VALUES (N'123',
+                insertCommand.Append("N'" + columnValues[i] + "'"); //INSERT INTO apartment(number,name,description) VALUES (N'123',N'nice'
+            }
+            insertCommand.Append(")");                              //INSERT INTO apartment(number,name,description) VALUES (N'123',N'nice')
+            string insertCommandSt = insertCommand.ToString();
+            db.Database.ExecuteSqlCommand(insertCommandSt);
+            if (symbolicId != "")
+            {
+                //The ID column contains a symbolic name - keep the ID in a dictionary of (<symbolicID>,<id>) pair
+                int identity = (db.Database.SqlQuery<int>("SELECT MAX(id) from " + tableName)).First();
+                symbolicIdList.Add(symbolicId, identity);
             }
         }
 

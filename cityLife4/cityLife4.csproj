@@ -272,7 +272,6 @@
     <Content Include="images\apartment 14\20170819_193359_tn.jpg" />
     <Content Include="images\apartment 14\main_photo_14.JPG" />
     <Content Include="images\apartment 14\main_photo_14P.jpg" />
-    <Content Include="images\apartment 22\main_photo_22.jpg" />
     <Content Include="images\apartment 23\main_photo_23.JPG" />
     <Content Include="images\apartment 24\main_photo_24.JPG" />
     <Content Include="images\apartment 24\main_photo_24P.jpg" />
@@ -289,7 +288,7 @@
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="cityLifeDB.csv" />
     <Content Include="cityLifeDB.xlsx" />
-    <Content Include="Views\Admin\a10uploadDB.cshtml" />
+    <Content Include="Views\Admin\a10populateDB.cshtml" />
     <Content Include="Views\Admin\a20unitTests.cshtml" />
     <Content Include="Views\Admin\a40translations.cshtml" />
     <Content Include="css\parts\styles.scss" />
@@ -472,6 +471,7 @@
     <Content Include="Views\Staff\t10welcomeMail.cshtml" />
     <Content Include="Views\Staff\s28bookingSuccess.cshtml" />
     <Content Include="Views\Admin\a30fakeTime.cshtml" />
+    <Content Include="Views\Admin\a05DBMigration.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
       <SubType>Designer</SubType>
@@ -481,6 +481,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="images\apartment 22\" />
+    <Folder Include="images\apartment 28\" />
     <Folder Include="Scripts\typings\jquery\" />
   </ItemGroup>
   <ItemGroup>

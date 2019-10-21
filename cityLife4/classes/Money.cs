@@ -188,9 +188,9 @@ namespace cityLife4
         /// <returns>a Money object converted to the new currency.</returns>
         /// <exception cref="101">no suitable currency exchange record found in the DB. (Either the currency code was illegal, or no
         /// such record exists)</exception>
-        public Money converTo(string newCurrencyCode, DateTime atDate, bool rounded = false)
+        public Money converTo(string newCurrencyCode, DateTime? atDate=null, bool rounded = false)
         {
-            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+            
             if (currencyCode == newCurrencyCode)
             {
                 //current and target currencies are the same - no conversion needed.
@@ -202,6 +202,11 @@ namespace cityLife4
                 //Note that in the DB we do not keep both conversion rates: EUR->USD and USD->EUR - since one is the reciprocal
                 //of the other. We only keep the pair where the "from" curency code is alphabetically lower than the "to"
                 //So we keep EUR->USD, UAH->USD, etc.
+                cityLifeDBContainer1 db = new cityLifeDBContainer1();
+                if (atDate == null)
+                {
+                    atDate = FakeDateTime.Now;
+                }
                 string lowerCurrencyCode;
                 string upperCurrencyCOde;
                 if (this.currencyCode.CompareTo(newCurrencyCode)<0)

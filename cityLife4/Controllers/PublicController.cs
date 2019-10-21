@@ -22,10 +22,22 @@ namespace cityLife.Controllers
     public class ApartmentPrice
     {
         public Apartment theApartment;
-        public Money minPricePerNight;  //if not calculated - will be 0
+        public Money minPricePerNight;  //if not calculated - will be null
         public Money pricePerStay;   //if not calculated - will be 0
         public int nightCount;     //for how many nights is the price per stay. 0 if unknown
         public Availability availability = Availability.UNKNOWN;
+        public void convertCurrency(string currencyCode)
+        {
+            if (minPricePerNight != null)
+            {
+                minPricePerNight = minPricePerNight.converTo(currencyCode);
+            }
+
+            if (pricePerStay != null)
+            {
+                pricePerStay = pricePerStay.converTo(currencyCode);
+            }
+        }
     }
     public class BookingRequest
     {
@@ -367,6 +379,8 @@ namespace cityLife.Controllers
                 Currency currentCurrency = (Currency)Session["currentCurrency"];
                 BookingRequest theBookingRequest = (BookingRequest)Session["bookingRequest"];
                 theApartmentAndPrice = apartments.Single(a => a.theApartment.Id == apartmentId);
+                theApartmentAndPrice.convertCurrency(currentCurrency.currencyCode);  //In case the user changed the selected currency 
+                Session["apartmentId"] = apartmentId;
 
                 cityLifeDBContainer1 db = new cityLifeDBContainer1();
                 ViewBag.apartmentAndPrice = theApartmentAndPrice;
@@ -391,6 +405,21 @@ namespace cityLife.Controllers
 
             return View("p25apartmentDetails");
         }
+        //[HttpGet]
+        //public ActionResult p25apartmentDetails(string language, string currency)
+        //{
+        //    if (language != null)
+        //    {
+        //        Session["currentLanguage"] = language;
+        //    }
+        //    if (currency != null)
+        //    {
+        //        Session["currentCurrency"] = currency;
+        //    }
+        //    int apartmentId = (int)Session["apartmentId"];
+        //    return p25apartmentDetails(apartmentId);
+            
+        //}
         [HttpGet]
         public PartialViewResult p26bookingForm(int apartmentId)
         {
@@ -461,6 +490,7 @@ namespace cityLife.Controllers
                     {
                         EmailMessage mailToCustomer = new EmailMessage(
                         to: theOrder.Guest.email,
+                        cc:"ksenia.korovina5@gmail.com",
                         subject: tBox.translate("Welcome to Kharkov Apartments City Life"),
                         mailName: "t10welcomeMail",
                         theController: this
@@ -660,6 +690,24 @@ namespace cityLife.Controllers
             ViewBag.pageURL = "/public/p50ourRules";
             ViewBag.preferredDevice = this.preferredDevice();
             return View("p50ourRulesEnglish");
+        }
+
+        [HttpGet]
+        public string p60CurrencyChange(string currency)
+        {
+            this.setCurrency(currency);
+            return "currency change to be:" + currency;
+        }
+
+        [HttpGet]
+        public string p61LanguageChange(string language)
+        {
+            Session["currentLanguage"] = language;
+            TranslateBox tBox = new TranslateBox(targetLanguageCode: language,
+                                        defaultLanguageCode: "RU",
+                                        noTranslation: WebConfigurationManager.AppSettings["noTranslations"]);
+            Session["tBox"] = tBox;
+            return "language changed to be:" + language;
         }
         private void prepareApartmentData(string language, string currency, DateTime? fromDate, DateTime? toDate, int? adultsCount, int? childrenCount)
         {
@@ -898,28 +946,25 @@ namespace cityLife.Controllers
 
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
 
-            if (currency == null && Session["currency"] == null)
+            if (currency == null && Session["currentCurrency"] != null)
+            {
+                //use the currency in the session
+                return (Currency)Session["currentCurrency"];
+            }
+            //
+            if (currency == null )
             {
                 //use default currency
                 currency = "UAH";
-                Session["currency"] = currency;
-            }
-            else if (currency == null)
-            {
-                //the session contains a currency - use it
-                currency = (string)Session["currency"];
-            }
-            else
-            {
-                //currency contains a new currency selected by the user
-                Session["currency"] = currency;
             }
 
+            //At this point currency contains a desired currency symbol
             Currency theCurrency = db.Currencies.SingleOrDefault(aCurrency => aCurrency.currencyCode == currency);
             if (theCurrency == null)
             {
                 throw new AppException(105, null, "Currency not found in DB:" + currency);
             }
+            Session["currentCurrency"] = theCurrency;
             return theCurrency;
         }
 
