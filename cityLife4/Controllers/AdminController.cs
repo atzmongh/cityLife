@@ -144,7 +144,7 @@ namespace cityLife.Controllers
         }
 
         [HttpPost]
-        public ActionResult a30fakeTime (string fakeDate, string fakeTime, string setFakeTime)
+        public ActionResult a30fakeTime(string fakeDate, string fakeTime, string setFakeTime)
         {
             if (setFakeTime == "Set")
             {
@@ -214,7 +214,7 @@ namespace cityLife.Controllers
                 translationDataList.Add(new TranslationData
                 {
                     translationKeyId = aTranslationKey.id,
-                    filePath = shortFilePath,  
+                    filePath = shortFilePath,
                     lineNumber = aTranslationKey.lineNumber ?? 0,
                     translationKey = aTranslationKey.transKey,
                     textOriginLanguage = textOriginLanguage,
@@ -285,12 +285,12 @@ namespace cityLife.Controllers
             StreamReader csvCountryFile = new StreamReader(Server.MapPath("/App_Data/country list.csv"));
             using (TextFieldParser parser = new TextFieldParser(csvCountryFile))
             {
-                parser.Delimiters = new string[]{","};
+                parser.Delimiters = new string[] { "," };
                 //Read all lines until end of file. Each line is expected to contain 2 fields - country name and country code
                 int addedCountries = 0;
                 int existingCountries = 0;
                 for (string[] lineFields = parser.ReadFields();
-                    lineFields!=null; 
+                    lineFields != null;
                     lineFields = parser.ReadFields())
                 {
                     if (lineFields.Count() != 2)
@@ -304,7 +304,7 @@ namespace cityLife.Controllers
                         code = countryCode,
                         name = countryName
                     };
-                    if (db.Countries.Find(countryCode)!=null)
+                    if (db.Countries.Find(countryCode) != null)
                     {
                         existingCountries++;
                     }
@@ -314,11 +314,11 @@ namespace cityLife.Controllers
                         addedCountries++;
                         db.SaveChanges();
                     }
-                   
+
                 }
-                return "countries added:" + addedCountries + " coungtries existing:"+existingCountries;
+                return "countries added:" + addedCountries + " coungtries existing:" + existingCountries;
             }
-            
+
 
         }
         /// <summary>
@@ -345,14 +345,35 @@ namespace cityLife.Controllers
                     if (lineFields[0].Contains("//"))
                     {
                         //This is a comment line - ignore it
+                        lineFields = parser.ReadFields();
+                        continue;
                     }
-                    else if (lineFields[0] != "")
+
+                    if (lineFields[0] == "upd")
                     {
-                        //This is a new table - the line contains the table name and then the field names
+                        //This is an update line. 
+                        lineType = "upd";
+                    }
+                    else if (lineFields[0] == "del")
+                    {
+                        lineType = "del";
+                    }
+                    else if (lineFields[0] == "")
+                    {
+                        lineType = "add";
+                    }
+                    else
+                    {
+                        lineType = "table";
+                    }
+
+                    if (lineType == "table")
+                    {
+                        //This is a new table - collect the table name and then the field names
                         tableName = lineFields[0];
                         columnNames.Clear();
                         columnNames = new List<string>();
-                       
+
                         //copy all column names to the columnNames list
                         int i;
                         for (i = 1; i < lineFields.Count(); i++)
@@ -370,11 +391,8 @@ namespace cityLife.Controllers
                     }
                     else
                     {
-                        //this is a data line - create an insert command to insert it into the DB
-                        //Copy all value names into the column value list
-                        //
+                        //This is a value line - either add, update or delete - collect value fields
                         columnValues.Clear();
-                        lineType = "add";
                         bool valuesExist = false;
                         string symbolicId = "";
                         if (columnNames[0] == "id" && lineFields[1].StartsWith("*"))
@@ -388,8 +406,8 @@ namespace cityLife.Controllers
                             {
                                 valuesExist = true;
                             }
-                            
-                            if (lineFields[i].StartsWith("*") && columnNames[i-1] != "id")
+
+                            if (lineFields[i].StartsWith("*") && columnNames[i - 1] != "id")
                             {
                                 //The column contains a symbolic reference (a foreign key) to a previously defined ID
                                 //But if columnNames[i-1] is "id" - then it is actually an id reference, which we already kept.
@@ -399,18 +417,19 @@ namespace cityLife.Controllers
                                     int foreignKey = symbolicIdList[lineFields[i]];
                                     columnValues.Add(foreignKey.ToString());  //add the foreign key, instead of the symbolic reference
                                 }
-                                catch(Exception e)
+                                catch (Exception e)
                                 {
                                     throw new AppException(114, null, lineFields[i], tableName);
                                 }
-                               
+
                             }
                             else
                             {
                                 //This is a simple value - enter it into the column value list.
                                 columnValues.Add(lineFields[i]);
                             }
-                            
+
+
                         }
                         //At this point we have all column names in columnName list and valus in columnValues list
                         //If the line starts with an ID - this column exists in both lists. Note that  if the ID column
@@ -423,6 +442,8 @@ namespace cityLife.Controllers
                             lineFields = parser.ReadFields();
                             continue;
                         }
+
+                        //Create the add/upd/del command
                         switch (lineType)
                         {
                             case "add":
@@ -434,11 +455,10 @@ namespace cityLife.Controllers
                             case "del":
                                 break;
                         }
-                        
+
                     }
                     lineFields = parser.ReadFields();
                 }
-                return;
             }
         }
 
@@ -450,34 +470,59 @@ namespace cityLife.Controllers
             //This will be used to identify the record to be updated
             int firstColumn = 1;
             updateCommand.Append(tableName);                       //UPDATE apartment
-            updateCommand.Append("(");                             //UPDATE apartment(
-            if (columnValues[firstColumn] != "")
-            {
-                //The cell contains a value - it should be updated. Note that an empty cell means "do not update this field"
-                //A cell containing "null" will set the field to null. A cell containing "" (empty apostrophes) - means 
-                //that we need to set the string field to be empty
+            updateCommand.Append(" SET ");                         //UPDATE apartment SET 
 
-            }
-            updateCommand.Append(columnNames[firstColumn]);        //INSERT INTO apartment(number
-            for (int i = firstColumn + 1; i < columnNames.Count(); i++)
+            for (int i = firstColumn; i < columnNames.Count(); i++)
             {
-                updateCommand.Append(",");                          //INSERT INTO apartment(number,
-                updateCommand.Append(columnNames[i]);               //INSERT INTO apartment(number,name
+                if (columnValues[i] != "")
+                {
+                    //The cell contains a value - it should be updated. Note that an empty cell means "do not update this field"
+                    //A cell containing "null" will set the field to null. A cell containing '' (2 single apostrophes) - means 
+                    //that we need to set the string field to be empty
+                    appendNameValue(columnNames[i], columnValues[i], updateCommand);   //UPDATE apartment SET name=N'johnson',tel=N'0522025500',
+                    updateCommand.Append(",");
+                }
             }
-            updateCommand.Append(") VALUES (");                     //INSERT INTO apartment(number,name,description) VALUES (
-            updateCommand.Append("N'" + columnValues[firstColumn] + "'");     //INSERT INTO apartment(number,name,description) VALUES (N'123'
-            for (int i = firstColumn + 1; i < columnValues.Count(); i++)
-            {
-                updateCommand.Append(",");                          //INSERT INTO apartment(number,name,description) VALUES (N'123',
-                updateCommand.Append("N'" + columnValues[i] + "'"); //INSERT INTO apartment(number,name,description) VALUES (N'123',N'nice'
-            }
-            updateCommand.Append(")");                              //INSERT INTO apartment(number,name,description) VALUES (N'123',N'nice')
-            string insertCommandSt = updateCommand.ToString();
-            db.Database.ExecuteSqlCommand(insertCommandSt);
+            //We inserted a comma after the last element - remove it.
+            int commandLength = updateCommand.Length;
+            updateCommand.Remove(commandLength - 1, 1);           //UPDATE apartment SET name=N'johnson',tel=N'0522025500'
+
+            updateCommand.Append(" WHERE ");                     //UPDATE apartment SET name=N'johnson',tel=N'0522025500' WHERE 
+            appendNameValue(columnNames[0], columnValues[0], updateCommand);//UPDATE apartment SET name=N'johnson',tel=N'0522025500' WHERE id=N'1'
+
+            string updateCommandSt = updateCommand.ToString();
+            db.Database.ExecuteSqlCommand(updateCommandSt);
 
         }
 
-        private void addRecord(cityLifeDBContainer1 db, string tableName, string symbolicId, Dictionary<string,int> symbolicIdList, 
+        /// <summary>
+        /// The function creates a name-value pair of the form name=N'john' or address=N'' (if the field is empty) or empId = null (if the field is null)
+        /// </summary>
+        /// <param name="columnName">such as "name"</param>
+        /// <param name="columnValue">such as "john" or '' (meaning empty) or null</param>
+        /// <param name="updateCommand">the string to which we append the result</param>
+        private void appendNameValue(string columnName, string columnValue, StringBuilder updateCommand)
+        {
+            string colValue;
+            if (columnValue == "''")
+            {
+                //The value is an empty field
+                colValue = "N''";
+            }
+            else if (columnValue == "null")
+            {
+                colValue = null;
+            }
+            else
+            {
+                colValue = "N'" + columnValue + "'";
+            }
+            updateCommand.Append(columnName);
+            updateCommand.Append("=");
+            updateCommand.Append(colValue);
+        }
+
+        private void addRecord(cityLifeDBContainer1 db, string tableName, string symbolicId, Dictionary<string, int> symbolicIdList,
             List<string> columnNames, List<string> columnValues)
         {
             //Create the SQL command to insert that record
@@ -566,7 +611,7 @@ namespace cityLife.Controllers
             Money gm2 = new Money(noCurrencyMoney, "USD");
             Test.check(11, gm2.toMoneyString());
             string badCurrency = "*1234.56";
-           
+
             try
             {
                 Money gm3 = new Money(badCurrency);
@@ -580,7 +625,7 @@ namespace cityLife.Controllers
             {
                 Money gm4 = new Money(badMoney);
             }
-            catch(AppException e)
+            catch (AppException e)
             {
                 Test.check(13, e.Message);
             }
@@ -625,7 +670,7 @@ namespace cityLife.Controllers
             {
                 mail = new Message(filePath, varDict);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Test.check(2, e.Message);
             }
@@ -648,14 +693,14 @@ namespace cityLife.Controllers
             StaffController theStaffController = new StaffController();
             List<Money> revenuePerDay = null;
             EmployeeWorkDay[] empWorkDaysArray = null;
-            var apartmentDayBlocks = theStaffController.s21dashboardPreparation(new DateTime(2018,9,20), 
+            var apartmentDayBlocks = theStaffController.s21dashboardPreparation(new DateTime(2018, 9, 20),
                 31,
-                ref revenuePerDay, 
+                ref revenuePerDay,
                 ref empWorkDaysArray);
             int testNumber = 1;
-            foreach(var anApartment in apartmentDayBlocks)
+            foreach (var anApartment in apartmentDayBlocks)
             {
-                foreach(var aDayBlock in anApartment)
+                foreach (var aDayBlock in anApartment)
                 {
                     Test.checkJson(testNumber, aDayBlock);
                     testNumber++;
@@ -664,19 +709,19 @@ namespace cityLife.Controllers
             testNumber = 200;
             var theDate = new DateTime(2018, 9, 20);
             var zeroMoney = new Money(0m, "UAH");
-            foreach(var aRevenue in revenuePerDay)
+            foreach (var aRevenue in revenuePerDay)
             {
                 if (!aRevenue.isZero())
                 {
                     Test.check(testNumber++, theDate.ToShortDateString() + " " + aRevenue.toMoneyString());
                 }
-               
+
                 theDate = theDate.AddDays(1);
             }
             testNumber = 300;
             foreach (var anEmpWorkDay in empWorkDaysArray)
             {
-                
+
                 if (anEmpWorkDay != null)
                 {
                     var empWorkDay = new
@@ -688,7 +733,7 @@ namespace cityLife.Controllers
                         empName = anEmpWorkDay.Employee.name
                     };
                     Test.checkJson(testNumber++, empWorkDay);
-                        
+
                 }
             }
 
