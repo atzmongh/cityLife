@@ -511,7 +511,7 @@ namespace cityLife.Controllers
             }
             else if (columnValue == "null")
             {
-                colValue = null;
+                colValue = "null";
             }
             else
             {
