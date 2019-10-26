@@ -696,10 +696,12 @@ namespace cityLife.Controllers
             StaffController theStaffController = new StaffController();
             List<Money> revenuePerDay = null;
             EmployeeWorkDay[] empWorkDaysArray = null;
+            List<Employee> maidList = null;
             var apartmentDayBlocks = theStaffController.s21dashboardPreparation(new DateTime(2018, 9, 20),
                 31,
                 ref revenuePerDay,
-                ref empWorkDaysArray);
+                ref empWorkDaysArray,
+                ref maidList);
             int testNumber = 1;
             foreach (var anApartment in apartmentDayBlocks)
             {

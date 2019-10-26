@@ -52,7 +52,7 @@ namespace cityLife.Controllers
     /// firstDate - the first date in the report. May not be the same as checkIn property
     ///  
     /// </summary>
-    public class DayBlock:OrderData
+    public class DayBlock : OrderData
     {
         public DayBlock()
         { }
@@ -64,7 +64,7 @@ namespace cityLife.Controllers
 
 
 
-   
+
     public class StaffController : Controller
     {
         // GET: Staff
@@ -131,7 +131,7 @@ namespace cityLife.Controllers
         /// each order element.</param>
         /// <returns></returns>
         [HttpGet]
-        public ActionResult s21Dashboard(DateTime? fromDate, string wideDashboard="off")
+        public ActionResult s21Dashboard(DateTime? fromDate, string wideDashboard = "off")
         {
             if (fromDate == null && Session["fromDate"] == null)
             {
@@ -172,7 +172,8 @@ namespace cityLife.Controllers
                 DateTime fromDateOrNow = fromDate ?? FakeDateTime.DateNow.AddDays(-1);   //start from yesterday by default
                 List<Money> revenuePerDay = null;
                 EmployeeWorkDay[] empWorkDaysArray = null;
-                var apartmentDayBlocks = s21dashboardPreparation(fromDateOrNow, dashboardDays, ref revenuePerDay, ref empWorkDaysArray);
+                List<Employee> maidList = null;
+                var apartmentDayBlocks = s21dashboardPreparation(fromDateOrNow, dashboardDays, ref revenuePerDay, ref empWorkDaysArray, ref maidList);
                 ViewBag.apartmentDayBlocks = apartmentDayBlocks;
                 ViewBag.revenuePerDay = revenuePerDay;
                 ViewBag.empWorkDaysArray = empWorkDaysArray;
@@ -182,9 +183,11 @@ namespace cityLife.Controllers
                 ViewBag.today = FakeDateTime.Now;
                 ViewBag.wideDashboard = wideDashboard == "on" ? "checked" : "";
                 ViewBag.dashboardDays = dashboardDays;
+                ViewBag.maidList = maidList;
 
                 ViewBag.employee = theEmployee;
-                if (Session["lastOrderDetails"] != null){
+                if (Session["lastOrderDetails"] != null)
+                {
                     ViewBag.highlightOrderId = (int)Session["lastOrderDetails"];
                 }
                 else
@@ -193,7 +196,7 @@ namespace cityLife.Controllers
                 }
                 return View("s21Dashboard");
             }
-            
+
 
 
         }
@@ -208,14 +211,16 @@ namespace cityLife.Controllers
         ///<param name="empWorkDaysArray">An array containing an employeeWorkDay record for each day in the month.
         ///Days for which no record found - will be null. Days for which more than one recrod found - will contain
         ///the last record. </param>
+        ///<param name="maidList">A list of maids (employees of role="maid") - ouitput parameter</param>
         /// <returns>List of apartment orders. For each apartment:
         /// list of DayBlocks.
         /// A dayBlock is either a single free day, or an order which can span 1 or more days. Note that a day block may not 
         /// be identical to the corresponding order because the order may start before the "fromDate" or end after the "fromDate+31".</returns>
-        public List<List<DayBlock>> s21dashboardPreparation(DateTime fromDate, 
+        public List<List<DayBlock>> s21dashboardPreparation(DateTime fromDate,
             int days,
-            ref List<Money> revenuePerDay, 
-            ref EmployeeWorkDay[] empWorkDaysArray)
+            ref List<Money> revenuePerDay,
+            ref EmployeeWorkDay[] empWorkDaysArray,
+            ref List<Employee> maidList)
         {
             //for each apartment
             //for each day from from_date to from_date+3
@@ -234,11 +239,11 @@ namespace cityLife.Controllers
 
             var apartmentDayBlocks = new List<List<DayBlock>>();
             revenuePerDay = new List<Money>();
-            for(int i = 0; i < days + 1; i++)
+            for (int i = 0; i < days + 1; i++)
             {
                 revenuePerDay.Add(new Money(0m, "UAH"));
             }
-            
+
             var lastDate = fromDate.AddDays(days);
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
             foreach (var anApartment in db.Apartments)
@@ -314,11 +319,13 @@ namespace cityLife.Controllers
                               where anEmpWorkDay.dateAndTime >= fromDate && anEmpWorkDay.dateAndTime <= lastDate
                               orderby anEmpWorkDay.dateAndTime
                               select anEmpWorkDay;
-            foreach(var anEmpWorkDays in empWorkDays)
+            foreach (var anEmpWorkDays in empWorkDays)
             {
                 int dayNumber = (int)Math.Round((anEmpWorkDays.dateAndTime.Date - fromDate).TotalDays, 0);
                 empWorkDaysArray[dayNumber] = anEmpWorkDays;
             }
+            maidList = db.Employees.Where(emp => emp.role == "maid").ToList();  //Add all maids to the maid list
+
             return apartmentDayBlocks;
 
         }
@@ -329,7 +336,7 @@ namespace cityLife.Controllers
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
             var theOrder = db.Orders.Single(a => a.Id == orderId);
             OrderData theOrderData = new OrderData(theOrder);
-            
+
             TranslateBox tBox = this.setTbox("RU");
             ViewBag.tBox = tBox;
             ViewBag.orderData = theOrderData;
@@ -416,7 +423,7 @@ namespace cityLife.Controllers
             }
             else
             {
-                theOrderData.price = thePrice.pricePerStay.toMoneyString(showCents:false);
+                theOrderData.price = thePrice.pricePerStay.toMoneyString(showCents: false);
             }
 
             theOrderData.paid = "";
@@ -439,7 +446,7 @@ namespace cityLife.Controllers
         /// <returns></returns>
         [HttpPost]
         public ActionResult s25addUpdateOrder(int orderId, int apartmentNumber, string Email, string Name, string Country, string Phone, string ArrivalTime,
-            string SpecialRequest, DateTime CheckinDate, DateTime CheckoutDate, int Adults, int Children,  string Price, string Paid,
+            string SpecialRequest, DateTime CheckinDate, DateTime CheckoutDate, int Adults, int Children, string Price, string Paid,
             string BookedBy, string confirmationNumber, OrderStatus status, Color orderColor, string staffComments)
         {
             //Perform validity checks on the input
@@ -492,7 +499,7 @@ namespace cityLife.Controllers
                 orderColor = orderColor,
                 staffComments = staffComments
             };
-           
+
             var apartmentNumbers = from anApartment in db.Apartments
                                    select anApartment.number;
             ViewBag.apartmentNumbers = apartmentNumbers;
@@ -509,7 +516,7 @@ namespace cityLife.Controllers
                 Money paidAmountM = new Money(Paid, "UAH");
 
                 Currency currentCurrency = db.Currencies.Single(a => a.currencyCode == "UAH");   //The staff application works currently only with UAH
-                ApartmentPrice apartmentAndPrice = PublicController.calculatePricePerStayForApartment(theAparatment, db, theBookingRequest, currentCurrency,orderId);
+                ApartmentPrice apartmentAndPrice = PublicController.calculatePricePerStayForApartment(theAparatment, db, theBookingRequest, currentCurrency, orderId);
                 Country theCountry = db.Countries.SingleOrDefault(a => a.name == Country);
                 if (apartmentAndPrice.availability == Availability.OCCUPIED)
                 {
@@ -546,10 +553,10 @@ namespace cityLife.Controllers
                     {
                         //This is an order update - show the grid, where this order will be highlighted. (TBD)
                         string fromDate = ((DateTime)Session["fromDate"]).ToString("yyyy/MM/dd");
-                        Response.Redirect("/staff/s21Dashboard?fromDate="+fromDate);
+                        Response.Redirect("/staff/s21Dashboard?fromDate=" + fromDate);
                         return View();   //fictitious, as the server.transfer moves control to another controller
                     }
-                    
+
                 }
             }
         }
@@ -561,7 +568,7 @@ namespace cityLife.Controllers
             try
             {
                 cityLifeDBContainer1 db = new cityLifeDBContainer1();
-               
+
                 var theApartmentDays = from anApartmentDays in db.ApartmentDays
                                        where anApartmentDays.Order.Id == orderId
                                        select anApartmentDays;
@@ -578,39 +585,78 @@ namespace cityLife.Controllers
 
                 return tBox.translate("order") + " " + orderId + " " + tBox.translate("deleted");
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 AppException.writeException(119, e, e.StackTrace, orderId);
                 return tBox.translate("order") + " " + orderId + " " + tBox.translate("could not be deleted");
             }
-           
+
         }
         [HttpGet]
         public JsonResult s27checkBookingPrice(DateTime checkinDate, DateTime checkoutDate, int adults, int children, int apartmentNumber, int orderId)
         {
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
             Apartment theApartment = db.Apartments.Single(a => a.number == apartmentNumber);
-           
+
             BookingRequest theBookingRequest = new BookingRequest()
             {
-                 checkinDate = checkinDate,
-                 checkoutDate = checkoutDate,
-                 adults = adults,
-                 children = children
+                checkinDate = checkinDate,
+                checkoutDate = checkoutDate,
+                adults = adults,
+                children = children
             };
             Currency theCrrency = db.Currencies.Single(a => a.currencyCode == "UAH");
-            ApartmentPrice apartmentAndPrice = PublicController.calculatePricePerStayForApartment(theApartment, db, theBookingRequest, theCrrency,orderId);
+            ApartmentPrice apartmentAndPrice = PublicController.calculatePricePerStayForApartment(theApartment, db, theBookingRequest, theCrrency, orderId);
             string availabilityName = Enum.GetName(typeof(Availability), apartmentAndPrice.availability);
-            
+
             //If the apartment is occupied, the price will be null. Replace it with 0
             Money thePrice = apartmentAndPrice.pricePerStay == null ? new Money(0m, "UAH") : apartmentAndPrice.pricePerStay;
-            var priceInfo = new { price = thePrice.toMoneyString(showCents:false), availability = availabilityName, nights = apartmentAndPrice.nightCount };
+            var priceInfo = new { price = thePrice.toMoneyString(showCents: false), availability = availabilityName, nights = apartmentAndPrice.nightCount };
             JsonResult jResult = Json(priceInfo, JsonRequestBehavior.AllowGet);
             return jResult;
 
 
         }
-       
+
+        [HttpPost]
+        public void s28AddUpdateMaid(int maidId, DateTime date)
+        {
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+            EmployeeWorkDay empWorkDay = db.EmployeeWorkDays.SingleOrDefault(a => a.dateAndTime == date);
+            Employee theMaid = db.Employees.SingleOrDefault(a => a.Id == maidId);
+
+            if (maidId == 0 && empWorkDay == null)
+            {
+                //no maid for assigned to this day. The day was not assigned before. do nothing
+            }
+            else if (maidId == 0)
+            {
+                //the day is unassigned from a previously assigned maid - delete the employeeWorkDay record
+                db.EmployeeWorkDays.Remove(empWorkDay);
+            }
+            else if (empWorkDay == null)
+            {
+                //no employee was previously assigned to this day - add the new employee
+                Currency theCurrency = db.Currencies.Single(a => a.currencyCode == "UAH");
+                empWorkDay = new EmployeeWorkDay()
+                {
+                    dateAndTime = date,
+                    Employee = theMaid,
+                    Currency = theCurrency,
+                    hours = 0,
+                    isSalaryDay = false,
+                    salaryCents = 0
+                };
+                db.EmployeeWorkDays.Add(empWorkDay);
+            }
+            else
+            {
+                //Another employee was assigned to this day - replace him by the new employee
+                empWorkDay.Employee = theMaid;
+            }
+            db.SaveChanges();
+        }
+
         /// <summary>
         /// This method is an auxiliary method to create the translation box and to insert it if needed to the Session variable
         /// It was copied from the public controller. A more elegant solution would be to create one method that will get the 

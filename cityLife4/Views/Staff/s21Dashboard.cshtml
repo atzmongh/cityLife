@@ -13,6 +13,7 @@
     int highlightOrderId = ViewBag.highlightOrderId;
     string wideDashboard = ViewBag.wideDashboard;   //contains either the word "checked" or empty
     int dashboardDays = ViewBag.dashboardDays;
+    List<Employee> maidList = ViewBag.maidList;
     string wide = "";
     string high = "";
     if (wideDashboard == "checked")
@@ -171,6 +172,7 @@
     
     <span id="highlightOrderId" data-order-id="@highlightOrderId"></span>  <!--keep the order which needs to be highlighted (or 0 if none -->
     <div style="display:flex">
+        @*first column - apartment numbers, rev and maid*@
         <div class="dash01">
             <table>
                 <tr><td class="dash01td">date</td></tr>
@@ -181,11 +183,13 @@
                     <tr><td class="dash01td @high">@apartmentNumber</td></tr>
                 }
                 <tr><td>rev.</td></tr>
+                <tr><td>maid</td></tr>
             </table>
         </div>
+        @*the table with all orders*@
         <div class="dash02">
             <table style="table-layout:fixed; width:100%">
-
+                @*line 1 - date line*@
                 <tr>
                     @{ var lastDate = fromDate.AddDays(dashboardDays);}
                     @for (DateTime aDate = fromDate; aDate < lastDate; aDate = aDate.AddDays(1))
@@ -201,6 +205,7 @@
                         <th class="dash02th @wide @weekendBackground @todaysBackground">@aDate.ToString("dd/MM")</th> <!--"wide" will make a wider column-->
                     }
                 </tr>
+                @*line 2 - day line*@
                 <tr>
                     @for (DateTime aDate = fromDate; aDate < lastDate; aDate = aDate.AddDays(1))
                     {
@@ -209,7 +214,7 @@
                     }
                 </tr>
 
-
+                @*line 3 and above - order lines (1 line for each apartment)*@
                 @foreach (var anApartment in apartmentDayBlocks)
     {
                 <tr style="background-color:@backgroundColors[colorIndex]">
@@ -274,12 +279,17 @@
                 </tr>
 
                 @*Maid on duty line*@
+                @{ 
+                    DateTime theDate = fromDate;
+                }
                 <tr>
                     @foreach (var anEmpWorkDay in empWorkDaysArray)
                     {
                         if (anEmpWorkDay == null)
                         {
-                            <td class="dash02td"></td>
+                            <td class="dash02td" onclick="displayMaidList(this)" data-emp-id="0" 
+                                data-date='@theDate.ToString("yyyy-MM-dd")'></td>  @*date-emp-id=0 denotes that an employee is not assigned to that day
+                                                                                     date-date gives the date of the current cell*@
                         }
                         else
                         {
@@ -288,8 +298,11 @@
                             {
                                 greenCss = "orderGreen";
                             }
-                            <td class="dash02td @greenCss">@anEmpWorkDay.Employee.name</td>
+                            <td class="dash02td @greenCss" onclick="displayMaidList(this)" 
+                                data-emp-id="@anEmpWorkDay.Employee.Id" 
+                                data-date='@theDate.ToString("yyyy-MM-dd")'>@anEmpWorkDay.Employee.name</td>
                         }
+                        theDate = theDate.AddDays(1);
                     }
                 </tr>
 
@@ -313,6 +326,13 @@
         <br />
         <a id="addOrderButton" class="btn" href="/staff/s23updateOrder">@tBox.translate("New Order")</a>
 
+    </div>
+    <div id="maidList" class="hidden">
+        @foreach (var aMaid in maidList)
+        {
+            <input type="radio" name="maid" value="@aMaid.Id" data-maid-name="@aMaid.name" onclick="setMaid(this)" />@aMaid.name
+        }
+        <input type="radio" name="maid" value="0" data-maid-name="" onclick="setMaid(this)" />none
     </div>
 </div>
 
@@ -362,6 +382,7 @@
 
     function displayOrderDetails(orderDetailsHTML) {
         $("#s22OrderDetails").empty();
+        $("#maidList").addClass("hidden");
         $("#s22OrderDetails").append(orderDetailsHTML);
     }
 
@@ -457,7 +478,8 @@
             '&apartmentNumber=' + apartmentNumber + '">@tBox.translate("Add Order") </a>' +
                 '</div>';
 
-            $("#s22OrderDetails").empty();
+        $("#s22OrderDetails").empty();
+        $("#maidList").addClass("hidden");
             $("#s22OrderDetails").append(html);
     }
 
@@ -470,5 +492,31 @@
         ndays = (tv2 - tv1) / 1000 / 86400;
         ndays = Math.round(ndays - 0.5);
         return ndays;
+    }
+
+    var tdMaid=null;  //contains: data-emp-id= emp_id and data-date = the date of that cell. If no 
+    function displayMaidList(tdEmp) {
+        if (tdMaid != null) {
+            $(tdMaid).removeClass("highlight");
+        }
+        $(tdEmp).addClass("highlight");
+        tdMaid = tdEmp;  //Keep the cell that was pressed by the user. When the user selects a new maid from the list of radio buttons - we will
+                         //know to which cell it was related
+        $("#s22OrderDetails").empty();
+        $("#newOrderDates").addClass("hidden");
+
+        //display the list of maids with 
+        $("#maidList").removeClass("hidden");
+    }
+
+    //the user pressed a radio button of a maid - this maid should be assigned to the date previously selected by the user 
+    //(and kept in "tdMaid")
+    function setMaid(maidRadio) {
+        $(tdMaid).empty();
+        tdMaid.append(maidRadio.dataset.maidName);
+        var maidDay = new Object();
+        maidDay.maidId = maidRadio.value;
+        maidDay.date = tdMaid.dataset.date;
+        $.post("/staff/s28AddUpdateMaid", maidDay);
     }
 </script>
