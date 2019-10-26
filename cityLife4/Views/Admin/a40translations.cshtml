@@ -25,7 +25,7 @@
             }
         </select>
     </div>
-    <input type="checkbox" name="showOnlyMissing" id="showOnlyMissing" value="true" checked />Show only missing translations<br />
+    <input type="checkbox" name="showOnlyMissing" id="showOnlyMissing" value="true" />Show only missing translations<br />
     <button onclick="populateTranslations()">Show Translations</button>
     <form method="post" action="/admin/saveTranslations">
         <table>
@@ -68,7 +68,7 @@
                 "<td>" + aTranslation.lineNumber + "</td>" +
                 "<td>" + aTranslation.translationKey + "</td>" +
                 "<td>" + aTranslation.textOriginLanguage + "</td>" +
-                "<td>" + '<input type="text" style="width:400px" name="' + $("#toLanguage").val() + '-'+ aTranslation.translationKeyId + '" value="' + aTranslation.textDestinationLanguage + '"/>' + "</td>" +
+                "<td>" + '<textarea style="width:400px" name="' + $("#toLanguage").val() + '-' + aTranslation.translationKeyId + '">' + aTranslation.textDestinationLanguage+'</textarea>' + "</td>" +
                 "</tr>";
                 //The name property of <input type="text" is of the form name="en-1" where en isthe language code and 1 is the translation key id
             $("#bodyTable").append(line);

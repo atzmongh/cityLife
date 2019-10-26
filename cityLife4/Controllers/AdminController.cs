@@ -10,6 +10,7 @@ using System.Configuration;
 using System.Data.SqlClient;
 using cityLife4;
 using cityLife.Controllers;
+using System.Net.Mime;
 
 //Look in http://www.binaryintellect.net/articles/6d19edd9-7582-4caf-b254-73deca44ecfb.aspx
 //for how to create infinite scrolling using MVC and Jquery.
@@ -321,6 +322,8 @@ namespace cityLife.Controllers
 
 
         }
+
+        
         /// <summary>
         /// The function reads the CSV file that contains the DB content and creates SQL statements to populate it
         /// Then it executes this SQL and populates the DB
