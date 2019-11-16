@@ -578,6 +578,8 @@ namespace cityLife.Controllers
             }
 
             //Create or update the apartment day records (a record for each apartment-day)
+            Money pricePerDay = apartmentAndPrice.pricePerStay / dayCount;  //Note that this may cause some rounding issues. So 100.00 / 3 gives 33.33
+            int pricePerDayCents = pricePerDay.toCents();
             for (var aDay = checkIn; aDay < checkOut; aDay = aDay.AddDays(1))
             {
                 ApartmentDay anApartmentDay = db.ApartmentDays.SingleOrDefault(a => a.date == aDay && a.Apartment.Id == apartmentAndPrice.theApartment.Id);
@@ -592,14 +594,11 @@ namespace cityLife.Controllers
                         Currency = theCurrency,
                         priceFactor = 1.0m,
                         isCleaned = false,
-                        revenue = 0,
+                        revenue = pricePerDayCents,   //We spread the revenue over all the days of the order evenly. Note that we might lose 
+                                                           //some cents doing so.
                         status = ApartOccuStatus.Reserved
                     };
-                    if (aDay == checkIn)
-                    {
-                        //this is the first day of the booking - add the revenue to this day
-                        anApartmentDay.revenue = apartmentAndPrice.pricePerStay.toCents();
-                    }
+                    
                     db.ApartmentDays.Add(anApartmentDay);
                 }
                 else
@@ -610,10 +609,9 @@ namespace cityLife.Controllers
                         anApartmentDay.Order = theOrder;
                         anApartmentDay.Apartment = apartmentAndPrice.theApartment;
                         anApartmentDay.Currency = theCurrency;
-                        if (aDay == checkIn)
-                        {
-                            anApartmentDay.revenue = apartmentAndPrice.pricePerStay.toCents();
-                        }
+                       
+                        anApartmentDay.revenue = pricePerDayCents;
+                       
                         
                         anApartmentDay.status = ApartOccuStatus.Reserved;
                     }

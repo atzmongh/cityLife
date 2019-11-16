@@ -697,9 +697,13 @@ namespace cityLife.Controllers
             List<Money> revenuePerDay = null;
             EmployeeWorkDay[] empWorkDaysArray = null;
             List<Employee> maidList = null;
+            List<Money> revenuPerApartment = null;
+            List<int> occupanyPercentPerApartment = null;
             var apartmentDayBlocks = theStaffController.s21dashboardPreparation(new DateTime(2018, 9, 20),
                 31,
                 ref revenuePerDay,
+                ref revenuPerApartment,
+                ref occupanyPercentPerApartment,
                 ref empWorkDaysArray,
                 ref maidList);
             int testNumber = 1;

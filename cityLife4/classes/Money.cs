@@ -156,23 +156,31 @@ namespace cityLife4
         /// converts the money object to string representation
         /// </summary>
         /// <param name="showCents">when true will show cents as 123.45 When false will round to the closest integral value</param>
+        /// <param name="showCurrency">when true will show the currency symbol to the left of the value.</param>
         /// <returns>$1,234.56 orf $1235 bsaed on the showCents param</returns>
-        public string toMoneyString(bool showCents = false)
+        public string toMoneyString(bool showCents = false, bool showCurrency=false)
         {
-            cityLifeDBContainer1 db = new cityLifeDBContainer1();
-            var theCurrency = db.Currencies.SingleOrDefault(aCurrency => aCurrency.currencyCode == this.currencyCode);
-            if (theCurrency == null)
+            string currencySymbol = "";
+            if (showCurrency)
             {
-                throw new AppException(102, null, "such currency does not exist in DB:" + this.currencyCode);
+                cityLifeDBContainer1 db = new cityLifeDBContainer1();
+                var theCurrency = db.Currencies.SingleOrDefault(aCurrency => aCurrency.currencyCode == this.currencyCode);
+                if (theCurrency == null)
+                {
+                    throw new AppException(102, null, "such currency does not exist in DB:" + this.currencyCode);
+                }
+                currencySymbol = theCurrency.symbol;
             }
+            //At this point currency symbol contains either the currency symbol or empty string, if show currency is false
+           
             string moneyString;
             if (showCents)
             {
-                moneyString = string.Format("{0}{1:#,##0.00}", theCurrency.symbol, this.amount);
+                moneyString = string.Format("{0}{1:#,##0.00}", currencySymbol, this.amount);
             }
             else
             {
-                moneyString = string.Format("{0}{1:#,##0}", theCurrency.symbol, decimal.Round(this.amount));
+                moneyString = string.Format("{0}{1:#,##0}", currencySymbol, decimal.Round(this.amount));
             }
             
             return moneyString;

@@ -133,35 +133,40 @@ namespace cityLife.Controllers
         [HttpGet]
         public ActionResult s21Dashboard(DateTime? fromDate, string wideDashboard = "off")
         {
+            DateTime startDate;
             if (fromDate == null && Session["fromDate"] == null)
             {
                 //Take yesterda's date as default
-                fromDate = FakeDateTime.DateNow.AddDays(-1);
-                Session["fromDate"] = fromDate;
+                startDate = FakeDateTime.DateNow.AddDays(-1);
+                Session["fromDate"] = startDate;
             }
             else if (fromDate == null)
             {
                 //fromDate is null but we have a date in the session - take it
-                fromDate = (DateTime)Session["fromDate"];
+                startDate = (DateTime)Session["fromDate"];
             }
             else
             {
                 //We have a date in "fromDate" - save it in the session variable
-                Session["fromDate"] = fromDate;
+                startDate = (DateTime)fromDate;
+                Session["fromDate"] = startDate;
             }
-            //At this point fromDate contains a date (and also Session[fromDate"] - contains the same date
+            //At this point startDate contains a date (and also Session[fromDate"] - contains the same date
 
             //Currntly for both normal mode and wide mode we dislay 31 days. The number of days can be set here.
-            int dashboardDays;
-            if (wideDashboard == "off")
-            {
-                dashboardDays = 31;
-            }
-            else
-            {
-                dashboardDays = 31;
-            }
+            //We display one month. The calculation is: the number of days displayed are equal to the month length of the starting month. 
+            //In most cases this will yield an end date which is one less that the starting date. The only exception is January 30 and 31, which will 
+            //end at 1 or 2 of March.
+            //For example: start date    end date
+            //             10/11/2019    9/12/2019
+            //             31/12/2019    30/1/2020
+            //             30/1/2019     1/3/2019 (except for leap year, where it will be 29/2/2020)
+            //             1/11/2019     30/11/2019
+            //             1/12/2019     31/12/2019
+            //             1/2/2020      29/2/2020 (2020 is leap year)
+            int dashboardDays = FakeDateTime.monthLength(startDate);
             Employee theEmployee = (Employee)Session["loggedinUser"];
+
             if (theEmployee == null)
             {
                 //No user is logged in - go to login screen
@@ -169,17 +174,27 @@ namespace cityLife.Controllers
             }
             else
             {
-                DateTime fromDateOrNow = fromDate ?? FakeDateTime.DateNow.AddDays(-1);   //start from yesterday by default
                 List<Money> revenuePerDay = null;
                 EmployeeWorkDay[] empWorkDaysArray = null;
                 List<Employee> maidList = null;
-                var apartmentDayBlocks = s21dashboardPreparation(fromDateOrNow, dashboardDays, ref revenuePerDay, ref empWorkDaysArray, ref maidList);
+                List<Money> revenuePerApartment = null;
+                List<int> percentOccupancyPerApartment = null;
+                var apartmentDayBlocks = s21dashboardPreparation(
+                    startDate, 
+                    dashboardDays, 
+                    ref revenuePerDay,
+                    ref revenuePerApartment,
+                    ref percentOccupancyPerApartment,
+                    ref empWorkDaysArray, 
+                    ref maidList);
                 ViewBag.apartmentDayBlocks = apartmentDayBlocks;
                 ViewBag.revenuePerDay = revenuePerDay;
+                ViewBag.revenuPerApartment = revenuePerApartment;
+                ViewBag.percentOccupancyPerApartment = percentOccupancyPerApartment;
                 ViewBag.empWorkDaysArray = empWorkDaysArray;
                 TranslateBox tBox = this.setTbox("RU");
                 ViewBag.tBox = tBox;
-                ViewBag.fromDate = fromDateOrNow;
+                ViewBag.fromDate = startDate;
                 ViewBag.today = FakeDateTime.Now;
                 ViewBag.wideDashboard = wideDashboard == "on" ? "checked" : "";
                 ViewBag.dashboardDays = dashboardDays;
@@ -202,12 +217,15 @@ namespace cityLife.Controllers
         }
 
         /// <summary>
-        /// The function reads the orders for all apartments starting from the date set by the user and for 31 days and 3 days (depending on 
-        /// dashboard type)
+        /// The function reads the orders for all apartments starting from the date set by the user and for a full month (30 or 31 days,
+        /// and for February 28 or 29 days)
         /// </summary>
         ///<param name="fromDate">starting date of the dashboard</param>
-        ///<param name="days">the number of days we wish to display.(depends on dashboard type - normal or wide)</param>
+        ///<param name="days">the number of days we wish to display.(depends on the starting month)</param>
         ///<param name="revenuePerDay">An output parameter - will contain the list of revenues per day</param>
+        ///<param name="percentOccupancyPerApartment">Number of days the apartment is occupied divided by total number of days (rounded to 
+        ///whole percent)</param>
+        ///<param name="revenuePerApartment">Total revenue per apartment for that month</param>
         ///<param name="empWorkDaysArray">An array containing an employeeWorkDay record for each day in the month.
         ///Days for which no record found - will be null. Days for which more than one recrod found - will contain
         ///the last record. </param>
@@ -219,6 +237,8 @@ namespace cityLife.Controllers
         public List<List<DayBlock>> s21dashboardPreparation(DateTime fromDate,
             int days,
             ref List<Money> revenuePerDay,
+            ref List<Money> revenuePerApartment,
+            ref List<int> percentOccupancyPerApartment,
             ref EmployeeWorkDay[] empWorkDaysArray,
             ref List<Employee> maidList)
         {
@@ -239,18 +259,22 @@ namespace cityLife.Controllers
 
             var apartmentDayBlocks = new List<List<DayBlock>>();
             revenuePerDay = new List<Money>();
-            for (int i = 0; i < days + 1; i++)
+            for (int i = 0; i < days; i++)
             {
                 revenuePerDay.Add(new Money(0m, "UAH"));
             }
 
-            var lastDate = fromDate.AddDays(days);
+            var lastDate = fromDate.AddDays(days - 1);
+            revenuePerApartment = new List<Money>();
+            percentOccupancyPerApartment = new List<int>();
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
             foreach (var anApartment in db.Apartments)
             {
                 var dayBlocks = new List<DayBlock>();
                 DayBlock aDayBlock = null;
                 int dayNumber = 0;
+                Money apartmentRevenue = new Money(0m, "UAH");
+                double apartmentOccupiedDays = 0;   //Use float for the percentage calculation later
                 for (var aDate = fromDate; aDate <= lastDate; aDate = aDate.AddDays(1))
                 {
                     var anApartmentDay = db.ApartmentDays.SingleOrDefault(record => record.Apartment.Id == anApartment.Id && record.date == aDate);
@@ -273,6 +297,8 @@ namespace cityLife.Controllers
                         var anOrder = db.Orders.Single(record => record.Id == anApartmentDay.Order.Id);
                         //Add the revenue of that day to the total revenu per day
                         revenuePerDay[dayNumber] += anApartmentDay.revenueAsMoney();
+                        apartmentRevenue += anApartmentDay.revenueAsMoney();
+                        apartmentOccupiedDays++;
                         if (aDayBlock == null)
                         {
                             //This is the first time we see this order - open a new DayBlock object. Note that if the report starts from 
@@ -308,6 +334,11 @@ namespace cityLife.Controllers
                 }
                 //Add the dayBlocks list into the apartmentDayBlocks
                 apartmentDayBlocks.Add(dayBlocks);
+                //Add the apartment revenue and apartment occupacy percentage
+                revenuePerApartment.Add(apartmentRevenue);
+                double apartmentOccupancyPercent = apartmentOccupiedDays / days * 100.0;
+                int apartmentOccupancyPercentRounded = (int)Math.Round(apartmentOccupancyPercent);
+                percentOccupancyPerApartment.Add(apartmentOccupancyPercentRounded);
             }
             //At this point the apartmentDayBlocks variable contaiins a list of list of day blocks 
 
