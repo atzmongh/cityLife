@@ -23,6 +23,7 @@ namespace cityLife4
             this.ApartmentDays = new HashSet<ApartmentDay>();
             this.Orders = new HashSet<Order>();
             this.EmployeeWorkDays = new HashSet<EmployeeWorkDay>();
+            this.Expenses = new HashSet<Expense>();
         }
     
         public string currencyCode { get; set; }
@@ -41,5 +42,7 @@ namespace cityLife4
         public virtual ICollection<Order> Orders { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<EmployeeWorkDay> EmployeeWorkDays { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Expense> Expenses { get; set; }
     }
 }

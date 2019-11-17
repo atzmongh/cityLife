@@ -4,495 +4,549 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="cityLifeDB.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2012" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-  <EntityContainer Name="cityLifeDBStoreContainer">
-    <EntitySet Name="Apartments" EntityType="cityLifeDB.Store.Apartments" store:Type="Tables" Schema="dbo" />
-    <EntitySet Name="ApartmentPhotoes" EntityType="cityLifeDB.Store.ApartmentPhotoes" store:Type="Tables" Schema="dbo" />
-    <EntitySet Name="Pricings" EntityType="cityLifeDB.Store.Pricings" store:Type="Tables" Schema="dbo" />
-    <EntitySet Name="Languages" EntityType="cityLifeDB.Store.Languages" store:Type="Tables" Schema="dbo" />
-    <EntitySet Name="TranslationKeys" EntityType="cityLifeDB.Store.TranslationKeys" store:Type="Tables" Schema="dbo" />
-    <EntitySet Name="Translations" EntityType="cityLifeDB.Store.Translations" store:Type="Tables" Schema="dbo" />
-    <EntitySet Name="Currencies" EntityType="cityLifeDB.Store.Currencies" store:Type="Tables" Schema="dbo" />
-    <EntitySet Name="CurrencyExchanges" EntityType="cityLifeDB.Store.CurrencyExchanges" store:Type="Tables" Schema="dbo" />
-    <EntitySet Name="ApartmentDays" EntityType="cityLifeDB.Store.ApartmentDays" store:Type="Tables" Schema="dbo" />
-    <EntitySet Name="unitTests" EntityType="cityLifeDB.Store.unitTests" store:Type="Tables" Schema="dbo" />
-    <EntitySet Name="ErrorCodes" EntityType="cityLifeDB.Store.ErrorCodes" store:Type="Tables" Schema="dbo" />
-    <EntitySet Name="ErrorMessages" EntityType="cityLifeDB.Store.ErrorMessages" store:Type="Tables" Schema="dbo" />
-    <EntitySet Name="Orders" EntityType="cityLifeDB.Store.Orders" store:Type="Tables" Schema="dbo" />
-    <EntitySet Name="Guests" EntityType="cityLifeDB.Store.Guests" store:Type="Tables" Schema="dbo" />
-    <EntitySet Name="Employees" EntityType="cityLifeDB.Store.Employees" store:Type="Tables" Schema="dbo" />
-    <EntitySet Name="Countries" EntityType="cityLifeDB.Store.Countries" store:Type="Tables" Schema="dbo" />
-    <EntitySet Name="EmployeeWorkDays" EntityType="cityLifeDB.Store.EmployeeWorkDays" store:Type="Tables" Schema="dbo" />
-    <AssociationSet Name="ApartmentApartmentPhoto" Association="cityLifeDB.Store.ApartmentApartmentPhoto">
-      <End Role="Apartment" EntitySet="Apartments" />
-      <End Role="ApartmentPhoto" EntitySet="ApartmentPhotoes" />
-    </AssociationSet>
-    <AssociationSet Name="ApartmentPricing" Association="cityLifeDB.Store.ApartmentPricing">
-      <End Role="Apartment" EntitySet="Apartments" />
-      <End Role="Pricing" EntitySet="Pricings" />
-    </AssociationSet>
-    <AssociationSet Name="TranslationKeyTranslatio" Association="cityLifeDB.Store.TranslationKeyTranslatio">
-      <End Role="TranslationKey" EntitySet="TranslationKeys" />
-      <End Role="Translatio" EntitySet="Translations" />
-    </AssociationSet>
-    <AssociationSet Name="LanguageTranslation" Association="cityLifeDB.Store.LanguageTranslation">
-      <End Role="Language" EntitySet="Languages" />
-      <End Role="Translation" EntitySet="Translations" />
-    </AssociationSet>
-    <AssociationSet Name="CurrencyPricing" Association="cityLifeDB.Store.CurrencyPricing">
-      <End Role="Currency" EntitySet="Currencies" />
-      <End Role="Pricing" EntitySet="Pricings" />
-    </AssociationSet>
-    <AssociationSet Name="CurrencyCurrencyExchange" Association="cityLifeDB.Store.CurrencyCurrencyExchangeFrom">
-      <End Role="Currency" EntitySet="Currencies" />
-      <End Role="CurrencyExchange" EntitySet="CurrencyExchanges" />
-    </AssociationSet>
-    <AssociationSet Name="CurrencyCurrencyExchange1" Association="cityLifeDB.Store.CurrencyCurrencyExchangeTo">
-      <End Role="Currency" EntitySet="Currencies" />
-      <End Role="CurrencyExchange" EntitySet="CurrencyExchanges" />
-    </AssociationSet>
-    <AssociationSet Name="CurrencyApartmentDay" Association="cityLifeDB.Store.CurrencyApartmentDay">
-      <End Role="Currency" EntitySet="Currencies" />
-      <End Role="ApartmentDay" EntitySet="ApartmentDays" />
-    </AssociationSet>
-    <AssociationSet Name="ApartmentApartmentDay" Association="cityLifeDB.Store.ApartmentApartmentDay">
-      <End Role="Apartment" EntitySet="Apartments" />
-      <End Role="ApartmentDay" EntitySet="ApartmentDays" />
-    </AssociationSet>
-    <AssociationSet Name="ErrorCodeErrorMessage" Association="cityLifeDB.Store.ErrorCodeErrorMessage">
-      <End Role="ErrorCode" EntitySet="ErrorCodes" />
-      <End Role="ErrorMessage" EntitySet="ErrorMessages" />
-    </AssociationSet>
-    <AssociationSet Name="CurrencyOrder" Association="cityLifeDB.Store.CurrencyOrder">
-      <End Role="Currency" EntitySet="Currencies" />
-      <End Role="Order" EntitySet="Orders" />
-    </AssociationSet>
-    <AssociationSet Name="OrderApartmentDay" Association="cityLifeDB.Store.OrderApartmentDay">
-      <End Role="Order" EntitySet="Orders" />
-      <End Role="ApartmentDay" EntitySet="ApartmentDays" />
-    </AssociationSet>
-    <AssociationSet Name="ApartmentOrder" Association="cityLifeDB.Store.ApartmentOrder">
-      <End Role="Apartment" EntitySet="Apartments" />
-      <End Role="Order" EntitySet="Orders" />
-    </AssociationSet>
-    <AssociationSet Name="GuestOrder" Association="cityLifeDB.Store.GuestOrder">
-      <End Role="Guest" EntitySet="Guests" />
-      <End Role="Order" EntitySet="Orders" />
-    </AssociationSet>
-    <AssociationSet Name="CountryGuest" Association="cityLifeDB.Store.CountryGuest">
-      <End Role="Country" EntitySet="Countries" />
-      <End Role="Guest" EntitySet="Guests" />
-    </AssociationSet>
-    <AssociationSet Name="EmployeeEmployeeWorkDay" Association="cityLifeDB.Store.EmployeeEmployeeWorkDay">
-      <End Role="Employee" EntitySet="Employees" />
-      <End Role="EmployeeWorkDay" EntitySet="EmployeeWorkDays" />
-    </AssociationSet>
-    <AssociationSet Name="CurrencyEmployeeWorkDay" Association="cityLifeDB.Store.CurrencyEmployeeWorkDay">
-      <End Role="Currency" EntitySet="Currencies" />
-      <End Role="EmployeeWorkDay" EntitySet="EmployeeWorkDays" />
-    </AssociationSet>
-  </EntityContainer>
-  <EntityType Name="Apartments">
-    <Key>
-      <PropertyRef Name="Id" />
-    </Key>
-    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="number" Type="smallint" Nullable="false" />
-    <Property Name="nameKey" Type="nvarchar(max)" Nullable="false" />
-    <Property Name="descriptionKey" Type="nvarchar(max)" Nullable="false" />
-    <Property Name="addressKey" Type="nvarchar(max)" Nullable="false" />
-    <Property Name="size" Type="smallint" Nullable="false" />
-    <Property Name="featuresKeys" Type="nvarchar(max)" Nullable="true" />
-  </EntityType>
-  <EntityType Name="ApartmentPhotoes">
-    <Key>
-      <PropertyRef Name="Id" />
-    </Key>
-    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="filePath" Type="nvarchar(max)" Nullable="false" />
-    <Property Name="type" Type="smallint" Nullable="false" />
-    <Property Name="orientation" Type="smallint" Nullable="false" />
-    <Property Name="width" Type="int" Nullable="true" />
-    <Property Name="height" Type="int" Nullable="true" />
-    <Property Name="sortOrder" Type="smallint" Nullable="false" />
-    <Property Name="thumbnailPath" Type="nvarchar(max)" Nullable="true" />
-    <Property Name="forDesktop" Type="bit" Nullable="false" DefaultValue="true" />
-    <Property Name="forMobile" Type="bit" Nullable="false" DefaultValue="true" />
-    <Property Name="Apartment_Id" Type="int" Nullable="false" />
-  </EntityType>
-  <EntityType Name="Pricings">
-    <Key>
-      <PropertyRef Name="Id" />
-    </Key>
-    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="adults" Type="smallint" Nullable="false" />
-    <Property Name="children" Type="smallint" Nullable="false" />
-    <Property Name="priceWeekDay" Type="int" Nullable="false" />
-    <Property Name="priceWeekEnd" Type="int" Nullable="false" />
-    <Property Name="Apartment_Id" Type="int" Nullable="false" />
-    <Property Name="Currency_currencyCode" Type="nchar" MaxLength="3" Nullable="false" />
-  </EntityType>
-  <EntityType Name="Languages">
-    <Key>
-      <PropertyRef Name="languageCode" />
-    </Key>
-    <Property Name="languageCode" Type="nvarchar" Nullable="false" MaxLength="10" />
-    <Property Name="name" Type="nvarchar" Nullable="false" MaxLength="30" />
-    <Property Name="isDefault" Type="bit" Nullable="false" DefaultValue="false" />
-  </EntityType>
-  <EntityType Name="TranslationKeys">
-    <Key>
-      <PropertyRef Name="id" />
-    </Key>
-    <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="transKey" Type="nvarchar(max)" Nullable="false" />
-    <Property Name="isUsed" Type="bit" Nullable="false" DefaultValue="false" />
-    <Property Name="filePath" Type="nvarchar(max)" Nullable="true" />
-    <Property Name="lineNumber" Type="int" Nullable="true" />
-  </EntityType>
-  <EntityType Name="Translations">
-    <Key>
-      <PropertyRef Name="Id" />
-    </Key>
-    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="message" Type="nvarchar(max)" Nullable="false" />
-    <Property Name="TranslationKey_id" Type="int" Nullable="false" />
-    <Property Name="Language_languageCode" Type="nvarchar" MaxLength="10" Nullable="false" />
-  </EntityType>
-  <EntityType Name="Currencies">
-    <Key>
-      <PropertyRef Name="currencyCode" />
-    </Key>
-    <Property Name="currencyCode" Type="nchar" Nullable="false" MaxLength="3" />
-    <Property Name="symbol" Type="nchar" Nullable="false" MaxLength="1" />
-    <Property Name="name" Type="nvarchar(max)" Nullable="false" />
-  </EntityType>
-  <EntityType Name="CurrencyExchanges">
-    <Key>
-      <PropertyRef Name="Id" />
-    </Key>
-    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="conversionRate" Type="decimal" Nullable="false" Precision="10" Scale="4" />
-    <Property Name="date" Type="datetime" Nullable="false" />
-    <Property Name="FromCurrency_currencyCode" Type="nchar" MaxLength="3" Nullable="false" />
-    <Property Name="ToCurrency_currencyCode" Type="nchar" MaxLength="3" Nullable="false" />
-  </EntityType>
-  <EntityType Name="ApartmentDays">
-    <Key>
-      <PropertyRef Name="Id" />
-    </Key>
-    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="status" Type="int" Nullable="false" />
-    <Property Name="isCleaned" Type="bit" Nullable="false" DefaultValue="false" />
-    <Property Name="revenue" Type="int" Nullable="false" DefaultValue="0" />
-    <Property Name="date" Type="datetime" Nullable="false" />
-    <Property Name="priceFactor" Type="decimal" Nullable="false" DefaultValue="1" Precision="10" Scale="4" />
-    <Property Name="Currency_currencyCode" Type="nchar" MaxLength="3" Nullable="true" />
-    <Property Name="Apartment_Id" Type="int" Nullable="false" />
-    <Property Name="Order_Id" Type="int" Nullable="true" />
-  </EntityType>
-  <EntityType Name="unitTests">
-    <Key>
-      <PropertyRef Name="series" />
-      <PropertyRef Name="number" />
-    </Key>
-    <Property Name="series" Type="nvarchar" Nullable="false" MaxLength="64" />
-    <Property Name="number" Type="int" Nullable="false" />
-    <Property Name="expectedResult" Type="nvarchar(max)" Nullable="true" />
-    <Property Name="actualResult" Type="nvarchar(max)" Nullable="true" />
-    <Property Name="dateLastRun" Type="datetime" Nullable="false" />
-    <Property Name="correctFlag" Type="bit" Nullable="true" />
-  </EntityType>
-  <EntityType Name="ErrorCodes">
-    <Key>
-      <PropertyRef Name="code" />
-    </Key>
-    <Property Name="code" Type="int" Nullable="false" />
-    <Property Name="message" Type="nvarchar(max)" Nullable="true" />
-    <Property Name="occurenceCount" Type="int" Nullable="false" DefaultValue="1" />
-    <Property Name="lastOccurenceDate" Type="datetime" Nullable="false" />
-  </EntityType>
-  <EntityType Name="ErrorMessages">
-    <Key>
-      <PropertyRef Name="Id" />
-    </Key>
-    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="formattedMessage" Type="nvarchar(max)" Nullable="false" />
-    <Property Name="stackTrace" Type="nvarchar(max)" Nullable="true" />
-    <Property Name="lastOccurenceDate" Type="datetime" Nullable="false" />
-    <Property Name="occurenceCount" Type="int" Nullable="false" DefaultValue="1" />
-    <Property Name="ErrorCode_code" Type="int" Nullable="false" />
-  </EntityType>
-  <EntityType Name="Orders">
-    <Key>
-      <PropertyRef Name="Id" />
-    </Key>
-    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="checkinDate" Type="datetime" Nullable="false" />
-    <Property Name="checkoutDate" Type="datetime" Nullable="false" />
-    <Property Name="dayCount" Type="int" Nullable="false" />
-    <Property Name="adultCount" Type="int" Nullable="false" />
-    <Property Name="childrenCount" Type="int" Nullable="false" DefaultValue="0" />
-    <Property Name="expectedArrival" Type="nvarchar(max)" Nullable="true" />
-    <Property Name="specialRequest" Type="nvarchar(max)" Nullable="true" />
-    <Property Name="status" Type="int" Nullable="false" />
-    <Property Name="confirmationNumber" Type="nvarchar(max)" Nullable="false" DefaultValue="0" />
-    <Property Name="cancellationNumber" Type="nvarchar(max)" Nullable="true" />
-    <Property Name="price" Type="int" Nullable="false" />
-    <Property Name="amountPaid" Type="int" Nullable="false" />
-    <Property Name="bookedBy" Type="nvarchar(max)" Nullable="true" />
-    <Property Name="OrderColor" Type="int" Nullable="false" />
-    <Property Name="staffComments" Type="nvarchar(max)" Nullable="true" />
-    <Property Name="Currency_currencyCode" Type="nchar" MaxLength="3" Nullable="false" />
-    <Property Name="Apartment_Id" Type="int" Nullable="false" />
-    <Property Name="Guest_Id" Type="int" Nullable="false" />
-  </EntityType>
-  <EntityType Name="Guests">
-    <Key>
-      <PropertyRef Name="Id" />
-    </Key>
-    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="name" Type="nvarchar(max)" Nullable="false" />
-    <Property Name="phone" Type="nvarchar(max)" Nullable="false" />
-    <Property Name="email" Type="nvarchar(max)" Nullable="false" />
-    <Property Name="Country_code" Type="nchar" MaxLength="3" Nullable="true" />
-  </EntityType>
-  <EntityType Name="Employees">
-    <Key>
-      <PropertyRef Name="Id" />
-    </Key>
-    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="name" Type="nvarchar(max)" Nullable="false" />
-    <Property Name="phone" Type="nvarchar(max)" Nullable="false" />
-    <Property Name="role" Type="nvarchar(max)" Nullable="true" />
-    <Property Name="passwordHash" Type="nvarchar(max)" Nullable="false" />
-    <Property Name="email" Type="nvarchar(max)" Nullable="false" />
-    <Property Name="userName" Type="nvarchar(max)" Nullable="false" />
-  </EntityType>
-  <EntityType Name="Countries">
-    <Key>
-      <PropertyRef Name="code" />
-    </Key>
-    <Property Name="code" Type="nchar" Nullable="false" MaxLength="3" />
-    <Property Name="name" Type="nvarchar(max)" Nullable="false" />
-  </EntityType>
-  <EntityType Name="EmployeeWorkDays">
-    <Key>
-      <PropertyRef Name="Id" />
-    </Key>
-    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="dateAndTime" Type="datetime" Nullable="false" />
-    <Property Name="hours" Type="int" Nullable="false" />
-    <Property Name="salaryCents" Type="int" Nullable="false" />
-    <Property Name="isSalaryDay" Type="bit" Nullable="false" DefaultValue="false" />
-    <Property Name="Employee_Id" Type="int" Nullable="false" />
-    <Property Name="Currency_currencyCode" Type="nchar" MaxLength="3" Nullable="false" />
-  </EntityType>
-  <Association Name="ApartmentApartmentPhoto">
-    <End Role="Apartment" Type="cityLifeDB.Store.Apartments" Multiplicity="1" />
-    <End Role="ApartmentPhoto" Type="cityLifeDB.Store.ApartmentPhotoes" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="Apartment">
-        <PropertyRef Name="Id" />
-      </Principal>
-      <Dependent Role="ApartmentPhoto">
-        <PropertyRef Name="Apartment_Id" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="ApartmentPricing">
-    <End Role="Apartment" Type="cityLifeDB.Store.Apartments" Multiplicity="1" />
-    <End Role="Pricing" Type="cityLifeDB.Store.Pricings" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="Apartment">
-        <PropertyRef Name="Id" />
-      </Principal>
-      <Dependent Role="Pricing">
-        <PropertyRef Name="Apartment_Id" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="TranslationKeyTranslatio">
-    <End Role="TranslationKey" Type="cityLifeDB.Store.TranslationKeys" Multiplicity="1" />
-    <End Role="Translatio" Type="cityLifeDB.Store.Translations" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="TranslationKey">
-        <PropertyRef Name="id" />
-      </Principal>
-      <Dependent Role="Translatio">
-        <PropertyRef Name="TranslationKey_id" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="LanguageTranslation">
-    <End Role="Language" Type="cityLifeDB.Store.Languages" Multiplicity="1" />
-    <End Role="Translation" Type="cityLifeDB.Store.Translations" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="Language">
-        <PropertyRef Name="languageCode" />
-      </Principal>
-      <Dependent Role="Translation">
-        <PropertyRef Name="Language_languageCode" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="CurrencyPricing">
-    <End Role="Currency" Type="cityLifeDB.Store.Currencies" Multiplicity="1" />
-    <End Role="Pricing" Type="cityLifeDB.Store.Pricings" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="Currency">
-        <PropertyRef Name="currencyCode" />
-      </Principal>
-      <Dependent Role="Pricing">
-        <PropertyRef Name="Currency_currencyCode" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="CurrencyCurrencyExchangeFrom">
-    <End Role="Currency" Type="cityLifeDB.Store.Currencies" Multiplicity="1" />
-    <End Role="CurrencyExchange" Type="cityLifeDB.Store.CurrencyExchanges" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="Currency">
-        <PropertyRef Name="currencyCode" />
-      </Principal>
-      <Dependent Role="CurrencyExchange">
-        <PropertyRef Name="FromCurrency_currencyCode" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="CurrencyCurrencyExchangeTo">
-    <End Role="Currency" Type="cityLifeDB.Store.Currencies" Multiplicity="1" />
-    <End Role="CurrencyExchange" Type="cityLifeDB.Store.CurrencyExchanges" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="Currency">
-        <PropertyRef Name="currencyCode" />
-      </Principal>
-      <Dependent Role="CurrencyExchange">
-        <PropertyRef Name="ToCurrency_currencyCode" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="CurrencyApartmentDay">
-    <End Role="Currency" Type="cityLifeDB.Store.Currencies" Multiplicity="0..1" />
-    <End Role="ApartmentDay" Type="cityLifeDB.Store.ApartmentDays" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="Currency">
-        <PropertyRef Name="currencyCode" />
-      </Principal>
-      <Dependent Role="ApartmentDay">
-        <PropertyRef Name="Currency_currencyCode" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="ApartmentApartmentDay">
-    <End Role="Apartment" Type="cityLifeDB.Store.Apartments" Multiplicity="1" />
-    <End Role="ApartmentDay" Type="cityLifeDB.Store.ApartmentDays" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="Apartment">
-        <PropertyRef Name="Id" />
-      </Principal>
-      <Dependent Role="ApartmentDay">
-        <PropertyRef Name="Apartment_Id" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="ErrorCodeErrorMessage">
-    <End Role="ErrorCode" Type="cityLifeDB.Store.ErrorCodes" Multiplicity="1" />
-    <End Role="ErrorMessage" Type="cityLifeDB.Store.ErrorMessages" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="ErrorCode">
-        <PropertyRef Name="code" />
-      </Principal>
-      <Dependent Role="ErrorMessage">
-        <PropertyRef Name="ErrorCode_code" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="CurrencyOrder">
-    <End Role="Currency" Type="cityLifeDB.Store.Currencies" Multiplicity="1" />
-    <End Role="Order" Type="cityLifeDB.Store.Orders" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="Currency">
-        <PropertyRef Name="currencyCode" />
-      </Principal>
-      <Dependent Role="Order">
-        <PropertyRef Name="Currency_currencyCode" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="OrderApartmentDay">
-    <End Role="Order" Type="cityLifeDB.Store.Orders" Multiplicity="0..1" />
-    <End Role="ApartmentDay" Type="cityLifeDB.Store.ApartmentDays" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="Order">
-        <PropertyRef Name="Id" />
-      </Principal>
-      <Dependent Role="ApartmentDay">
-        <PropertyRef Name="Order_Id" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="ApartmentOrder">
-    <End Role="Apartment" Type="cityLifeDB.Store.Apartments" Multiplicity="1" />
-    <End Role="Order" Type="cityLifeDB.Store.Orders" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="Apartment">
-        <PropertyRef Name="Id" />
-      </Principal>
-      <Dependent Role="Order">
-        <PropertyRef Name="Apartment_Id" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="GuestOrder">
-    <End Role="Guest" Type="cityLifeDB.Store.Guests" Multiplicity="1" />
-    <End Role="Order" Type="cityLifeDB.Store.Orders" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="Guest">
-        <PropertyRef Name="Id" />
-      </Principal>
-      <Dependent Role="Order">
-        <PropertyRef Name="Guest_Id" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="CountryGuest">
-    <End Role="Country" Type="cityLifeDB.Store.Countries" Multiplicity="0..1" />
-    <End Role="Guest" Type="cityLifeDB.Store.Guests" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="Country">
-        <PropertyRef Name="code" />
-      </Principal>
-      <Dependent Role="Guest">
-        <PropertyRef Name="Country_code" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="EmployeeEmployeeWorkDay">
-    <End Role="Employee" Type="cityLifeDB.Store.Employees" Multiplicity="1" />
-    <End Role="EmployeeWorkDay" Type="cityLifeDB.Store.EmployeeWorkDays" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="Employee">
-        <PropertyRef Name="Id" />
-      </Principal>
-      <Dependent Role="EmployeeWorkDay">
-        <PropertyRef Name="Employee_Id" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="CurrencyEmployeeWorkDay">
-    <End Role="Currency" Type="cityLifeDB.Store.Currencies" Multiplicity="1" />
-    <End Role="EmployeeWorkDay" Type="cityLifeDB.Store.EmployeeWorkDays" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="Currency">
-        <PropertyRef Name="currencyCode" />
-      </Principal>
-      <Dependent Role="EmployeeWorkDay">
-        <PropertyRef Name="Currency_currencyCode" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-</Schema></edmx:StorageModels>
+    <Schema Namespace="cityLifeDB.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="ApartmentDays">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="status" Type="int" Nullable="false" />
+          <Property Name="isCleaned" Type="bit" Nullable="false" />
+          <Property Name="revenue" Type="int" Nullable="false" />
+          <Property Name="date" Type="datetime" Nullable="false" />
+          <Property Name="priceFactor" Type="decimal" Precision="10" Scale="4" Nullable="false" />
+          <Property Name="Currency_currencyCode" Type="nchar" MaxLength="3" />
+          <Property Name="Apartment_Id" Type="int" Nullable="false" />
+          <Property Name="Order_Id" Type="int" />
+        </EntityType>
+        <EntityType Name="ApartmentPhotoes">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="filePath" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="type" Type="smallint" Nullable="false" />
+          <Property Name="orientation" Type="smallint" Nullable="false" />
+          <Property Name="width" Type="int" />
+          <Property Name="height" Type="int" />
+          <Property Name="sortOrder" Type="smallint" Nullable="false" />
+          <Property Name="thumbnailPath" Type="nvarchar(max)" />
+          <Property Name="forDesktop" Type="bit" Nullable="false" />
+          <Property Name="forMobile" Type="bit" Nullable="false" />
+          <Property Name="Apartment_Id" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Apartments">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="number" Type="smallint" Nullable="false" />
+          <Property Name="nameKey" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="descriptionKey" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="addressKey" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="size" Type="smallint" Nullable="false" />
+          <Property Name="featuresKeys" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="Countries">
+          <Key>
+            <PropertyRef Name="code" />
+          </Key>
+          <Property Name="code" Type="nchar" MaxLength="3" Nullable="false" />
+          <Property Name="name" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="language" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="Currencies">
+          <Key>
+            <PropertyRef Name="currencyCode" />
+          </Key>
+          <Property Name="currencyCode" Type="nchar" MaxLength="3" Nullable="false" />
+          <Property Name="symbol" Type="nchar" MaxLength="1" Nullable="false" />
+          <Property Name="name" Type="nvarchar(max)" Nullable="false" />
+        </EntityType>
+        <EntityType Name="CurrencyExchanges">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="conversionRate" Type="decimal" Precision="10" Scale="4" Nullable="false" />
+          <Property Name="date" Type="datetime" Nullable="false" />
+          <Property Name="FromCurrency_currencyCode" Type="nchar" MaxLength="3" Nullable="false" />
+          <Property Name="ToCurrency_currencyCode" Type="nchar" MaxLength="3" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Employees">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="name" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="phone" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="role" Type="nvarchar(max)" />
+          <Property Name="passwordHash" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="email" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="userName" Type="nvarchar(max)" Nullable="false" />
+        </EntityType>
+        <EntityType Name="EmployeeWorkDays">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="dateAndTime" Type="datetime" Nullable="false" />
+          <Property Name="hours" Type="int" Nullable="false" />
+          <Property Name="salaryCents" Type="int" Nullable="false" />
+          <Property Name="isSalaryDay" Type="bit" Nullable="false" />
+          <Property Name="Employee_Id" Type="int" Nullable="false" />
+          <Property Name="Currency_currencyCode" Type="nchar" MaxLength="3" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ErrorCodes">
+          <Key>
+            <PropertyRef Name="code" />
+          </Key>
+          <Property Name="code" Type="int" Nullable="false" />
+          <Property Name="message" Type="nvarchar(max)" />
+          <Property Name="occurenceCount" Type="int" Nullable="false" />
+          <Property Name="lastOccurenceDate" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ErrorMessages">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="formattedMessage" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="stackTrace" Type="nvarchar(max)" />
+          <Property Name="lastOccurenceDate" Type="datetime" Nullable="false" />
+          <Property Name="occurenceCount" Type="int" Nullable="false" />
+          <Property Name="ErrorCode_code" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Expenses">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="date" Type="datetime" Nullable="false" />
+          <Property Name="amount" Type="int" Nullable="false" />
+          <Property Name="currency_currencyCode" Type="nchar" MaxLength="3" />
+          <Property Name="expenseType_Id" Type="int" Nullable="false" />
+          <Property Name="description" Type="nvarchar(max)" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ExpenseTypes">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="nameKey" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="descriptionKey" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="Guests">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="name" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="phone" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="email" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Country_code" Type="nchar" MaxLength="3" />
+        </EntityType>
+        <EntityType Name="Languages">
+          <Key>
+            <PropertyRef Name="languageCode" />
+          </Key>
+          <Property Name="languageCode" Type="nvarchar" MaxLength="10" Nullable="false" />
+          <Property Name="name" Type="nvarchar" MaxLength="30" Nullable="false" />
+          <Property Name="isDefault" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Orders">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="checkinDate" Type="datetime" Nullable="false" />
+          <Property Name="checkoutDate" Type="datetime" Nullable="false" />
+          <Property Name="dayCount" Type="int" Nullable="false" />
+          <Property Name="adultCount" Type="int" Nullable="false" />
+          <Property Name="childrenCount" Type="int" Nullable="false" />
+          <Property Name="expectedArrival" Type="nvarchar(max)" />
+          <Property Name="specialRequest" Type="nvarchar(max)" />
+          <Property Name="status" Type="int" Nullable="false" />
+          <Property Name="confirmationNumber" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="cancellationNumber" Type="nvarchar(max)" />
+          <Property Name="price" Type="int" Nullable="false" />
+          <Property Name="amountPaid" Type="int" Nullable="false" />
+          <Property Name="bookedBy" Type="nvarchar(max)" />
+          <Property Name="OrderColor" Type="int" Nullable="false" />
+          <Property Name="staffComments" Type="nvarchar(max)" />
+          <Property Name="Currency_currencyCode" Type="nchar" MaxLength="3" Nullable="false" />
+          <Property Name="Apartment_Id" Type="int" Nullable="false" />
+          <Property Name="Guest_Id" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Pricings">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="adults" Type="smallint" Nullable="false" />
+          <Property Name="children" Type="smallint" Nullable="false" />
+          <Property Name="priceWeekDay" Type="int" Nullable="false" />
+          <Property Name="priceWeekEnd" Type="int" Nullable="false" />
+          <Property Name="Apartment_Id" Type="int" Nullable="false" />
+          <Property Name="Currency_currencyCode" Type="nchar" MaxLength="3" Nullable="false" />
+        </EntityType>
+        <EntityType Name="TranslationKeys">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="transKey" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="isUsed" Type="bit" Nullable="false" />
+          <Property Name="filePath" Type="nvarchar(max)" />
+          <Property Name="lineNumber" Type="int" />
+        </EntityType>
+        <EntityType Name="Translations">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="message" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="TranslationKey_id" Type="int" Nullable="false" />
+          <Property Name="Language_languageCode" Type="nvarchar" MaxLength="10" Nullable="false" />
+        </EntityType>
+        <EntityType Name="unitTests">
+          <Key>
+            <PropertyRef Name="series" />
+            <PropertyRef Name="number" />
+          </Key>
+          <Property Name="series" Type="nvarchar" MaxLength="64" Nullable="false" />
+          <Property Name="number" Type="int" Nullable="false" />
+          <Property Name="expectedResult" Type="nvarchar(max)" />
+          <Property Name="actualResult" Type="nvarchar(max)" />
+          <Property Name="dateLastRun" Type="datetime" Nullable="false" />
+          <Property Name="correctFlag" Type="bit" />
+        </EntityType>
+        <Association Name="FK_ApartmentApartmentDay">
+          <End Role="Apartments" Type="Self.Apartments" Multiplicity="1" />
+          <End Role="ApartmentDays" Type="Self.ApartmentDays" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Apartments">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ApartmentDays">
+              <PropertyRef Name="Apartment_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ApartmentApartmentPhoto">
+          <End Role="Apartments" Type="Self.Apartments" Multiplicity="1" />
+          <End Role="ApartmentPhotoes" Type="Self.ApartmentPhotoes" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Apartments">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ApartmentPhotoes">
+              <PropertyRef Name="Apartment_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ApartmentOrder">
+          <End Role="Apartments" Type="Self.Apartments" Multiplicity="1" />
+          <End Role="Orders" Type="Self.Orders" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Apartments">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Orders">
+              <PropertyRef Name="Apartment_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ApartmentPricing">
+          <End Role="Apartments" Type="Self.Apartments" Multiplicity="1" />
+          <End Role="Pricings" Type="Self.Pricings" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Apartments">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Pricings">
+              <PropertyRef Name="Apartment_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CountryGuest">
+          <End Role="Countries" Type="Self.Countries" Multiplicity="0..1" />
+          <End Role="Guests" Type="Self.Guests" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Countries">
+              <PropertyRef Name="code" />
+            </Principal>
+            <Dependent Role="Guests">
+              <PropertyRef Name="Country_code" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CurrencyApartmentDay">
+          <End Role="Currencies" Type="Self.Currencies" Multiplicity="0..1" />
+          <End Role="ApartmentDays" Type="Self.ApartmentDays" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Currencies">
+              <PropertyRef Name="currencyCode" />
+            </Principal>
+            <Dependent Role="ApartmentDays">
+              <PropertyRef Name="Currency_currencyCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CurrencyCurrencyExchangeFrom">
+          <End Role="Currencies" Type="Self.Currencies" Multiplicity="1" />
+          <End Role="CurrencyExchanges" Type="Self.CurrencyExchanges" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Currencies">
+              <PropertyRef Name="currencyCode" />
+            </Principal>
+            <Dependent Role="CurrencyExchanges">
+              <PropertyRef Name="FromCurrency_currencyCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CurrencyCurrencyExchangeTo">
+          <End Role="Currencies" Type="Self.Currencies" Multiplicity="1" />
+          <End Role="CurrencyExchanges" Type="Self.CurrencyExchanges" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Currencies">
+              <PropertyRef Name="currencyCode" />
+            </Principal>
+            <Dependent Role="CurrencyExchanges">
+              <PropertyRef Name="ToCurrency_currencyCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CurrencyEmployeeWorkDay">
+          <End Role="Currencies" Type="Self.Currencies" Multiplicity="1" />
+          <End Role="EmployeeWorkDays" Type="Self.EmployeeWorkDays" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Currencies">
+              <PropertyRef Name="currencyCode" />
+            </Principal>
+            <Dependent Role="EmployeeWorkDays">
+              <PropertyRef Name="Currency_currencyCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CurrencyExpense">
+          <End Role="Currencies" Type="Self.Currencies" Multiplicity="0..1" />
+          <End Role="Expenses" Type="Self.Expenses" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Currencies">
+              <PropertyRef Name="currencyCode" />
+            </Principal>
+            <Dependent Role="Expenses">
+              <PropertyRef Name="currency_currencyCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CurrencyOrder">
+          <End Role="Currencies" Type="Self.Currencies" Multiplicity="1" />
+          <End Role="Orders" Type="Self.Orders" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Currencies">
+              <PropertyRef Name="currencyCode" />
+            </Principal>
+            <Dependent Role="Orders">
+              <PropertyRef Name="Currency_currencyCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CurrencyPricing">
+          <End Role="Currencies" Type="Self.Currencies" Multiplicity="1" />
+          <End Role="Pricings" Type="Self.Pricings" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Currencies">
+              <PropertyRef Name="currencyCode" />
+            </Principal>
+            <Dependent Role="Pricings">
+              <PropertyRef Name="Currency_currencyCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_EmployeeEmployeeWorkDay">
+          <End Role="Employees" Type="Self.Employees" Multiplicity="1" />
+          <End Role="EmployeeWorkDays" Type="Self.EmployeeWorkDays" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employees">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="EmployeeWorkDays">
+              <PropertyRef Name="Employee_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ErrorCodeErrorMessage">
+          <End Role="ErrorCodes" Type="Self.ErrorCodes" Multiplicity="1" />
+          <End Role="ErrorMessages" Type="Self.ErrorMessages" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ErrorCodes">
+              <PropertyRef Name="code" />
+            </Principal>
+            <Dependent Role="ErrorMessages">
+              <PropertyRef Name="ErrorCode_code" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ExpenseTypeExpense">
+          <End Role="ExpenseTypes" Type="Self.ExpenseTypes" Multiplicity="1" />
+          <End Role="Expenses" Type="Self.Expenses" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ExpenseTypes">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Expenses">
+              <PropertyRef Name="expenseType_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_GuestOrder">
+          <End Role="Guests" Type="Self.Guests" Multiplicity="1" />
+          <End Role="Orders" Type="Self.Orders" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Guests">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Orders">
+              <PropertyRef Name="Guest_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LanguageTranslation">
+          <End Role="Languages" Type="Self.Languages" Multiplicity="1" />
+          <End Role="Translations" Type="Self.Translations" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Languages">
+              <PropertyRef Name="languageCode" />
+            </Principal>
+            <Dependent Role="Translations">
+              <PropertyRef Name="Language_languageCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_OrderApartmentDay">
+          <End Role="Orders" Type="Self.Orders" Multiplicity="0..1" />
+          <End Role="ApartmentDays" Type="Self.ApartmentDays" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Orders">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ApartmentDays">
+              <PropertyRef Name="Order_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TranslationKeyTranslatio">
+          <End Role="TranslationKeys" Type="Self.TranslationKeys" Multiplicity="1" />
+          <End Role="Translations" Type="Self.Translations" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TranslationKeys">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Translations">
+              <PropertyRef Name="TranslationKey_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="cityLifeDBStoreContainer">
+          <EntitySet Name="ApartmentDays" EntityType="Self.ApartmentDays" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ApartmentPhotoes" EntityType="Self.ApartmentPhotoes" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Apartments" EntityType="Self.Apartments" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Countries" EntityType="Self.Countries" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Currencies" EntityType="Self.Currencies" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="CurrencyExchanges" EntityType="Self.CurrencyExchanges" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Employees" EntityType="Self.Employees" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="EmployeeWorkDays" EntityType="Self.EmployeeWorkDays" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ErrorCodes" EntityType="Self.ErrorCodes" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ErrorMessages" EntityType="Self.ErrorMessages" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Expenses" EntityType="Self.Expenses" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ExpenseTypes" EntityType="Self.ExpenseTypes" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Guests" EntityType="Self.Guests" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Languages" EntityType="Self.Languages" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Orders" EntityType="Self.Orders" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Pricings" EntityType="Self.Pricings" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="TranslationKeys" EntityType="Self.TranslationKeys" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Translations" EntityType="Self.Translations" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="unitTests" EntityType="Self.unitTests" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_ApartmentApartmentDay" Association="Self.FK_ApartmentApartmentDay">
+            <End Role="Apartments" EntitySet="Apartments" />
+            <End Role="ApartmentDays" EntitySet="ApartmentDays" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ApartmentApartmentPhoto" Association="Self.FK_ApartmentApartmentPhoto">
+            <End Role="Apartments" EntitySet="Apartments" />
+            <End Role="ApartmentPhotoes" EntitySet="ApartmentPhotoes" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ApartmentOrder" Association="Self.FK_ApartmentOrder">
+            <End Role="Apartments" EntitySet="Apartments" />
+            <End Role="Orders" EntitySet="Orders" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ApartmentPricing" Association="Self.FK_ApartmentPricing">
+            <End Role="Apartments" EntitySet="Apartments" />
+            <End Role="Pricings" EntitySet="Pricings" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CountryGuest" Association="Self.FK_CountryGuest">
+            <End Role="Countries" EntitySet="Countries" />
+            <End Role="Guests" EntitySet="Guests" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CurrencyApartmentDay" Association="Self.FK_CurrencyApartmentDay">
+            <End Role="Currencies" EntitySet="Currencies" />
+            <End Role="ApartmentDays" EntitySet="ApartmentDays" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CurrencyCurrencyExchangeFrom" Association="Self.FK_CurrencyCurrencyExchangeFrom">
+            <End Role="Currencies" EntitySet="Currencies" />
+            <End Role="CurrencyExchanges" EntitySet="CurrencyExchanges" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CurrencyCurrencyExchangeTo" Association="Self.FK_CurrencyCurrencyExchangeTo">
+            <End Role="Currencies" EntitySet="Currencies" />
+            <End Role="CurrencyExchanges" EntitySet="CurrencyExchanges" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CurrencyEmployeeWorkDay" Association="Self.FK_CurrencyEmployeeWorkDay">
+            <End Role="Currencies" EntitySet="Currencies" />
+            <End Role="EmployeeWorkDays" EntitySet="EmployeeWorkDays" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CurrencyExpense" Association="Self.FK_CurrencyExpense">
+            <End Role="Currencies" EntitySet="Currencies" />
+            <End Role="Expenses" EntitySet="Expenses" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CurrencyOrder" Association="Self.FK_CurrencyOrder">
+            <End Role="Currencies" EntitySet="Currencies" />
+            <End Role="Orders" EntitySet="Orders" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CurrencyPricing" Association="Self.FK_CurrencyPricing">
+            <End Role="Currencies" EntitySet="Currencies" />
+            <End Role="Pricings" EntitySet="Pricings" />
+          </AssociationSet>
+          <AssociationSet Name="FK_EmployeeEmployeeWorkDay" Association="Self.FK_EmployeeEmployeeWorkDay">
+            <End Role="Employees" EntitySet="Employees" />
+            <End Role="EmployeeWorkDays" EntitySet="EmployeeWorkDays" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ErrorCodeErrorMessage" Association="Self.FK_ErrorCodeErrorMessage">
+            <End Role="ErrorCodes" EntitySet="ErrorCodes" />
+            <End Role="ErrorMessages" EntitySet="ErrorMessages" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ExpenseTypeExpense" Association="Self.FK_ExpenseTypeExpense">
+            <End Role="ExpenseTypes" EntitySet="ExpenseTypes" />
+            <End Role="Expenses" EntitySet="Expenses" />
+          </AssociationSet>
+          <AssociationSet Name="FK_GuestOrder" Association="Self.FK_GuestOrder">
+            <End Role="Guests" EntitySet="Guests" />
+            <End Role="Orders" EntitySet="Orders" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LanguageTranslation" Association="Self.FK_LanguageTranslation">
+            <End Role="Languages" EntitySet="Languages" />
+            <End Role="Translations" EntitySet="Translations" />
+          </AssociationSet>
+          <AssociationSet Name="FK_OrderApartmentDay" Association="Self.FK_OrderApartmentDay">
+            <End Role="Orders" EntitySet="Orders" />
+            <End Role="ApartmentDays" EntitySet="ApartmentDays" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TranslationKeyTranslatio" Association="Self.FK_TranslationKeyTranslatio">
+            <End Role="TranslationKeys" EntitySet="TranslationKeys" />
+            <End Role="Translations" EntitySet="Translations" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema xmlns="http://schemas.microsoft.com/ado/2009/11/edm" xmlns:cg="http://schemas.microsoft.com/ado/2006/04/codegeneration" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" Namespace="cityLifeDB" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" annotation:UseStrongSpatialTypes="false">
@@ -582,6 +636,16 @@
             <End Role="Currency" EntitySet="Currencies" />
             <End Role="EmployeeWorkDay" EntitySet="EmployeeWorkDays" />
           </AssociationSet>
+          <EntitySet Name="Expenses" EntityType="cityLifeDB.Expense" />
+          <AssociationSet Name="FK_CurrencyExpense" Association="cityLifeDB.FK_CurrencyExpense">
+            <End Role="Currency" EntitySet="Currencies" />
+            <End Role="Expens" EntitySet="Expenses" />
+          </AssociationSet>
+          <EntitySet Name="ExpenseTypes" EntityType="cityLifeDB.ExpenseType" />
+          <AssociationSet Name="FK_ExpenseTypeExpense" Association="cityLifeDB.FK_ExpenseTypeExpense">
+            <End Role="ExpenseType" EntitySet="ExpenseTypes" />
+            <End Role="Expense" EntitySet="Expenses" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="Apartment">
           <Key>
@@ -589,11 +653,11 @@
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="number" Type="Int16" Nullable="false" />
-          <Property Name="nameKey" Type="String" Nullable="false" Unicode="true" />
-          <Property Name="descriptionKey" Type="String" Nullable="false" />
-          <Property Name="addressKey" Type="String" Nullable="false" />
+          <Property Name="nameKey" Type="String" Nullable="false" Unicode="true" MaxLength="Max" FixedLength="false" />
+          <Property Name="descriptionKey" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="addressKey" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
           <Property Name="size" Type="Int16" Nullable="false" />
-          <Property Name="featuresKeys" Type="String" Nullable="true" />
+          <Property Name="featuresKeys" Type="String" Nullable="true" MaxLength="Max" Unicode="true" FixedLength="false" />
           <NavigationProperty Name="ApartmentPhotoes" Relationship="cityLifeDB.ApartmentApartmentPhoto" FromRole="Apartment" ToRole="ApartmentPhoto" />
           <NavigationProperty Name="Pricings" Relationship="cityLifeDB.ApartmentPricing" FromRole="Apartment" ToRole="Pricing" />
           <NavigationProperty Name="ApartmentDays" Relationship="cityLifeDB.ApartmentApartmentDay" FromRole="Apartment" ToRole="ApartmentDay" />
@@ -604,14 +668,14 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="filePath" Type="String" Nullable="false" />
+          <Property Name="filePath" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
           <Property Name="type" Type="cityLifeDB.PhotoType" Nullable="false" />
           <Property Name="orientation" Type="cityLifeDB.OrientationType" Nullable="false" />
           <Property Name="width" Type="Int32" Nullable="true" />
           <Property Name="height" Type="Int32" Nullable="true" />
           <Property Name="sortOrder" Type="Int16" Nullable="false" />
           <NavigationProperty Name="Apartment" Relationship="cityLifeDB.ApartmentApartmentPhoto" FromRole="ApartmentPhoto" ToRole="Apartment" />
-          <Property Name="thumbnailPath" Type="String" Nullable="true" >
+          <Property Name="thumbnailPath" Type="String" Nullable="true" MaxLength="Max" Unicode="true" FixedLength="false" >
             <Documentation>
               <Summary>file path of the thumbnail version of this photo. If null - thumbnail for this photo does not exist</Summary>
             </Documentation>
@@ -657,7 +721,7 @@
               <Summary>the standard 5 letter code of the language, such as en-US</Summary>
             </Documentation>
           </Property>
-          <Property Name="name" Type="String" Nullable="false" FixedLength="false" MaxLength="30" >
+          <Property Name="name" Type="String" Nullable="false" FixedLength="false" MaxLength="30" Unicode="true" >
             <Documentation>
               <Summary>the language name in its own language.</Summary>
             </Documentation>
@@ -674,14 +738,14 @@
             <PropertyRef Name="id" />
           </Key>
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="transKey" Type="String" Nullable="false" />
+          <Property Name="transKey" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
           <Property Name="isUsed" Type="Boolean" Nullable="false" DefaultValue="false" >
             <Documentation>
               <Summary>set to true if this translation key has ever been used. This can help us to remove garbage translation keys from the DB</Summary>
             </Documentation>
           </Property>
           <NavigationProperty Name="Translatios" Relationship="cityLifeDB.TranslationKeyTranslatio" FromRole="TranslationKey" ToRole="Translatio" />
-          <Property Name="filePath" Type="String" Nullable="true" >
+          <Property Name="filePath" Type="String" Nullable="true" MaxLength="Max" Unicode="true" FixedLength="false" >
             <Documentation>
               <Summary>The file path where the translate method was last called for this translation key
 </Summary>
@@ -698,7 +762,7 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="message" Type="String" Nullable="false" Unicode="true" />
+          <Property Name="message" Type="String" Nullable="false" Unicode="true" MaxLength="Max" FixedLength="false" />
           <NavigationProperty Name="TranslationKey" Relationship="cityLifeDB.TranslationKeyTranslatio" FromRole="Translatio" ToRole="TranslationKey" />
           <NavigationProperty Name="Language" Relationship="cityLifeDB.LanguageTranslation" FromRole="Translation" ToRole="Language" />
         </EntityType>
@@ -715,14 +779,15 @@
             <PropertyRef Name="currencyCode" />
           </Key>
           <Property Name="currencyCode" Type="String" Nullable="false" annotation:StoreGeneratedPattern="None" Unicode="true" FixedLength="true" MaxLength="3" />
-          <Property Name="symbol" Type="String" Nullable="false" FixedLength="true" MaxLength="1" />
-          <Property Name="name" Type="String" Nullable="false" Unicode="true" />
+          <Property Name="symbol" Type="String" Nullable="false" FixedLength="true" MaxLength="1" Unicode="true" />
+          <Property Name="name" Type="String" Nullable="false" Unicode="true" MaxLength="Max" FixedLength="false" />
           <NavigationProperty Name="Pricings" Relationship="cityLifeDB.CurrencyPricing" FromRole="Currency" ToRole="Pricing" />
           <NavigationProperty Name="FromCurrencyExchanges" Relationship="cityLifeDB.CurrencyCurrencyExchangeFrom" FromRole="Currency" ToRole="CurrencyExchange" />
           <NavigationProperty Name="ToCurrencyExchanges" Relationship="cityLifeDB.CurrencyCurrencyExchangeTo" FromRole="Currency" ToRole="CurrencyExchange" />
           <NavigationProperty Name="ApartmentDays" Relationship="cityLifeDB.CurrencyApartmentDay" FromRole="Currency" ToRole="ApartmentDay" />
           <NavigationProperty Name="Orders" Relationship="cityLifeDB.CurrencyOrder" FromRole="Currency" ToRole="Order" />
           <NavigationProperty Name="EmployeeWorkDays" Relationship="cityLifeDB.CurrencyEmployeeWorkDay" FromRole="Currency" ToRole="EmployeeWorkDay" />
+          <NavigationProperty Name="Expenses" Relationship="cityLifeDB.FK_CurrencyExpense" FromRole="Currency" ToRole="Expens" />
         </EntityType>
         <Association Name="CurrencyPricing">
           <End Type="cityLifeDB.Currency" Role="Currency" Multiplicity="1" />
@@ -734,7 +799,7 @@
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="conversionRate" Type="Decimal" Nullable="false" Precision="10" Scale="4" />
-          <Property Name="date" Type="DateTime" Nullable="false" />
+          <Property Name="date" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="FromCurrency" Relationship="cityLifeDB.CurrencyCurrencyExchangeFrom" FromRole="CurrencyExchange" ToRole="Currency" />
           <NavigationProperty Name="ToCurrency" Relationship="cityLifeDB.CurrencyCurrencyExchangeTo" FromRole="CurrencyExchange" ToRole="Currency" />
         </EntityType>
@@ -756,7 +821,7 @@
           <Property Name="revenue" Type="Int32" Nullable="false" DefaultValue="0" />
           <NavigationProperty Name="Currency" Relationship="cityLifeDB.CurrencyApartmentDay" FromRole="ApartmentDay" ToRole="Currency" />
           <NavigationProperty Name="Apartment" Relationship="cityLifeDB.ApartmentApartmentDay" FromRole="ApartmentDay" ToRole="Apartment" />
-          <Property Name="date" Type="DateTime" Nullable="false" />
+          <Property Name="date" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="priceFactor" Type="Decimal" Nullable="false" Precision="10" Scale="4" DefaultValue="1" >
             <Documentation>
               <Summary>a factor by which we need to multiply the price to get the final price. </Summary>
@@ -785,9 +850,9 @@
           </Key>
           <Property Name="series" Type="String" Nullable="false" FixedLength="false" MaxLength="64" Unicode="true" />
           <Property Name="number" Type="Int32" Nullable="false" />
-          <Property Name="expectedResult" Type="String" Nullable="true" />
-          <Property Name="actualResult" Type="String" Nullable="true" />
-          <Property Name="dateLastRun" Type="DateTime" Nullable="false" />
+          <Property Name="expectedResult" Type="String" Nullable="true" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="actualResult" Type="String" Nullable="true" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="dateLastRun" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="correctFlag" Type="Boolean" Nullable="true" />
         </EntityType>
         <EntityType Name="ErrorCode">
@@ -795,9 +860,9 @@
             <PropertyRef Name="code" />
           </Key>
           <Property Name="code" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="None" />
-          <Property Name="message" Type="String" Nullable="true" />
+          <Property Name="message" Type="String" Nullable="true" MaxLength="Max" Unicode="true" FixedLength="false" />
           <Property Name="occurenceCount" Type="Int32" Nullable="false" DefaultValue="1" />
-          <Property Name="lastOccurenceDate" Type="DateTime" Nullable="false" />
+          <Property Name="lastOccurenceDate" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="ErrorMessages" Relationship="cityLifeDB.ErrorCodeErrorMessage" FromRole="ErrorCode" ToRole="ErrorMessage" />
         </EntityType>
         <EntityType Name="ErrorMessage">
@@ -806,9 +871,9 @@
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <NavigationProperty Name="ErrorCode" Relationship="cityLifeDB.ErrorCodeErrorMessage" FromRole="ErrorMessage" ToRole="ErrorCode" />
-          <Property Name="formattedMessage" Type="String" Nullable="false" />
-          <Property Name="stackTrace" Type="String" Nullable="true" />
-          <Property Name="lastOccurenceDate" Type="DateTime" Nullable="false" />
+          <Property Name="formattedMessage" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="stackTrace" Type="String" Nullable="true" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="lastOccurenceDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="occurenceCount" Type="Int32" Nullable="false" DefaultValue="1" />
         </EntityType>
         <Association Name="ErrorCodeErrorMessage">
@@ -820,16 +885,16 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="checkinDate" Type="DateTime" Nullable="false" />
-          <Property Name="checkoutDate" Type="DateTime" Nullable="false" />
+          <Property Name="checkinDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="checkoutDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="dayCount" Type="Int32" Nullable="false" />
           <Property Name="adultCount" Type="Int32" Nullable="false" />
           <Property Name="childrenCount" Type="Int32" Nullable="false" DefaultValue="0" />
-          <Property Name="expectedArrival" Type="String" Nullable="true" />
-          <Property Name="specialRequest" Type="String" Nullable="true" />
+          <Property Name="expectedArrival" Type="String" Nullable="true" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="specialRequest" Type="String" Nullable="true" MaxLength="Max" Unicode="true" FixedLength="false" />
           <Property Name="status" Type="cityLifeDB.OrderStatus" Nullable="false" />
-          <Property Name="confirmationNumber" Type="String" Nullable="false" DefaultValue="0" />
-          <Property Name="cancellationNumber" Type="String" Nullable="true" />
+          <Property Name="confirmationNumber" Type="String" Nullable="false" DefaultValue="0" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="cancellationNumber" Type="String" Nullable="true" MaxLength="Max" Unicode="true" FixedLength="false" />
           <Property Name="price" Type="Int32" Nullable="false" >
             <Documentation>
               <Summary>holds the price in cents</Summary>
@@ -841,12 +906,12 @@
             </Documentation>
           </Property>
           <NavigationProperty Name="Currency" Relationship="cityLifeDB.CurrencyOrder" FromRole="Order" ToRole="Currency" />
-          <Property Name="bookedBy" Type="String" Nullable="true" />
+          <Property Name="bookedBy" Type="String" Nullable="true" MaxLength="Max" Unicode="true" FixedLength="false" />
           <NavigationProperty Name="ApartmentDays" Relationship="cityLifeDB.OrderApartmentDay" FromRole="Order" ToRole="ApartmentDay" />
           <NavigationProperty Name="Apartment" Relationship="cityLifeDB.ApartmentOrder" FromRole="Order" ToRole="Apartment" />
           <NavigationProperty Name="Guest" Relationship="cityLifeDB.GuestOrder" FromRole="Order" ToRole="Guest" />
           <Property Name="OrderColor" Type="cityLifeDB.Color" Nullable="false" />
-          <Property Name="staffComments" Type="String" Nullable="true" />
+          <Property Name="staffComments" Type="String" Nullable="true" MaxLength="Max" Unicode="true" FixedLength="false" />
         </EntityType>
         <EnumType Name="OrderStatus">
           <Member Name="Created" />
@@ -872,9 +937,9 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="name" Type="String" Nullable="false" />
-          <Property Name="phone" Type="String" Nullable="false" />
-          <Property Name="email" Type="String" Nullable="false" />
+          <Property Name="name" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="phone" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="email" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
           <NavigationProperty Name="Orders" Relationship="cityLifeDB.GuestOrder" FromRole="Guest" ToRole="Order" />
           <NavigationProperty Name="Country" Relationship="cityLifeDB.CountryGuest" FromRole="Guest" ToRole="Country" />
         </EntityType>
@@ -887,12 +952,12 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="name" Type="String" Nullable="false" />
-          <Property Name="phone" Type="String" Nullable="false" />
-          <Property Name="role" Type="String" Nullable="true" />
-          <Property Name="passwordHash" Type="String" Nullable="false" />
-          <Property Name="email" Type="String" Nullable="false" />
-          <Property Name="userName" Type="String" Nullable="false" />
+          <Property Name="name" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="phone" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="role" Type="String" Nullable="true" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="passwordHash" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="email" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="userName" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
           <NavigationProperty Name="EmployeeWorkDays" Relationship="cityLifeDB.EmployeeEmployeeWorkDay" FromRole="Employee" ToRole="EmployeeWorkDay" />
         </EntityType>
         <EntityType Name="Country">
@@ -900,8 +965,9 @@
             <PropertyRef Name="code" />
           </Key>
           <Property Name="code" Type="String" Nullable="false" annotation:StoreGeneratedPattern="None" FixedLength="true" MaxLength="3" Unicode="true" />
-          <Property Name="name" Type="String" Nullable="false" />
+          <Property Name="name" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
           <NavigationProperty Name="Guests" Relationship="cityLifeDB.CountryGuest" FromRole="Country" ToRole="Guest" />
+          <Property Name="language" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
         <Association Name="CountryGuest">
           <End Type="cityLifeDB.Country" Role="Country" Multiplicity="0..1" />
@@ -919,7 +985,7 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="dateAndTime" Type="DateTime" Nullable="false" />
+          <Property Name="dateAndTime" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="hours" Type="Int32" Nullable="false" />
           <Property Name="salaryCents" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Employee" Relationship="cityLifeDB.EmployeeEmployeeWorkDay" FromRole="EmployeeWorkDay" ToRole="Employee" />
@@ -933,6 +999,52 @@
         <Association Name="CurrencyEmployeeWorkDay">
           <End Type="cityLifeDB.Currency" Role="Currency" Multiplicity="1" />
           <End Type="cityLifeDB.EmployeeWorkDay" Role="EmployeeWorkDay" Multiplicity="*" />
+        </Association>
+        <EntityType Name="Expense">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="date" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="amount" Type="Int32" Nullable="false" />
+          <Property Name="currency_currencyCode" Type="String" MaxLength="3" FixedLength="true" Unicode="true" />
+          <Property Name="description" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Currency" Relationship="cityLifeDB.FK_CurrencyExpense" FromRole="Expens" ToRole="Currency" />
+          <Property Name="expenseType_Id" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="ExpenseType" Relationship="cityLifeDB.FK_ExpenseTypeExpense" FromRole="Expense" ToRole="ExpenseType" />
+        </EntityType>
+        <Association Name="FK_CurrencyExpense">
+          <End Type="cityLifeDB.Currency" Role="Currency" Multiplicity="0..1" />
+          <End Type="cityLifeDB.Expense" Role="Expens" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Currency">
+              <PropertyRef Name="currencyCode" />
+            </Principal>
+            <Dependent Role="Expens">
+              <PropertyRef Name="currency_currencyCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="ExpenseType">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="nameKey" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="descriptionKey" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Expenses" Relationship="cityLifeDB.FK_ExpenseTypeExpense" FromRole="ExpenseType" ToRole="Expense" />
+        </EntityType>
+        <Association Name="FK_ExpenseTypeExpense">
+          <End Type="cityLifeDB.ExpenseType" Role="ExpenseType" Multiplicity="1" />
+          <End Type="cityLifeDB.Expense" Role="Expense" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ExpenseType">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Expense">
+              <PropertyRef Name="expenseType_Id" />
+            </Dependent>
+          </ReferentialConstraint>
         </Association>
       </Schema>
     </edmx:ConceptualModels>
@@ -1119,7 +1231,8 @@
     <EntitySetMapping Name="Countries">
       <EntityTypeMapping TypeName="IsTypeOf(cityLifeDB.Country)">
         <MappingFragment StoreEntitySet="Countries">
-          <ScalarProperty Name="code" ColumnName="code" />
+          <ScalarProperty Name="language" ColumnName="language" />
+                <ScalarProperty Name="code" ColumnName="code" />
           <ScalarProperty Name="name" ColumnName="name" />
         </MappingFragment>
       </EntityTypeMapping>
@@ -1274,6 +1387,27 @@
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
     </AssociationSetMapping>
+          <EntitySetMapping Name="Expenses">
+            <EntityTypeMapping TypeName="cityLifeDB.Expense">
+              <MappingFragment StoreEntitySet="Expenses">
+                <ScalarProperty Name="expenseType_Id" ColumnName="expenseType_Id" />
+                <ScalarProperty Name="description" ColumnName="description" />
+                <ScalarProperty Name="currency_currencyCode" ColumnName="currency_currencyCode" />
+                <ScalarProperty Name="amount" ColumnName="amount" />
+                <ScalarProperty Name="date" ColumnName="date" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ExpenseTypes">
+            <EntityTypeMapping TypeName="cityLifeDB.ExpenseType">
+              <MappingFragment StoreEntitySet="ExpenseTypes">
+                <ScalarProperty Name="descriptionKey" ColumnName="descriptionKey" />
+                <ScalarProperty Name="nameKey" ColumnName="nameKey" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
   </EntityContainerMapping>
 </Mapping></edmx:Mappings>
   </edmx:Runtime>
@@ -1290,6 +1424,7 @@
         <DesignerProperty Name="EnablePluralization" Value="True" />
         <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
         <DesignerProperty Name="UseLegacyProvider" Value="False" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="True" />
       </DesignerInfoPropertySet>
     </edmx:Options>
     <!-- Diagram content (shape and connector positions) -->

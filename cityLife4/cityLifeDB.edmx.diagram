@@ -17,7 +17,7 @@
         <AssociationConnector Association="cityLifeDB.LanguageTranslation" />
         <EntityTypeShape EntityType="cityLifeDB.Currency" Width="1.5" PointX="0.5" PointY="3.75" />
         <AssociationConnector Association="cityLifeDB.CurrencyPricing" />
-        <EntityTypeShape EntityType="cityLifeDB.CurrencyExchange" Width="1.5" PointX="0.5" PointY="6.625" />
+        <EntityTypeShape EntityType="cityLifeDB.CurrencyExchange" Width="1.5" PointX="0.5" PointY="7.375" />
         <AssociationConnector Association="cityLifeDB.CurrencyCurrencyExchangeFrom" />
         <AssociationConnector Association="cityLifeDB.CurrencyCurrencyExchangeTo" />
         <EntityTypeShape EntityType="cityLifeDB.ApartmentDay" Width="1.5" PointX="2.75" PointY="4.5" />
@@ -39,6 +39,10 @@
         <EntityTypeShape EntityType="cityLifeDB.EmployeeWorkDay" Width="1.5" PointX="1.5" PointY="9.625" />
         <AssociationConnector Association="cityLifeDB.EmployeeEmployeeWorkDay" />
         <AssociationConnector Association="cityLifeDB.CurrencyEmployeeWorkDay" />
+        <EntityTypeShape EntityType="cityLifeDB.Expense" Width="1.5" PointX="0.5" PointY="12.375" />
+        <AssociationConnector Association="cityLifeDB.FK_CurrencyExpense" />
+        <EntityTypeShape EntityType="cityLifeDB.ExpenseType" Width="1.5" PointX="12.625" PointY="9.875" />
+        <AssociationConnector Association="cityLifeDB.FK_ExpenseTypeExpense" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
