@@ -9,6 +9,7 @@
     DateTime today = ViewBag.today;
     List<List<DayBlock>> apartmentDayBlocks = ViewBag.apartmentDayBlocks;
     List<Money> revenuePerDay = ViewBag.revenuePerDay;
+    List<Money> expensePerDay = ViewBag.expensePerDay;
     List<Money> revenuePerApartment = ViewBag.revenuPerApartment;
     List<int> percentOccupancyPerApartment = ViewBag.percentOccupancyPerApartment;
     EmployeeWorkDay[] empWorkDaysArray = ViewBag.empWorkDaysArray;
@@ -174,7 +175,7 @@
     
     <span id="highlightOrderId" data-order-id="@highlightOrderId"></span>  <!--keep the order which needs to be highlighted (or 0 if none -->
     <div style="display:flex">
-        @*first column - apartment numbers, rev and maid*@
+        @*first column - apartment numbers, rev, expense and maid*@
         <div class="dash01">
             <table>
                 <tr><td class="dash01td">date</td></tr>
@@ -185,6 +186,7 @@
                     <tr><td class="dash01td @high">@apartmentNumber</td></tr>
                 }
                 <tr><td>rev.</td></tr>
+                <tr><td>exp</td></tr>
                 <tr><td>maid</td></tr>
             </table>
         </div>
@@ -290,6 +292,25 @@
                     }
                     <td class="dash02td rightAlign">@totalRevenue.toMoneyString()</td>
                     <td class="dash02td rightAlign">@Math.Round(percentOccupancyPerApartment.Average())%</td>
+                </tr>
+
+                @*Expense total line*@
+                <tr>
+                    @{ var totalExpense = new Money(0m, "UAH");}
+                    @foreach (var anExpense in expensePerDay)
+                    {
+                        if (anExpense.isZero())
+                        {
+                            <td class="dash02td"></td>
+                        }
+                        else
+                        {
+                            <td class="dash02td">@anExpense.toMoneyString(showCents: false)</td>
+                            totalExpense += anExpense;
+                        }
+                    }
+                    <td class="dash02td rightAlign">@totalExpense.toMoneyString()</td>
+                    <td class="dash02td rightAlign"></td>
                 </tr>
 
                 @*Maid on duty line*@

@@ -31,6 +31,11 @@ namespace cityLife4
             amount = m.amount;
             currencyCode = m.currencyCode;
         }
+        public Money(int cents, string aCurrencyCode)
+        {
+            amount = (decimal)cents / 100;
+            currencyCode = aCurrencyCode;
+        }
         /// <summary>
         /// The constructor gets a string containing: $1,234.56. If currencyCode exists - uses it as the currency, regardless if thre is a currency symbol 
         /// or not. If not - creates the currency based on the symbol. If symbol does not exist, or it is an unknown symbol - aborts

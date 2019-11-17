@@ -175,6 +175,7 @@ namespace cityLife.Controllers
             else
             {
                 List<Money> revenuePerDay = null;
+                List<Money> expensePerDay = null;
                 EmployeeWorkDay[] empWorkDaysArray = null;
                 List<Employee> maidList = null;
                 List<Money> revenuePerApartment = null;
@@ -183,12 +184,14 @@ namespace cityLife.Controllers
                     startDate, 
                     dashboardDays, 
                     ref revenuePerDay,
+                    ref expensePerDay,
                     ref revenuePerApartment,
                     ref percentOccupancyPerApartment,
                     ref empWorkDaysArray, 
                     ref maidList);
                 ViewBag.apartmentDayBlocks = apartmentDayBlocks;
                 ViewBag.revenuePerDay = revenuePerDay;
+                ViewBag.expensePerDay = expensePerDay;
                 ViewBag.revenuPerApartment = revenuePerApartment;
                 ViewBag.percentOccupancyPerApartment = percentOccupancyPerApartment;
                 ViewBag.empWorkDaysArray = empWorkDaysArray;
@@ -223,6 +226,7 @@ namespace cityLife.Controllers
         ///<param name="fromDate">starting date of the dashboard</param>
         ///<param name="days">the number of days we wish to display.(depends on the starting month)</param>
         ///<param name="revenuePerDay">An output parameter - will contain the list of revenues per day</param>
+        ///<param name="expensePerDay">total expenses for each day</param>
         ///<param name="percentOccupancyPerApartment">Number of days the apartment is occupied divided by total number of days (rounded to 
         ///whole percent)</param>
         ///<param name="revenuePerApartment">Total revenue per apartment for that month</param>
@@ -237,6 +241,7 @@ namespace cityLife.Controllers
         public List<List<DayBlock>> s21dashboardPreparation(DateTime fromDate,
             int days,
             ref List<Money> revenuePerDay,
+            ref List<Money> expensePerDay,
             ref List<Money> revenuePerApartment,
             ref List<int> percentOccupancyPerApartment,
             ref EmployeeWorkDay[] empWorkDaysArray,
@@ -256,18 +261,36 @@ namespace cityLife.Controllers
 
             //a 2 dimensional array - a list of apartments, and for each apartment - a list of day blocks
             //where each day block is either a free day or an order.
-
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
             var apartmentDayBlocks = new List<List<DayBlock>>();
             revenuePerDay = new List<Money>();
+            expensePerDay = new List<Money>();
             for (int i = 0; i < days; i++)
             {
                 revenuePerDay.Add(new Money(0m, "UAH"));
             }
 
+
             var lastDate = fromDate.AddDays(days - 1);
             revenuePerApartment = new List<Money>();
             percentOccupancyPerApartment = new List<int>();
-            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+
+            //Calculate the expenses for each date in the range
+            for (DateTime aDate = fromDate; aDate<=lastDate; aDate = aDate.AddDays(1))
+            {
+                //Read all expenses for the date and sum them
+                var expenseListCentsForDate = (from expense in db.Expenses
+                                      where expense.date == aDate
+                                      select expense.amount);   //The expenses are kept as cents in the DB
+                int expensesCentsForDate = 0;
+                if (expenseListCentsForDate.Count() > 0)
+                {
+                    expensesCentsForDate = expenseListCentsForDate.Sum();
+                }
+                Money expensesForDate = new Money(expensesCentsForDate, "UAH");
+                expensePerDay.Add(expensesForDate);
+            }
+
             foreach (var anApartment in db.Apartments)
             {
                 var dayBlocks = new List<DayBlock>();
@@ -355,6 +378,7 @@ namespace cityLife.Controllers
                 int dayNumber = (int)Math.Round((anEmpWorkDays.dateAndTime.Date - fromDate).TotalDays, 0);
                 empWorkDaysArray[dayNumber] = anEmpWorkDays;
             }
+
             maidList = db.Employees.Where(emp => emp.role == "maid").ToList();  //Add all maids to the maid list
 
             return apartmentDayBlocks;
