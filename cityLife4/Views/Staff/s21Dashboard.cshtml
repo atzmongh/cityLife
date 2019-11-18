@@ -156,6 +156,9 @@
         color:darkblue;
         text-decoration:underline;
     }
+    .selectCell{
+        cursor:pointer;
+    }
 </style>
 <div class="main-wrapper reset-indent">
     <form id="fromDateForm" method="get" action="s21Dashboard">
@@ -295,19 +298,24 @@
                 </tr>
 
                 @*Expense total line*@
+                @{
+                    DateTime theDate = fromDate;
+                }
                 <tr>
                     @{ var totalExpense = new Money(0m, "UAH");}
                     @foreach (var anExpense in expensePerDay)
                     {
                         if (anExpense.isZero())
                         {
-                            <td class="dash02td"></td>
+                            <td class="dash02td selectCell" data-date='@theDate.ToString("yyyy-MM-dd")' onclick="expenseClicked(this,false)" ></td>
                         }
                         else
                         {
-                            <td class="dash02td">@anExpense.toMoneyString(showCents: false)</td>
+                            <td class="dash02td selectCell" data-date='@theDate.ToString("yyyy-MM-dd")' onclick="expenseClicked(this,true)">
+                    @anExpense.toMoneyString(showCents: false)</td>
                             totalExpense += anExpense;
                         }
+                        theDate = theDate.AddDays(1);
                     }
                     <td class="dash02td rightAlign">@totalExpense.toMoneyString()</td>
                     <td class="dash02td rightAlign"></td>
@@ -315,14 +323,14 @@
 
                 @*Maid on duty line*@
                 @{
-                    DateTime theDate = fromDate;
+                    theDate = fromDate;
                 }
                 <tr>
                     @foreach (var anEmpWorkDay in empWorkDaysArray)
                     {
                         if (anEmpWorkDay == null)
                         {
-                            <td class="dash02td" onclick="displayMaidList(this)" data-emp-id="0"
+                            <td class="dash02td selectCell" onclick="displayMaidList(this)" data-emp-id="0"
                                 data-date='@theDate.ToString("yyyy-MM-dd")'></td> @*date-emp-id=0 denotes that an employee is not assigned to that day
                     date-date gives the date of the current cell*@
                             }
@@ -333,7 +341,7 @@
                                 {
                                     greenCss = "orderGreen";
                                 }
-                                <td class="dash02td @greenCss" onclick="displayMaidList(this)"
+                                <td class="dash02td @greenCss selectCell" onclick="displayMaidList(this)"
                                     data-emp-id="@anEmpWorkDay.Employee.Id"
                                     data-date='@theDate.ToString("yyyy-MM-dd")'>
                                     @anEmpWorkDay.Employee.name
@@ -347,10 +355,12 @@
         </div>
     </div>
     <div style="padding:2px;">@tBox.translate("Total revenue"):@totalRevenue.toMoneyString(showCents:false)</div>
+    <!--div for the order details info (when the user clicks on an existing order)-->
     <div style="padding:4px;max-width:400px;" id="s22OrderDetails">
 
 
     </div>
+    <!--div for info about new order dates (when the user clicks on an empty cell)-->
     <div id="newOrderDates" class="hidden">
         <span style="float:left">@tBox.translate("Apartment Number")</span>
         <span id="apartmentNumber" style="float:right"></span>
@@ -364,12 +374,21 @@
         <a id="addOrderButton" class="btn" href="/staff/s23updateOrder">@tBox.translate("New Order")</a>
 
     </div>
+    <!--div for the maid list (when the user clicks on a maid line)-->
     <div id="maidList" class="hidden">
         @foreach (var aMaid in maidList)
         {
             <input type="radio" name="maid" value="@aMaid.Id" data-maid-name="@aMaid.name" onclick="setMaid(this)" />@aMaid.name
         }
         <input type="radio" name="maid" value="0" data-maid-name="" onclick="setMaid(this)" />none
+    </div>
+    <!--div for the "add expense" form (when clicking on an empty expense cell)-->
+    <div id="addExpense" class="hidden">
+        add expense here
+    </div>
+    <!--div for the table showing all expenses for that date (when clicking on a non-empty expense cell)-->
+    <div id="s27showExpenses" class="hidden">
+        show expenses here
     </div>
 </div>
 
@@ -533,9 +552,10 @@
 
     var tdMaid=null;  //contains: data-emp-id= emp_id and data-date = the date of that cell. If no 
     function displayMaidList(tdEmp) {
-        if (tdMaid != null) {
-            $(tdMaid).removeClass("highlight");
-        }
+        
+        $(tdMaid).removeClass("highlight");   //If tdMaid is null - the command is ignored.
+        $(tdExp) .removeClass("highlight");
+        
         $(tdEmp).addClass("highlight");
         tdMaid = tdEmp;  //Keep the cell that was pressed by the user. When the user selects a new maid from the list of radio buttons - we will
                          //know to which cell it was related
@@ -555,5 +575,31 @@
         maidDay.maidId = maidRadio.value;
         maidDay.date = tdMaid.dataset.date;
         $.post("/staff/s28AddUpdateMaid", maidDay);
+    }
+
+    //The function is called when an expense cell is clicked. 
+    //param 1: the cell clicked
+    //param 2: whether the expense cell contained an expense or not. 
+    var tdExp = null;
+    function expenseClicked(tdExpense, expenseIsPositive) {
+        var date = tdExpense.dataset.date;
+        $("#s22OrderDetails").empty();
+        $("#newOrderDates").addClass("hidden");
+        $("#maidList").addClass("hidden");
+        $(tdMaid).removeClass("highlight");   //If tdMaid or tdExpense is null - the command is ignored.
+        $(tdExp).removeClass("highlight");
+        $(tdExpense).addClass("highlight");
+        tdExp = tdExpense;  //Keep the cell that was pressed by the user. When the user selects a new expense from the list of radio buttons - we will
+        //know to which cell it was related
+        if (expenseIsPositive) {
+            //We need to show the list of expenses
+            $("#addExpense").addClass("hidden");
+            $("#s27showExpenses").removeClass("hidden");
+        }
+        else {
+            //We need to show the "add class" form
+            $("#27showExpenses").addClass("hidden");
+            $("#addExpense").removeClass("hidden");
+        }
     }
 </script>
