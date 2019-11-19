@@ -696,6 +696,7 @@ namespace cityLife.Controllers
             StaffController theStaffController = new StaffController();
             List<Money> revenuePerDay = null;
             List<Money> expensePerDay = null;
+            List<string> expenseTypes = null;
             EmployeeWorkDay[] empWorkDaysArray = null;
             List<Employee> maidList = null;
             List<Money> revenuPerApartment = null;
@@ -704,6 +705,7 @@ namespace cityLife.Controllers
                 31,
                 ref revenuePerDay,
                 ref expensePerDay,
+                ref expenseTypes,
                 ref revenuPerApartment,
                 ref occupanyPercentPerApartment,
                 ref empWorkDaysArray,

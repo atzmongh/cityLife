@@ -10,6 +10,7 @@
     List<List<DayBlock>> apartmentDayBlocks = ViewBag.apartmentDayBlocks;
     List<Money> revenuePerDay = ViewBag.revenuePerDay;
     List<Money> expensePerDay = ViewBag.expensePerDay;
+    List<string> expenseTypes = ViewBag.expenseTypes;
     List<Money> revenuePerApartment = ViewBag.revenuPerApartment;
     List<int> percentOccupancyPerApartment = ViewBag.percentOccupancyPerApartment;
     EmployeeWorkDay[] empWorkDaysArray = ViewBag.empWorkDaysArray;
@@ -382,10 +383,54 @@
         }
         <input type="radio" name="maid" value="0" data-maid-name="" onclick="setMaid(this)" />none
     </div>
+
+
     <!--div for the "add expense" form (when clicking on an empty expense cell)-->
     <div id="addExpense" class="hidden">
-        add expense here
+        <form id="addExpenseForm" method="post">
+            <div class='field-box datepicker-box'>
+                <input type="text" id="expenseDate" name="expenseDate">
+                <label for="expenseDate">
+                    <span class="field-name">@tBox.translate("Expense date")</span>
+                    <span class="calendar-ico"></span>
+                </label>
+                <span class="field-error"></span>
+            </div>
+            <div class='inputBox select-box'>
+                <input list="expenseTypeList" name="expenseType" id="expenseType" class="inputElement" />
+                <datalist id="expenseTypeList">
+                    @foreach (var expenseType in expenseTypes)
+                    {
+                        <option value="@expenseType" />
+                    }
+                </datalist>
+                <label for="expenseType" class="label">@tBox.translate("Expense Type")</label>
+                <span class="error-text"></span>
+            </div>
+            <div class="form-box-wrap">
+                @Html.inputField("amount", "", "", tBox, style: "width:48%")
+                <div class="field-box select-box">
+                    <select id="currency" name="currency">
+                        <option value="UAH" selected>UAH</option>
+                        <option value="USD">USD</option>
+                        <option value="EUR">EUR</option>
+                    </select>
+                    <label>
+                        <span class="field-name">@tBox.translate("Currency")</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-box-wrap">
+                @Html.inputField("description", "", "", tBox)
+
+            </div>
+            <input type="button" class="btn small-button" value='@tBox.translate("Add")' onclick="sendExpense(this)" />
+            <a class="btn" style=" min-width: 90px;height: auto;margin: 5px;" href="/staff/s21Dashboard">@tBox.translate("Cancel")</a>
+        </form>
     </div>
+
+
     <!--div for the table showing all expenses for that date (when clicking on a non-empty expense cell)-->
     <div id="s27showExpenses" class="hidden">
         show expenses here
@@ -404,13 +449,19 @@
                 dateFormat: "d MM, yy",
                 firstDay: 1
             });
+        $("#expenseDate")
+            .datepicker({
+                defaultDate: "+0d",
+                numberOfMonths: 1,
+                dateFormat: "dd/mm/yy",
+                firstDay: 1
+            });
         //highlight the default order (if it should be highlighted)
         var orderId = document.getElementById("highlightOrderId").dataset.orderId;
         if (orderId != 0) {
             var td = document.getElementById(orderId);
             showOrder(td);  //We do the same as if a user would click on an occupied cell.
         }
-
     }
 
     var lastSelectedTd = null;
@@ -582,12 +633,18 @@
     //param 2: whether the expense cell contained an expense or not. 
     var tdExp = null;
     function expenseClicked(tdExpense, expenseIsPositive) {
-        var date = tdExpense.dataset.date;
+        var date = tdExpense.dataset.date;  //the date format is yyyy-mm-dd
+        var theDate = new Date(date);
+        var ddmmyy = theDate.getDate() + "/" + (theDate.getMonth()+1) + "/" + theDate.getFullYear();
+        $("#expenseDate").val(ddmmyy);
+
+        
+        //Clean all other pieces of information which may exist under the grid
         $("#s22OrderDetails").empty();
         $("#newOrderDates").addClass("hidden");
         $("#maidList").addClass("hidden");
         $(tdMaid).removeClass("highlight");   //If tdMaid or tdExpense is null - the command is ignored.
-        $(tdExp).removeClass("highlight");
+        $(tdExp).removeClass("highlight");  //remove highlight from the previous expense cell 
         $(tdExpense).addClass("highlight");
         tdExp = tdExpense;  //Keep the cell that was pressed by the user. When the user selects a new expense from the list of radio buttons - we will
         //know to which cell it was related
@@ -601,5 +658,10 @@
             $("#27showExpenses").addClass("hidden");
             $("#addExpense").removeClass("hidden");
         }
+    }
+
+    function sendExpense() {
+        var formParams = $("#addExpenseForm").serialize()
+        prompt("sendExpense function:" + formParams);
     }
 </script>

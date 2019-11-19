@@ -176,6 +176,7 @@ namespace cityLife.Controllers
             {
                 List<Money> revenuePerDay = null;
                 List<Money> expensePerDay = null;
+                List<string> expenseTypes = null;
                 EmployeeWorkDay[] empWorkDaysArray = null;
                 List<Employee> maidList = null;
                 List<Money> revenuePerApartment = null;
@@ -185,6 +186,7 @@ namespace cityLife.Controllers
                     dashboardDays, 
                     ref revenuePerDay,
                     ref expensePerDay,
+                    ref expenseTypes,
                     ref revenuePerApartment,
                     ref percentOccupancyPerApartment,
                     ref empWorkDaysArray, 
@@ -192,6 +194,7 @@ namespace cityLife.Controllers
                 ViewBag.apartmentDayBlocks = apartmentDayBlocks;
                 ViewBag.revenuePerDay = revenuePerDay;
                 ViewBag.expensePerDay = expensePerDay;
+                ViewBag.expenseTypes = expenseTypes;
                 ViewBag.revenuPerApartment = revenuePerApartment;
                 ViewBag.percentOccupancyPerApartment = percentOccupancyPerApartment;
                 ViewBag.empWorkDaysArray = empWorkDaysArray;
@@ -242,6 +245,7 @@ namespace cityLife.Controllers
             int days,
             ref List<Money> revenuePerDay,
             ref List<Money> expensePerDay,
+            ref List<string> expenseTypes,
             ref List<Money> revenuePerApartment,
             ref List<int> percentOccupancyPerApartment,
             ref EmployeeWorkDay[] empWorkDaysArray,
@@ -380,6 +384,11 @@ namespace cityLife.Controllers
             }
 
             maidList = db.Employees.Where(emp => emp.role == "maid").ToList();  //Add all maids to the maid list
+           
+            expenseTypes = (from expenseType in db.ExpenseTypes
+                                  select expenseType.nameKey).ToList();
+            
+            
 
             return apartmentDayBlocks;
 
