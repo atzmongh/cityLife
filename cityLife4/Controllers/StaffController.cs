@@ -721,6 +721,35 @@ namespace cityLife.Controllers
             db.SaveChanges();
         }
 
+        [HttpPost]
+        public void s29addExpense(string expenseDate, string expenseType, int amount, string currency, string description)
+        {
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+            //Check if that expense type exists
+            var expenseTypeRec = db.ExpenseTypes.SingleOrDefault(rec => rec.nameKey == expenseType);
+            if (expenseTypeRec == null)
+            {
+                //This expense type does not exist in the expenseTypes table - add it
+                expenseTypeRec = new ExpenseType()
+                {
+                     nameKey = expenseType
+                };
+                db.ExpenseTypes.Add(expenseTypeRec);
+            }
+            //At this point the expense type exists in expenseTypeRec record
+            Currency theCurrency = db.Currencies.Single(rec => rec.currencyCode == currency);   //We assume it must be in the DB
+            Expense theExpense = new Expense()
+            {
+                 amount = amount * 100,   //The amount is kept in cents in the DB
+                 Currency = theCurrency,
+                 date = DateTime.ParseExact(expenseDate, "dd/MM/yyyy", null),
+                 description = description,
+                 ExpenseType = expenseTypeRec
+            };
+            db.Expenses.Add(theExpense);
+            db.SaveChanges();
+        }
+
         /// <summary>
         /// This method is an auxiliary method to create the translation box and to insert it if needed to the Session variable
         /// It was copied from the public controller. A more elegant solution would be to create one method that will get the 

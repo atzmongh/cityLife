@@ -401,14 +401,14 @@
                 <datalist id="expenseTypeList">
                     @foreach (var expenseType in expenseTypes)
                     {
-                        <option value="@expenseType" />
+                        <option value="@expenseType" >@tBox.translate(expenseType)</option>
                     }
                 </datalist>
                 <label for="expenseType" class="label">@tBox.translate("Expense Type")</label>
                 <span class="error-text"></span>
             </div>
             <div class="form-box-wrap">
-                @Html.inputField("amount", "", "", tBox, style: "width:48%")
+                @Html.inputField("amount", "", "", tBox, style: "width:48%", fieldType:"number")
                 <div class="field-box select-box">
                     <select id="currency" name="currency">
                         <option value="UAH" selected>UAH</option>
@@ -661,7 +661,7 @@
     }
 
     function sendExpense() {
-        var formParams = $("#addExpenseForm").serialize()
-        prompt("sendExpense function:" + formParams);
+        var formParams = $("#addExpenseForm").serialize();
+        $.post("/staff/s29addExpense", formParams);
     }
 </script>
