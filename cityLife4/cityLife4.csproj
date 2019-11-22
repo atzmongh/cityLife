@@ -697,6 +697,7 @@
     <Content Include="Views\Staff\s28bookingSuccess.cshtml" />
     <Content Include="Views\Admin\a30fakeTime.cshtml" />
     <Content Include="Views\Admin\a05DBMigration.cshtml" />
+    <Content Include="Views\Staff\s30showExpenses.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
       <SubType>Designer</SubType>

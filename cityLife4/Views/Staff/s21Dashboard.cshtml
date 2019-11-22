@@ -386,7 +386,7 @@
 
 
     <!--div for the "add expense" form (when clicking on an empty expense cell)-->
-    <div id="addExpense" class="hidden">
+    <div id="addExpense" style="max-width:500px;" class="hidden">
         <form id="addExpenseForm" method="post">
             <div class='field-box datepicker-box'>
                 <input type="text" id="expenseDate" name="expenseDate">
@@ -432,8 +432,11 @@
 
 
     <!--div for the table showing all expenses for that date (when clicking on a non-empty expense cell)-->
-    <div id="s27showExpenses" class="hidden">
+    <div id="s30showExpenses" class="hidden">
         show expenses here
+        <input type="button" value="Add Expense" onclick="expenseClicked(tdExp,0)"/>  <!--we want to show the expense form - call the "expense clicked
+                                                                                          function with 0 in second parameter - that will display 
+                                                                                          the expense form-->
     </div>
 </div>
 
@@ -549,12 +552,20 @@
     }
     //convert a Date object to dd/mm/yyyy
     function formatDateddmmyyyy(aDate) {
-        var ddmmyyyy = aDate.getDate() + "/" + (aDate.getMonth() + 1) + "/" + aDate.getFullYear();
+        var day = aDate.getDate();
+        var zeroDay = day <= 9 ? "0" : "";
+        var month = aDate.getMonth() + 1;
+        var zeroMonth = month <= 9 ? "0" : "";
+        var ddmmyyyy = zeroDay + day + "/" + zeroMonth + month + "/" + aDate.getFullYear();   //create the string dd/mm/yyyy. Note that dd and mm will always have 2 digits
         return ddmmyyyy;
     }
     //convert a Date object to yyyy-mm-dd
     function formatDateyyyymmdd(aDate) {
-        var yyyymmdd = aDate.getFullYear() + "-" + (aDate.getMonth() + 1) + "-" + aDate.getDate();
+        var day = aDate.getDate();
+        var zeroDay = day <= 9 ? "0" : "";
+        var month = aDate.getMonth() + 1;
+        var zeroMonth = month <= 9 ? "0" : "";
+        var yyyymmdd = aDate.getFullYear() + "-" + zeroMonth + month + "-" + zeroDay + day;
         return yyyymmdd;
     }
     //returns a date which is 1 day later
@@ -633,10 +644,10 @@
     //param 2: whether the expense cell contained an expense or not. 
     var tdExp = null;
     function expenseClicked(tdExpense, expenseIsPositive) {
-        var date = tdExpense.dataset.date;  //the date format is yyyy-mm-dd
-        var theDate = new Date(date);
-        var ddmmyy = theDate.getDate() + "/" + (theDate.getMonth()+1) + "/" + theDate.getFullYear();
-        $("#expenseDate").val(ddmmyy);
+        var expenseDate = tdExpense.dataset.date;  //the date format is yyyy-mm-dd
+        var theDate = new Date(expenseDate);
+        var ddmmyyyy = formatDateddmmyyyy(theDate);
+        $("#expenseDate").val(ddmmyyyy);
 
         
         //Clean all other pieces of information which may exist under the grid
@@ -650,6 +661,7 @@
         //know to which cell it was related
         if (expenseIsPositive) {
             //We need to show the list of expenses
+            $.get("/staff/s30showExpensesForDate", expenseDate, showExpenseList);
             $("#addExpense").addClass("hidden");
             $("#s27showExpenses").removeClass("hidden");
         }
@@ -660,8 +672,18 @@
         }
     }
 
+    function showExpenseList(expenseListHTML) {
+        $("#s30showExpenses").empty();
+        $("#s30showExpenses").html(expenseListHTML);
+    }
+    //perform ajax call to send the expense form to the backend - staff controller s29addExpense
     function sendExpense() {
         var formParams = $("#addExpenseForm").serialize();
-        $.post("/staff/s29addExpense", formParams);
+        $.post("/staff/s29addExpense", formParams,expenseAdded);
+    }
+
+    //get response from staff controller s29addExpense. The callback returns the total amount of expenses for that day after adding the new expense.
+    function expenseAdded(totalExpenseForDay) {
+        $(tdExp).text(totalExpenseForDay);
     }
 </script>

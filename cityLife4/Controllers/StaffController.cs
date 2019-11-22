@@ -720,9 +720,18 @@ namespace cityLife.Controllers
             }
             db.SaveChanges();
         }
-
+        /// <summary>
+        /// The function adds an expense reported by the user in s21dashboard.
+        /// </summary>
+        /// <param name="expenseDate"></param>
+        /// <param name="expenseType">either one of the existing expense types in expenseTypes table or a new expense type
+        /// If new - that expense type will be added to the expenseTypes table</param>
+        /// <param name="amount">expense amount (as integer)</param>
+        /// <param name="currency">currency code</param>
+        /// <param name="description"></param>
+        /// <returns>the new expense amount for that date.</returns>
         [HttpPost]
-        public void s29addExpense(string expenseDate, string expenseType, int amount, string currency, string description)
+        public int s29addExpense(string expenseDate, string expenseType, int amount, string currency, string description)
         {
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
             //Check if that expense type exists
@@ -738,16 +747,38 @@ namespace cityLife.Controllers
             }
             //At this point the expense type exists in expenseTypeRec record
             Currency theCurrency = db.Currencies.Single(rec => rec.currencyCode == currency);   //We assume it must be in the DB
+            DateTime theExpenseDate = DateTime.ParseExact(expenseDate, "dd/MM/yyyy", null);
             Expense theExpense = new Expense()
             {
                  amount = amount * 100,   //The amount is kept in cents in the DB
                  Currency = theCurrency,
-                 date = DateTime.ParseExact(expenseDate, "dd/MM/yyyy", null),
+                 date = theExpenseDate,
                  description = description,
                  ExpenseType = expenseTypeRec
             };
             db.Expenses.Add(theExpense);
             db.SaveChanges();
+
+            //Calculate the new amount of expenses for that date (divide by 100 as expenses are kept in cents)
+            int totalAmount = (from expense in db.Expenses
+             where expense.date == theExpenseDate
+             select expense.amount).Sum() / 100;
+            return totalAmount;
+        }
+
+        /// <summary>
+        /// Creates a list of expenses for the date selected by the user
+        /// </summary>
+        /// <param name="expenseDate">the date in </param>
+        /// <returns></returns>
+        [HttpGet]
+        public PartialViewResult s30showExpensesForDate(DateTime expenseDate)
+        {
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+            var expenseList = from expense in db.Expenses
+                              where expense.date == expenseDate
+                              select expense;
+            return PartialView("s30showExpenses", expenseList);
         }
 
         /// <summary>

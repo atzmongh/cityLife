@@ -1,0 +1,15 @@
+﻿@using cityLife4;
+@using cityLife.Controllers;
+@using System.Data.Entity;
+@model  IEnumerable<Expense>
+
+@{ var expenseList = Model;
+    foreach(var anExpense in expenseList)
+    {
+        <span>@anExpense.amount</span><br />
+    }
+
+}
+
+
+
