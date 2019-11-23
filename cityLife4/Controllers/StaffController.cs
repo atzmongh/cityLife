@@ -772,13 +772,38 @@ namespace cityLife.Controllers
         /// <param name="expenseDate">the date in </param>
         /// <returns></returns>
         [HttpGet]
-        public PartialViewResult s30showExpensesForDate(DateTime expenseDate)
+        public PartialViewResult s30showExpensesForDate(string expenseDateSt)
         {
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
+            DateTime expenseDate = DateTime.ParseExact(expenseDateSt, "yyyy-MM-dd",null);
             var expenseList = from expense in db.Expenses
                               where expense.date == expenseDate
                               select expense;
+            
             return PartialView("s30showExpenses", expenseList);
+        }
+
+        /// <summary>
+        /// The method gets is called when the user presses an existing expense in the expense list. The method creates the 
+        /// expense update form
+        /// </summary>
+        /// <param name="expenseId"></param>
+        /// <returns>the form containing the expense fields: type, amount, description, and an update, delete and cancel buttons</returns>
+        [HttpGet]
+        public PartialViewResult s31updateExpense(int expenseId)
+        {
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+            Expense theExpense = db.Expenses.Single(rec => rec.Id == expenseId);
+            TranslateBox tBox = this.setTbox("RU");
+            ViewBag.tBox = tBox;
+            ViewBag.expenseTypes = db.ExpenseTypes;
+            return PartialView("s31updateExpense", theExpense);
+
+        }
+        [HttpPut]
+        public void updateExpense()
+        {
+
         }
 
         /// <summary>

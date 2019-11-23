@@ -160,6 +160,8 @@
     .selectCell{
         cursor:pointer;
     }
+    
+
 </style>
 <div class="main-wrapper reset-indent">
     <form id="fromDateForm" method="get" action="s21Dashboard">
@@ -427,16 +429,17 @@
             </div>
             <input type="button" class="btn small-button" value='@tBox.translate("Add")' onclick="sendExpense(this)" />
             <a class="btn" style=" min-width: 90px;height: auto;margin: 5px;" href="/staff/s21Dashboard">@tBox.translate("Cancel")</a>
+            <span id="expenseAddedMessage" style="display:none; background-color:darkblue; color:white">Expense Added</span>
         </form>
     </div>
 
 
     <!--div for the table showing all expenses for that date (when clicking on a non-empty expense cell)-->
-    <div id="s30showExpenses" class="hidden">
-        show expenses here
-        <input type="button" value="Add Expense" onclick="expenseClicked(tdExp,0)"/>  <!--we want to show the expense form - call the "expense clicked
-                                                                                          function with 0 in second parameter - that will display 
-                                                                                          the expense form-->
+    <div id="s30showExpenses">
+       
+    </div>
+    <div id="s31updateExpense">
+
     </div>
 </div>
 
@@ -500,6 +503,7 @@
 
     function addOrder(td) {
         cellClickCounter++;
+        $("#s30showExpenses").empty();
         if (lastSelectedTd != null) {
             //remove highlighting from a previous booking that was selected
             $(lastSelectedTd).removeClass("highlight");
@@ -648,7 +652,7 @@
         var theDate = new Date(expenseDate);
         var ddmmyyyy = formatDateddmmyyyy(theDate);
         $("#expenseDate").val(ddmmyyyy);
-
+        tdExpense.text
         
         //Clean all other pieces of information which may exist under the grid
         $("#s22OrderDetails").empty();
@@ -659,15 +663,17 @@
         $(tdExpense).addClass("highlight");
         tdExp = tdExpense;  //Keep the cell that was pressed by the user. When the user selects a new expense from the list of radio buttons - we will
         //know to which cell it was related
-        if (expenseIsPositive) {
-            //We need to show the list of expenses
-            $.get("/staff/s30showExpensesForDate", expenseDate, showExpenseList);
+        if (tdExpense.innerText != "") {
+            //the cell contains expenses - show a table with a list of expenses for that day
+            var expenseDateParam = new Object();
+            expenseDateParam.expenseDateSt = expenseDate;
+            $.get("/staff/s30showExpensesForDate", expenseDateParam, showExpenseList);
             $("#addExpense").addClass("hidden");
             $("#s27showExpenses").removeClass("hidden");
         }
         else {
-            //We need to show the "add class" form
-            $("#27showExpenses").addClass("hidden");
+            //There are no expenses for that day - show the "add class" form
+            $("#s30showExpenses").empty();
             $("#addExpense").removeClass("hidden");
         }
     }
@@ -685,5 +691,29 @@
     //get response from staff controller s29addExpense. The callback returns the total amount of expenses for that day after adding the new expense.
     function expenseAdded(totalExpenseForDay) {
         $(tdExp).text(totalExpenseForDay);
+        $("#expenseType").val("");
+        $("#amount").val("");
+        $("#description").val("");
+        $("#expenseAddedMessage").fadeIn(1000, () => $("#expenseAddedMessage").fadeOut(1000));
+
+    }
+    //the function is called by on click in s30showExpenses
+    function addExpense() {
+        $("#s30showExpenses").empty();
+        $("#addExpense").removeClass("hidden");
+    }
+
+    //The function is called by on click in s30showExpenses (for each expense line)
+    function updateExpense(expenseId) {
+        var expense = new Object();
+        expense.expenseId = expenseId;
+        $.get("/staff/s31updateExpense", expense, showUpdateForm);
+    }
+    function showUpdateForm(updateForm) {
+        $("#s30showExpenses").empty();
+        $("#s31updateExpense").html(updateForm);
+        $('select').select2({
+            minimumResultsForSearch: Infinity
+        });
     }
 </script>

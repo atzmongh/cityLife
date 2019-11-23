@@ -4,12 +4,28 @@
 @model  IEnumerable<Expense>
 
 @{ var expenseList = Model;
-    foreach(var anExpense in expenseList)
-    {
-        <span>@anExpense.amount</span><br />
-    }
+<table style="max-width:500px;">
+    <thead>
+        <tr>
+            <th>type</th>
+            <th>amount</th>
+            <th>desc</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var anExpense in expenseList)
+        {
+        <tr onclick="updateExpense(@anExpense.Id)">
+            <td>@anExpense.ExpenseType.nameKey</td>
+            <td style="text-align:right">@anExpense.expenseAsMoney().toMoneyString()</td>
+            <td>@anExpense.description</td>
+        </tr>
+        }
+    </tbody>
+</table>
 
 }
-
-
-
+<input type="button" class="btn small-button" value="Add Expense" onclick="addExpense()" />
+<!--we want to show the expense form - call the "expense clicked
+           function with 0 in second parameter - that will display
+           the expense form. tdExp is a variable in s21dashboard-->
