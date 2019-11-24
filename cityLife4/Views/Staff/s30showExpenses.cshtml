@@ -6,19 +6,19 @@
 @{ var expenseList = Model;
 <table style="max-width:500px;">
     <thead>
-        <tr>
-            <th>type</th>
-            <th>amount</th>
-            <th>desc</th>
+        <tr class="table-tr">
+            <th class="table-th">type</th>
+            <th class="table-th">amount</th>
+            <th class="table-th">desc</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var anExpense in expenseList)
         {
-        <tr onclick="updateExpense(@anExpense.Id)">
-            <td>@anExpense.ExpenseType.nameKey</td>
-            <td style="text-align:right">@anExpense.expenseAsMoney().toMoneyString()</td>
-            <td>@anExpense.description</td>
+        <tr class="table-tr" onclick="updateExpense(@anExpense.Id)">
+            <td class="table-td">@anExpense.ExpenseType.nameKey</td>
+            <td class="table-td" style="text-align:right">@anExpense.expenseAsMoney().toMoneyString()</td>
+            <td class="table-td">@anExpense.description</td>
         </tr>
         }
     </tbody>

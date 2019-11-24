@@ -7,6 +7,6 @@ namespace cityLife4
 {
     public static class AppVersion
     {
-        public static string current = "V2.0.3";
+        public static string current = "V2.0.7";
     }
 }

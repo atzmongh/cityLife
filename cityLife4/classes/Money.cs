@@ -163,7 +163,7 @@ namespace cityLife4
         /// <param name="showCents">when true will show cents as 123.45 When false will round to the closest integral value</param>
         /// <param name="showCurrency">when true will show the currency symbol to the left of the value.</param>
         /// <returns>$1,234.56 orf $1235 bsaed on the showCents param</returns>
-        public string toMoneyString(bool showCents = false, bool showCurrency=false)
+        public string toMoneyString(bool showCents = false, bool showCurrency = false, bool showComma = true)
         {
             string currencySymbol = "";
             if (showCurrency)
@@ -177,15 +177,19 @@ namespace cityLife4
                 currencySymbol = theCurrency.symbol;
             }
             //At this point currency symbol contains either the currency symbol or empty string, if show currency is false
-           
+            string comma = "";
+            if (showComma)
+            {
+                comma = ",";
+            }
             string moneyString;
             if (showCents)
             {
-                moneyString = string.Format("{0}{1:#,##0.00}", currencySymbol, this.amount);
+                moneyString = string.Format("{0}{1:#"+comma+"##0.00}", currencySymbol, this.amount);
             }
-            else
+            else 
             {
-                moneyString = string.Format("{0}{1:#,##0}", currencySymbol, decimal.Round(this.amount));
+                moneyString = string.Format("{0}{1:#"+comma+"##0}", currencySymbol, decimal.Round(this.amount));
             }
             
             return moneyString;

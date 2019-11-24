@@ -729,9 +729,9 @@ namespace cityLife.Controllers
         /// <param name="amount">expense amount (as integer)</param>
         /// <param name="currency">currency code</param>
         /// <param name="description"></param>
-        /// <returns>the new expense amount for that date.</returns>
+        /// <returns>the new expense amount for that date in UAH without currency symbol and cents</returns>
         [HttpPost]
-        public int s29addExpense(string expenseDate, string expenseType, int amount, string currency, string description)
+        public string s29addExpense(string expenseDate, string expenseType, int amount, string currency, string description)
         {
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
             //Check if that expense type exists
@@ -759,11 +759,7 @@ namespace cityLife.Controllers
             db.Expenses.Add(theExpense);
             db.SaveChanges();
 
-            //Calculate the new amount of expenses for that date (divide by 100 as expenses are kept in cents)
-            int totalAmount = (from expense in db.Expenses
-             where expense.date == theExpenseDate
-             select expense.amount).Sum() / 100;
-            return totalAmount;
+            return calculateExpensesForDate(theExpenseDate);
         }
 
         /// <summary>
@@ -800,11 +796,84 @@ namespace cityLife.Controllers
             return PartialView("s31updateExpense", theExpense);
 
         }
-        [HttpPut]
-        public void updateExpense()
+        /// <summary>
+        /// gets the updated expense data and updates the DB
+        /// </summary>
+        /// <param name="expenseDate"></param>
+        /// <param name="expenseType"></param>
+        /// <param name="amount"></param>
+        /// <param name="currency"></param>
+        /// <param name="description"></param>
+        /// <param name="expenseId">the id of the expense being updated</param>
+        /// <returns>the new total expenses for that date in UAH, without cents and currency sign</returns>
+        [HttpPost]
+        public string s31updateExpense(string expenseDate, string expenseType, int amount, string currency, string description, int expenseId)
         {
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+            //Check if that expense type exists
+            var expenseTypeRec = db.ExpenseTypes.SingleOrDefault(rec => rec.nameKey == expenseType);
+            if (expenseTypeRec == null)
+            {
+                //This expense type does not exist in the expenseTypes table - add it
+                expenseTypeRec = new ExpenseType()
+                {
+                    nameKey = expenseType
+                };
+                db.ExpenseTypes.Add(expenseTypeRec);
+            }
+            //At this point the expense type exists in expenseTypeRec record
+            Currency theCurrency = db.Currencies.Single(rec => rec.currencyCode == currency);   //We assume it must be in the DB
+            DateTime theExpenseDate = DateTime.ParseExact(expenseDate, "dd/MM/yyyy", null);
+            //Read the existing expense
+            Expense theExpense = db.Expenses.Single(rec => rec.Id == expenseId);
+            theExpense.amount = amount * 100;
+            theExpense.Currency = theCurrency;
+            theExpense.date = theExpenseDate;
+            theExpense.description = description;
+            theExpense.ExpenseType = expenseTypeRec;
+           
+            db.SaveChanges();
 
+            return calculateExpensesForDate(theExpenseDate);
         }
+
+        [HttpPost]
+        public string s32deleteExpense(int expenseId)
+        {
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+
+            Expense theExpense = db.Expenses.Single(rec => rec.Id == expenseId);
+            DateTime theExpenseDate = theExpense.date;
+            db.Expenses.Remove(theExpense);
+            db.SaveChanges();
+
+            return calculateExpensesForDate(theExpenseDate);
+        }
+
+        /// <summary>
+        /// Calculate the  amount of expenses for that date (as money string)
+        /// </summary>
+        /// <param name="aDate">the date for which we want to calcualte the expenses</param>
+        /// <returns>total expenses as string (without currency and cents in UAH)</returns>
+        private string calculateExpensesForDate(DateTime theExpenseDate)
+        {
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+            var expensesForDate = from expense in db.Expenses
+                                  where expense.date == theExpenseDate
+                                  select expense;
+            Money totalExpensesForDate = new Money(0m, "UAH");
+            foreach (var anExpense in expensesForDate)
+            {
+                totalExpensesForDate += anExpense.expenseAsMoney();
+            }
+            string totalExpensesSt = totalExpensesForDate.toMoneyString();
+            if (totalExpensesSt == "0")
+            {
+                totalExpensesSt = "";   //show empty cell when 0
+            }
+            return totalExpensesSt;
+        }
+
 
         /// <summary>
         /// This method is an auxiliary method to create the translation box and to insert it if needed to the Session variable

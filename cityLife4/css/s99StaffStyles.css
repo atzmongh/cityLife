@@ -50,27 +50,21 @@
     margin: 5px;
 }
 /*Copied from _adminLayout.cshtml. Consider unifying in a single place*/
-/*
-table {
-    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-    border-collapse: collapse;
-    width: 100%;
-}
-    */
-    table td, table th {
+
+    .table-td, .table-th {
         border: 1px solid #ddd;
         padding: 8px;
     }
 
-    table tr:nth-child(even) {
+    .table-tr:nth-child(even) {
         background-color: #f2f2f2;
     }
 
-    table tr:hover {
+    .table-tr:hover {
         background-color: #ddd;
     }
 
-    table th {
+    .table-th {
         padding-top: 12px;
         padding-bottom: 12px;
         text-align: left;
@@ -78,5 +72,5 @@ table {
         color: white;
     }
 
-*/
+
 /*# sourceMappingURL=data:application/json;base64,ewoJInZlcnNpb24iOiAzLAoJImZpbGUiOiAiY3NzL3BhcnRzL3M5OVN0YWZmU3R5bGVzLmNzcyIsCgkic291cmNlcyI6IFsKCQkiY3NzL3BhcnRzL3M5OVN0YWZmU3R5bGVzLnNjc3MiLAoJCSJjc3MvcGFydHMvX3ZhcmlhYmxlcy5zY3NzIiwKCQkiY3NzL3BhcnRzL3MyNGlucHV0RWxlbWVudC5zY3NzIgoJXSwKCSJuYW1lcyI6IFtdLAoJIm1hcHBpbmdzIjogIkFBQUEsYUFBYTtBQUdiLHdCQUF3QjtBRUZ4QixBQUFBLFNBQVMsQ0FBQztFQUNOLE1BQU0sRUFBRSxJQUFJO0VBQ1osS0FBSyxFQUFFLElBQUk7RUFDWCxNQUFNLEVBQUUsR0FBRyxDQUFDLEtBQUssQ0RXVixPQUFPO0VDVmQsUUFBUSxFQUFFLFFBQVE7RUFDbEIsYUFBYSxFQUFFLElBQUksR0FDdEI7O0FBRUQsQUFBQSxhQUFhLENBQUM7RUFDVixNQUFNLEVBQUUsR0FBRztFQUNYLFFBQVEsRUFBRSxRQUFRO0VBQ2xCLEdBQUcsRUFBRSxJQUFJO0VBQ1QsWUFBWSxFQUFFLElBQUk7RUFDbEIsYUFBYSxFQUFFLElBQUk7RUFDbkIsS0FBSyxFREdHLE9BQU87RUNGZixVQUFVLEVBQUUsSUFBSTtFQUNoQixLQUFLLEVBQUUsSUFBSTtFQUNYLFdBQVcsRURmQyxlQUFlLEVBQUUsS0FBSyxFQUFFLFVBQVU7RUNnQjlDLFNBQVMsRUFBRSxJQUFJLEdBQ2xCOztBQUVELEFBQUEsTUFBTSxDQUFDO0VBQ0gsUUFBUSxFQUFFLFFBQVE7RUFDbEIsWUFBWSxFQUFFLElBQUk7RUFDbEIsS0FBSyxFRFZFLE9BQU87RUNXZCxXQUFXLEVEdkJDLGVBQWUsRUFBRSxLQUFLLEVBQUUsVUFBVTtFQ3dCOUMsU0FBUyxFQUFFLElBQUksR0FDbEI7O0FBRUQsQUFBQSxXQUFXLENBQUM7RUFDUixRQUFRLEVBQUUsUUFBUTtFQUNsQixHQUFHLEVBQUUsS0FBSztFQUNWLEtBQUssRUFBRSxHQUFHO0VBQ1YsS0FBSyxFQUFFLEdBQUc7RUFDVixVQUFVLEVBQUUsS0FBSyxHQUNwQjs7QUFFRCxBQUFBLE1BQU0sQ0FBQztFQUNILFlBQVksRUFBRSxHQUFHLEdBQ3BCIgp9 */

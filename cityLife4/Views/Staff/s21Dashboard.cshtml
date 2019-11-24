@@ -358,88 +358,95 @@
         </div>
     </div>
     <div style="padding:2px;">@tBox.translate("Total revenue"):@totalRevenue.toMoneyString(showCents:false)</div>
-    <!--div for the order details info (when the user clicks on an existing order)-->
-    <div style="padding:4px;max-width:400px;" id="s22OrderDetails">
+
+    <!--This part contgains all forms which are displayed under the main grid. Contains 6 forms, where each time only 
+        one is displayed and the rest are hidden-->
+    <div id="s20underTheGrid">
+        <!--div for the order details info (when the user clicks on an existing order)-->
+        <div style="padding:4px;max-width:400px;" id="s22OrderDetails">
 
 
-    </div>
-    <!--div for info about new order dates (when the user clicks on an empty cell)-->
-    <div id="newOrderDates" class="hidden">
-        <span style="float:left">@tBox.translate("Apartment Number")</span>
-        <span id="apartmentNumber" style="float:right"></span>
-        <br />
-        <span style="float:left">@tBox.translate("Checkin Date")</span>
-        <span id="checkinDate" style="float:right"></span>
-        <br />
-        <span style="float:left">@tBox.translate("Checkout Date")</span>
-        <span id="checkoutDate" style="float:right"></span>
-        <br />
-        <a id="addOrderButton" class="btn" href="/staff/s23updateOrder">@tBox.translate("New Order")</a>
+        </div>
+        <!--div for info about new order dates (when the user clicks on an empty cell)-->
+        <div id="newOrderDates" class="hidden">
+            <span style="float:left">@tBox.translate("Apartment Number")</span>
+            <span id="apartmentNumber" style="float:right"></span>
+            <br />
+            <span style="float:left">@tBox.translate("Checkin Date")</span>
+            <span id="checkinDate" style="float:right"></span>
+            <br />
+            <span style="float:left">@tBox.translate("Checkout Date")</span>
+            <span id="checkoutDate" style="float:right"></span>
+            <br />
+            <a id="addOrderButton" class="btn" href="/staff/s23updateOrder">@tBox.translate("New Order")</a>
 
-    </div>
-    <!--div for the maid list (when the user clicks on a maid line)-->
-    <div id="maidList" class="hidden">
-        @foreach (var aMaid in maidList)
-        {
-            <input type="radio" name="maid" value="@aMaid.Id" data-maid-name="@aMaid.name" onclick="setMaid(this)" />@aMaid.name
-        }
-        <input type="radio" name="maid" value="0" data-maid-name="" onclick="setMaid(this)" />none
-    </div>
+        </div>
+        <!--div for the maid list (when the user clicks on a maid line)-->
+        <div id="maidList" class="hidden">
+            @foreach (var aMaid in maidList)
+            {
+                <input type="radio" name="maid" value="@aMaid.Id" data-maid-name="@aMaid.name" onclick="setMaid(this)" />@aMaid.name
+            }
+            <input type="radio" name="maid" value="0" data-maid-name="" onclick="setMaid(this)" />none
+        </div>
 
 
-    <!--div for the "add expense" form (when clicking on an empty expense cell)-->
-    <div id="addExpense" style="max-width:500px;" class="hidden">
-        <form id="addExpenseForm" method="post">
-            <div class='field-box datepicker-box'>
-                <input type="text" id="expenseDate" name="expenseDate">
-                <label for="expenseDate">
-                    <span class="field-name">@tBox.translate("Expense date")</span>
-                    <span class="calendar-ico"></span>
-                </label>
-                <span class="field-error"></span>
-            </div>
-            <div class='inputBox select-box'>
-                <input list="expenseTypeList" name="expenseType" id="expenseType" class="inputElement" />
-                <datalist id="expenseTypeList">
-                    @foreach (var expenseType in expenseTypes)
-                    {
-                        <option value="@expenseType" >@tBox.translate(expenseType)</option>
-                    }
-                </datalist>
-                <label for="expenseType" class="label">@tBox.translate("Expense Type")</label>
-                <span class="error-text"></span>
-            </div>
-            <div class="form-box-wrap">
-                @Html.inputField("amount", "", "", tBox, style: "width:48%", fieldType:"number")
-                <div class="field-box select-box">
-                    <select id="currency" name="currency">
-                        <option value="UAH" selected>UAH</option>
-                        <option value="USD">USD</option>
-                        <option value="EUR">EUR</option>
-                    </select>
-                    <label>
-                        <span class="field-name">@tBox.translate("Currency")</span>
+        <!--div for the "add expense" form (when clicking on an empty expense cell)-->
+        <div id="addExpense" style="max-width:500px;" class="hidden">
+            <form id="addExpenseForm" method="post">
+                <div class='field-box datepicker-box'>
+                    <input type="text" id="expenseDate" name="expenseDate">
+                    <label for="expenseDate">
+                        <span class="field-name">@tBox.translate("Expense date")</span>
+                        <span class="calendar-ico"></span>
                     </label>
+                    <span class="field-error"></span>
                 </div>
-            </div>
+                <div class='inputBox select-box'>
+                    <input list="expenseTypeList" name="expenseType" id="expenseType" class="inputElement" />
+                    <datalist id="expenseTypeList">
+                        @foreach (var expenseType in expenseTypes)
+                        {
+                            <option value="@expenseType">@tBox.translate(expenseType)</option>
+                        }
+                    </datalist>
+                    <label for="expenseType" class="label">@tBox.translate("Expense Type")</label>
+                    <span class="error-text"></span>
+                </div>
+                <div class="form-box-wrap">
+                    @Html.inputField("amount", "", "", tBox, style: "width:48%", fieldType: "number")
+                    <div class="field-box select-box">
+                        <select id="currency" name="currency">
+                            <option value="UAH" selected>UAH</option>
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                        </select>
+                        <label>
+                            <span class="field-name">@tBox.translate("Currency")</span>
+                        </label>
+                    </div>
+                </div>
 
-            <div class="form-box-wrap">
-                @Html.inputField("description", "", "", tBox)
+                <div class="form-box-wrap">
+                    @Html.inputField("description", "", "", tBox)
 
-            </div>
-            <input type="button" class="btn small-button" value='@tBox.translate("Add")' onclick="sendExpense(this)" />
-            <a class="btn" style=" min-width: 90px;height: auto;margin: 5px;" href="/staff/s21Dashboard">@tBox.translate("Cancel")</a>
-            <span id="expenseAddedMessage" style="display:none; background-color:darkblue; color:white">Expense Added</span>
-        </form>
-    </div>
+                </div>
+                <input type="button" class="btn small-button" value='@tBox.translate("Add")' onclick="sendExpense(this)" />
+                <a class="btn" style=" min-width: 90px;height: auto;margin: 5px;" href="/staff/s21Dashboard">@tBox.translate("Cancel")</a>
+                <span id="expenseAddedMessage" style="display:none; background-color:darkblue; color:white">Expense Added</span>
+            </form>
+        </div>
 
 
-    <!--div for the table showing all expenses for that date (when clicking on a non-empty expense cell)-->
-    <div id="s30showExpenses">
-       
-    </div>
-    <div id="s31updateExpense">
+        <!--div for the table showing all expenses for that date (when clicking on a non-empty expense cell)-->
+        <div id="s30showExpenses">
 
+        </div>
+
+        <!--div for the update expense form-->
+        <div id="s31updateExpense" style="max-width:550px;">
+
+        </div>
     </div>
 </div>
 
@@ -468,6 +475,9 @@
             var td = document.getElementById(orderId);
             showOrder(td);  //We do the same as if a user would click on an occupied cell.
         }
+
+        //Initialize the currency dropdown in expense form
+
     }
 
     var lastSelectedTd = null;
@@ -480,6 +490,11 @@
     var cellClickCounter = 0;
 
 
+    //The function hides all forms under the grid except the one given in the parameter
+    function hideAllExcept(div) {
+        $("#s20underTheGrid").children().addClass("hidden");
+        $(div).removeClass("hidden");
+    }
     function showOrder(td) {
         // var orderId = td.dataset.orderId;
         if (lastSelectedTd != null) {
@@ -489,21 +504,17 @@
         lastSelectedTd = td;
         var orderIdJson = { orderId: td.dataset.orderId };
         $.get("/staff/s22OrderDetails", orderIdJson).done(displayOrderDetails);
-
-       // $.getJSON("/staff/s22OrderDetails", orderIdJson).done(displayOrderDetails);
     }
 
     function displayOrderDetails(orderDetailsHTML) {
-        $("#s22OrderDetails").empty();
-        $("#maidList").addClass("hidden");
-        $("#s22OrderDetails").append(orderDetailsHTML);
+        hideAllExcept("#s22OrderDetails");
+        $("#s22OrderDetails").html(orderDetailsHTML);
     }
 
     
 
     function addOrder(td) {
         cellClickCounter++;
-        $("#s30showExpenses").empty();
         if (lastSelectedTd != null) {
             //remove highlighting from a previous booking that was selected
             $(lastSelectedTd).removeClass("highlight");
@@ -600,9 +611,8 @@
             '&apartmentNumber=' + apartmentNumber + '">@tBox.translate("Add Order") </a>' +
                 '</div>';
 
-        $("#s22OrderDetails").empty();
-        $("#maidList").addClass("hidden");
-            $("#s22OrderDetails").append(html);
+        hideAllExcept("#s22OrderDetails");
+        $("#s22OrderDetails").html(html);
     }
 
     //returns the difference between d1 and d2 (actually d2 minus d1)
@@ -624,19 +634,14 @@
         
         $(tdEmp).addClass("highlight");
         tdMaid = tdEmp;  //Keep the cell that was pressed by the user. When the user selects a new maid from the list of radio buttons - we will
-                         //know to which cell it was related
-        $("#s22OrderDetails").empty();
-        $("#newOrderDates").addClass("hidden");
-
-        //display the list of maids with 
-        $("#maidList").removeClass("hidden");
+        //know to which cell it was related
+        hideAllExcept("#maidList");
     }
 
     //the user pressed a radio button of a maid - this maid should be assigned to the date previously selected by the user 
     //(and kept in "tdMaid")
     function setMaid(maidRadio) {
-        $(tdMaid).empty();
-        tdMaid.append(maidRadio.dataset.maidName);
+        tdMaid.text(maidRadio.dataset.maidName);
         var maidDay = new Object();
         maidDay.maidId = maidRadio.value;
         maidDay.date = tdMaid.dataset.date;
@@ -655,9 +660,6 @@
         tdExpense.text
         
         //Clean all other pieces of information which may exist under the grid
-        $("#s22OrderDetails").empty();
-        $("#newOrderDates").addClass("hidden");
-        $("#maidList").addClass("hidden");
         $(tdMaid).removeClass("highlight");   //If tdMaid or tdExpense is null - the command is ignored.
         $(tdExp).removeClass("highlight");  //remove highlight from the previous expense cell 
         $(tdExpense).addClass("highlight");
@@ -668,18 +670,16 @@
             var expenseDateParam = new Object();
             expenseDateParam.expenseDateSt = expenseDate;
             $.get("/staff/s30showExpensesForDate", expenseDateParam, showExpenseList);
-            $("#addExpense").addClass("hidden");
-            $("#s27showExpenses").removeClass("hidden");
+           
         }
         else {
             //There are no expenses for that day - show the "add class" form
-            $("#s30showExpenses").empty();
-            $("#addExpense").removeClass("hidden");
+            hideAllExcept("#addExpense");
         }
     }
 
     function showExpenseList(expenseListHTML) {
-        $("#s30showExpenses").empty();
+        hideAllExcept("#s30showExpenses");
         $("#s30showExpenses").html(expenseListHTML);
     }
     //perform ajax call to send the expense form to the backend - staff controller s29addExpense
@@ -699,8 +699,7 @@
     }
     //the function is called by on click in s30showExpenses
     function addExpense() {
-        $("#s30showExpenses").empty();
-        $("#addExpense").removeClass("hidden");
+        hideAllExcept("#addExpense");
     }
 
     //The function is called by on click in s30showExpenses (for each expense line)
@@ -710,10 +709,40 @@
         $.get("/staff/s31updateExpense", expense, showUpdateForm);
     }
     function showUpdateForm(updateForm) {
-        $("#s30showExpenses").empty();
+        hideAllExcept("#s31updateExpense");
         $("#s31updateExpense").html(updateForm);
-        $('select').select2({
+        $("#currency2").select2({
             minimumResultsForSearch: Infinity
         });
+        var expenseDate = $("#expenseDate2");
+        expenseDate.datepicker({
+           // defaultDate: "5 Feb 2019",
+            numberOfMonths: 1,
+            dateFormat: "dd/mm/yy",   
+            firstDay: 1
+        });
+    }
+
+    function expenseUpdating(btn) {
+        var formParams = $("#updateExpenseForm").serialize();
+        $.post("/staff/s31updateExpense", formParams, expenseUpdated);
+        
+    }
+
+    function expenseUpdated(totalExpenseForDay) {
+        $(tdExp).text(totalExpenseForDay);
+        $("#expenseUpdatedMessage").fadeIn(1000, () => $("#expenseUpdatedMessage").fadeOut(1000, () => $("#s31updateExpense").empty()));
+    }
+
+    function expenseDeleting(btn) {
+        var expenseId = $("#expenseId").val();
+        var formParams = new Object();
+        formParams.expenseId = expenseId;
+        $.post("/staff/s32deleteExpense", formParams, expenseDeleted);
+    }
+
+    function expenseDeleted(totalExpenseForDay) {
+        $(tdExp).text(totalExpenseForDay);
+        $("#expenseDeletedMessage").fadeIn(1000, () => $("#expenseDeletedMessage").fadeOut(1000, () => $("#s31updateExpense").empty()));
     }
 </script>
