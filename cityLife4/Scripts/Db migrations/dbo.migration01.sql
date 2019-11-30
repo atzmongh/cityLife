@@ -1,5 +1,5 @@
-﻿--ALTER TABLE [dbo].[Countries] 
---    ADD [language] NVARCHAR (50);
+﻿ALTER TABLE [dbo].[Countries] 
+    ADD [language] NVARCHAR (50);
 
 create table dbo.ExpenseTypes(
 	Id int identity (1,1) not null,
@@ -7,7 +7,6 @@ create table dbo.ExpenseTypes(
 	descriptionKey nvarchar(max) null,
 	constraint PK_ExpenseTypes primary key clustered (Id asc)
 	);
-drop table IF EXISTS dbo.Expenses ;
 
 create table [dbo].[Expenses](
 	Id int identity (1,1) not null,

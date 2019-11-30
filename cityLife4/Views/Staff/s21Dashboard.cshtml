@@ -641,7 +641,7 @@
     //the user pressed a radio button of a maid - this maid should be assigned to the date previously selected by the user 
     //(and kept in "tdMaid")
     function setMaid(maidRadio) {
-        tdMaid.text(maidRadio.dataset.maidName);
+        $(tdMaid).text(maidRadio.dataset.maidName);
         var maidDay = new Object();
         maidDay.maidId = maidRadio.value;
         maidDay.date = tdMaid.dataset.date;

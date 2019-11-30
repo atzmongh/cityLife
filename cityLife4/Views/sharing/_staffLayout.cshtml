@@ -21,7 +21,7 @@
         <nav class="main-nav">
             <div class="holder">
                 <div class="personal-info">
-                    @{ 
+                    @{
                         string photoURL = string.Format("/images/employee{0}.jpg",theEmployee.Id);
                     }
                     <div class="photo" style="background-image: url('@photoURL');background-size:contain;"></div>
@@ -41,7 +41,8 @@
         </nav>
         <div class="mobile-menu-toggle"><span></span></div>
 
-     @RenderBody()
+        @RenderBody()
+        <div style="font-size:10px;"> @AppVersion.current</div>
     </main>
 
     <script src="/js/libs.js?version=@AppVersion.current"></script>
