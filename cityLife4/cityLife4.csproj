@@ -679,8 +679,8 @@
       <DependentUpon>compilerconfig.json</DependentUpon>
     </None>
     <Content Include="css\parts\s24inputElement.scss" />
-    <None Include="Properties\PublishProfiles\cityLife4 - Web Deploy.pubxml" />
-    <None Include="Properties\PublishProfiles\cityLife4 - Web Deploy1.pubxml" />
+    <None Include="Properties\PublishProfiles\cityLife4 - Web Deploy prod.pubxml" />
+    <None Include="Properties\PublishProfiles\cityLife4 - Web Deploy stage.pubxml" />
     <None Include="Properties\PublishProfiles\cityLife4VM - Web Deploy.pubxml" />
     <Content Include="Views\Public\p50OurRulesEnglish.cshtml" />
     <Content Include="Views\Public\t10welcomeMail.cshtml" />
