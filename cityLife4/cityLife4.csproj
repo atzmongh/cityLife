@@ -502,6 +502,7 @@
     <Content Include="images\missing portrait photo.jpg" />
     <Content Include="messages\m010NewOrder.html" />
     <Content Include="Scripts\Db migrations\dbo.migration01.sql" />
+    <Content Include="Scripts\Db migrations\dbo.migration2_3.sql" />
     <Content Include="styles2.css" />
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="cityLifeDB.csv" />
@@ -556,6 +557,9 @@
       <DependentUpon>cityLife.tt</DependentUpon>
     </Compile>
     <Compile Include="ApartmentDay.cs">
+      <DependentUpon>cityLife.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ApartmentIs.cs">
       <DependentUpon>cityLife.tt</DependentUpon>
     </Compile>
     <Compile Include="ApartmentPhoto.cs">
@@ -618,7 +622,7 @@
     <Compile Include="Expense.cs">
       <DependentUpon>cityLife.tt</DependentUpon>
     </Compile>
-    <Compile Include="expenseType.cs">
+    <Compile Include="ExpenseType.cs">
       <DependentUpon>cityLife.tt</DependentUpon>
     </Compile>
     <Compile Include="Global.asax.cs">

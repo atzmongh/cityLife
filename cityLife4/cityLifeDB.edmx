@@ -46,6 +46,7 @@
           <Property Name="addressKey" Type="nvarchar(max)" Nullable="false" />
           <Property Name="size" Type="smallint" Nullable="false" />
           <Property Name="featuresKeys" Type="nvarchar(max)" />
+          <Property Name="type" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="Countries">
           <Key>
@@ -662,6 +663,7 @@
           <NavigationProperty Name="Pricings" Relationship="cityLifeDB.ApartmentPricing" FromRole="Apartment" ToRole="Pricing" />
           <NavigationProperty Name="ApartmentDays" Relationship="cityLifeDB.ApartmentApartmentDay" FromRole="Apartment" ToRole="ApartmentDay" />
           <NavigationProperty Name="Orders" Relationship="cityLifeDB.ApartmentOrder" FromRole="Apartment" ToRole="Order" />
+          <Property Name="type" Type="cityLifeDB.ApartmentIs" Nullable="false" />
         </EntityType>
         <EntityType Name="ApartmentPhoto">
           <Key>
@@ -914,11 +916,13 @@
           <Property Name="staffComments" Type="String" Nullable="true" MaxLength="Max" Unicode="true" FixedLength="false" />
         </EntityType>
         <EnumType Name="OrderStatus">
-          <Member Name="Created" />
-          <Member Name="CheckedIn" />
-          <Member Name="CheckedOut" />
-          <Member Name="Cancelled" />
+          <Member Name="Created" Value="0" />
+          <Member Name="CheckedIn" Value="1" />
+          <Member Name="CheckedOut" Value="2" />
+          <Member Name="Cancelled" Value="3" />
           <Member Name="Free" Value="9" />
+          <Member Name="Waiting_list" Value="4" />
+          <Member Name="Waiting_deletion" Value="5" />
         </EnumType>
         <Association Name="CurrencyOrder">
           <End Type="cityLifeDB.Currency" Role="Currency" Multiplicity="1" />
@@ -1046,6 +1050,10 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EnumType Name="ApartmentIs">
+          <Member Name="Real" Value="1" />
+          <Member Name="Waiting" Value="2" />
+        </EnumType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1055,7 +1063,8 @@
     <EntitySetMapping Name="Apartments">
       <EntityTypeMapping TypeName="IsTypeOf(cityLifeDB.Apartment)">
         <MappingFragment StoreEntitySet="Apartments">
-          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="type" ColumnName="type" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
           <ScalarProperty Name="number" ColumnName="number" />
           <ScalarProperty Name="nameKey" ColumnName="nameKey" />
           <ScalarProperty Name="descriptionKey" ColumnName="descriptionKey" />

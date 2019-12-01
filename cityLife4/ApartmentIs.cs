@@ -11,14 +11,9 @@ namespace cityLife4
 {
     using System;
     
-    public enum OrderStatus : int
+    public enum ApartmentIs : int
     {
-        Created = 0,
-        CheckedIn = 1,
-        CheckedOut = 2,
-        Cancelled = 3,
-        Free = 9,
-        Waiting_list = 4,   //Order is waiting to be assigned an aparmnet.
-        Waiting_deletion = 5   //Order is waiting to be deleted. (before cancelling at Booking.com for example)
+        Real = 1,
+        Waiting = 2
     }
 }

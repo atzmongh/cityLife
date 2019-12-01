@@ -803,18 +803,47 @@ namespace cityLife.Controllers
             //At this point the apartment list contains the list of apartments plus the price per stay for each and whether it is suitable or not
             return apartmentList;
         }
-
         /// <summary>
-        /// the method calculates the availability and price per stay for a specific apartment
+        /// the method checks if an apartment is free in the date range of the order. It is similar to calculatePricePerStayForApartment - but
+        /// calculates only the availability part (does not take into account group size). Used mainly in order to find a waiting-list apartment suitable for the order.
+        /// A waiting list apartment is a fuctitious apartmnet, used for waiting list or waiting deletion orders.
         /// </summary>
         /// <param name="anApartment">the apartment for which we need to calculate availability</param>
         /// <param name="db"></param>
         /// <param name="theBookingRequest"></param>
-        /// <param name="theCurrency"></param>
         /// <param name="originalOrderId">In case we update an existing order - gives the original order ID which we wish to update. Otherwise
         /// it is set to 0</param>
-        /// <returns>apartment availability and price information</returns>
-        public static ApartmentPrice calculatePricePerStayForApartment(Apartment anApartment, cityLifeDBContainer1 db, BookingRequest theBookingRequest, Currency theCurrency, int originalOrderId = 0)
+        /// <returns>true is the apartment is free for these days.</returns>
+        public static bool calculateFreeDatesForApartment(Apartment anApartment, cityLifeDBContainer1 db, BookingRequest theBookingRequest, int originalOrderId = 0)
+        {
+            //Look for apartment days for that apartment and these dates. Note that we exclude from the list records belonging to the same order ID (in case of update)
+            //For example: we had an order for 1/12 until 3/12. If we added another day - we are only interestsed to know if the new day is free or not.
+            var apartmentDays = from anApartmentDay in db.ApartmentDays
+                                where anApartmentDay.Apartment.Id == anApartment.Id &&
+                                anApartmentDay.date >= theBookingRequest.checkinDate &&
+                                anApartmentDay.date < theBookingRequest.checkoutDate &&
+                                anApartmentDay.Order.Id != originalOrderId   //if the apartment day is for the same order ID - it is not "blocking" us from updating the order
+                                select anApartmentDay;
+
+            var nonFreeDays = from anApartmentDay in apartmentDays
+                              where anApartmentDay.status != ApartOccuStatus.Free
+                              select anApartmentDay;
+            return nonFreeDays.Count() == 0;  //If there are 0 non-free days - it means the apartment is free is this date range.
+        }
+
+
+
+                /// <summary>
+                /// the method calculates the availability and price per stay for a specific apartment
+                /// </summary>
+                /// <param name="anApartment">the apartment for which we need to calculate availability</param>
+                /// <param name="db"></param>
+                /// <param name="theBookingRequest"></param>
+                /// <param name="theCurrency"></param>
+                /// <param name="originalOrderId">In case we update an existing order - gives the original order ID which we wish to update. Otherwise
+                /// it is set to 0</param>
+                /// <returns>apartment availability and price information</returns>
+                public static ApartmentPrice calculatePricePerStayForApartment(Apartment anApartment, cityLifeDBContainer1 db, BookingRequest theBookingRequest, Currency theCurrency, int originalOrderId = 0)
         {
 
             ApartmentPrice apartmentAndPrice;

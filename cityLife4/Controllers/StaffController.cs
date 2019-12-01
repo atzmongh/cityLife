@@ -580,17 +580,53 @@ namespace cityLife.Controllers
                 Money paidAmountM = new Money(Paid, "UAH");
 
                 Currency currentCurrency = db.Currencies.Single(a => a.currencyCode == "UAH");   //The staff application works currently only with UAH
-                ApartmentPrice apartmentAndPrice = PublicController.calculatePricePerStayForApartment(theAparatment, db, theBookingRequest, currentCurrency, orderId);
+
+                ApartmentPrice apartmentAndPrice = new ApartmentPrice()
+                {
+                    availability = Availability.OCCUPIED   //Set occupied as default value. If not replaced - will stay as occupied
+                };
+                if (theOrderData.status == OrderStatus.Waiting_list || theOrderData.status == OrderStatus.Waiting_deletion)
+                {
+                    //This is either a waiting list order or an order waiting deletion - Find the first "waiting apartment" that is free for these dates
+                    //and assign the order to that fictitious apartment
+                    var waitingApartments = from anApartment in db.Apartments
+                                            where anApartment.type == ApartmentIs.Waiting
+                                            select anApartment;
+                    foreach(var anApartment in waitingApartments)
+                    {
+                        if (PublicController.calculateFreeDatesForApartment(anApartment, db, theBookingRequest) == true)
+                        {
+                            //The waiting apartment is free for these dates - assign that apartment to the order
+                            apartmentAndPrice = new ApartmentPrice()
+                            {
+                                 availability = Availability.AVAILABLE,
+                                 theApartment = anApartment,
+                                 nightCount = theOrderData.nights
+                            };
+                            break;
+                        }
+                    }
+                    //At this point - if the loop was not "broken" - it means that no waiting apartment is free at these dates and the 
+                    //apartmentAndPrice remains as "occupied"
+                }
+                else
+                {
+                    //This is a normal order - check apartment availability and price
+                    apartmentAndPrice = PublicController.calculatePricePerStayForApartment(theAparatment, db, theBookingRequest, currentCurrency, orderId);
+                }
+                
                 Country theCountry = db.Countries.SingleOrDefault(a => a.name == Country);
                 if (apartmentAndPrice.availability == Availability.OCCUPIED)
                 {
                     //the apartment is not available, although it seemed to be available. Perhaps it was taken in the last minutes
+                    //If the order is a waiting order - no "waiting apartment" was free for these dastes.
                     theOrderData.setErrorMessageFor("comments", "These dates are not available for that apartment");
                     return View("s23addUpdateOrder");
                 }
                 else
                 {
                     //Complete the booking
+                    //At this point we do not care if this is a normal order or a waiting order. 
                     apartmentAndPrice.pricePerStay = priceM;  //enter the actual price to be paid, rather than the calculated price.
                     Order theOrder = PublicController.p27createUpdateOrder(db, theBookingRequest, apartmentAndPrice, theOrderData, theCountry, tBox);
 

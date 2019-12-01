@@ -30,6 +30,7 @@ namespace cityLife4
         public string addressKey { get; set; }
         public short size { get; set; }
         public string featuresKeys { get; set; }
+        public ApartmentIs type { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ApartmentPhoto> ApartmentPhotoes { get; set; }
