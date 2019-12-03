@@ -240,7 +240,8 @@ namespace cityLife.Controllers
         /// <returns>List of apartment orders. For each apartment:
         /// list of DayBlocks.
         /// A dayBlock is either a single free day, or an order which can span 1 or more days. Note that a day block may not 
-        /// be identical to the corresponding order because the order may start before the "fromDate" or end after the "fromDate+31".</returns>
+        /// be identical to the corresponding order because the order may start before the "fromDate" or end after the "fromDate+31".
+        /// Note  that the list contains first all real apartments, then "waiting" apartments</returns>
         public List<List<DayBlock>> s21dashboardPreparation(DateTime fromDate,
             int days,
             ref List<Money> revenuePerDay,
@@ -295,7 +296,11 @@ namespace cityLife.Controllers
                 expensePerDay.Add(expensesForDate);
             }
 
-            foreach (var anApartment in db.Apartments)
+            //Sort apartments by type (first all "normal" apartments then the "waiting" apartments), then by their number
+            var sortedApartments = from anApartment in db.Apartments
+                                   orderby anApartment.type, anApartment.number
+                                   select anApartment;
+            foreach (var anApartment in sortedApartments)
             {
                 var dayBlocks = new List<DayBlock>();
                 DayBlock aDayBlock = null;
@@ -359,9 +364,10 @@ namespace cityLife.Controllers
                     dayBlocks.Add(aDayBlock);
                     aDayBlock = null;
                 }
-                //Add the dayBlocks list into the apartmentDayBlocks
+                //Add the dayBlocks list into the apartmentDayBlocks. Check if it is a "waiting" apartment.
                 apartmentDayBlocks.Add(dayBlocks);
-                //Add the apartment revenue and apartment occupacy percentage
+                
+                //Add the apartment revenue and apartment occupacy percentage - only for "normal" apartments
                 revenuePerApartment.Add(apartmentRevenue);
                 double apartmentOccupancyPercent = apartmentOccupiedDays / days * 100.0;
                 int apartmentOccupancyPercentRounded = (int)Math.Round(apartmentOccupancyPercent);
@@ -589,12 +595,15 @@ namespace cityLife.Controllers
                 {
                     //This is either a waiting list order or an order waiting deletion - Find the first "waiting apartment" that is free for these dates
                     //and assign the order to that fictitious apartment
+                    //We sort the apartments in ascending order. That means that apartment -3 will be before -2, and before -1. This is done to be consistent 
+                    //with what we do when displaying the real apartments and "waiting" apartments. (See s21dashBoardPreparation)
                     var waitingApartments = from anApartment in db.Apartments
                                             where anApartment.type == ApartmentIs.Waiting
+                                            orderby anApartment.number
                                             select anApartment;
                     foreach(var anApartment in waitingApartments)
                     {
-                        if (PublicController.calculateFreeDatesForApartment(anApartment, db, theBookingRequest) == true)
+                        if (PublicController.calculateFreeDatesForApartment(anApartment, db, theBookingRequest, orderId) == true)
                         {
                             //The waiting apartment is free for these dates - assign that apartment to the order
                             apartmentAndPrice = new ApartmentPrice()
@@ -603,6 +612,7 @@ namespace cityLife.Controllers
                                  theApartment = anApartment,
                                  nightCount = theOrderData.nights
                             };
+                            theOrderData.apartmentNumber = anApartment.number;
                             break;
                         }
                     }

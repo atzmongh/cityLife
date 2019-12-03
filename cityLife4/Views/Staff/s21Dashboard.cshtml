@@ -189,7 +189,17 @@
                 @foreach (var anApartment in apartmentDayBlocks)
                 {
                     int apartmentNumber = anApartment.First().apartmentNumber;
-                    <tr><td class="dash01td @high">@apartmentNumber</td></tr>
+                    if (apartmentNumber > 0)
+                    {
+                        //this is a real apartment
+                        <tr><td class="dash01td @high">@apartmentNumber</td></tr>
+                    }
+                    else
+                    {
+                        //This is a "waiting" apartment
+                        <tr><td class="dash01td @high">Wt</td></tr>
+                    }
+
                 }
                 <tr><td>rev.</td></tr>
                 <tr><td>exp</td></tr>
