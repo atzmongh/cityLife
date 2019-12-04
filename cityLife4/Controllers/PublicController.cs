@@ -715,7 +715,7 @@ namespace cityLife.Controllers
             BookingRequest theBookingRequest = this.setBookingRequest(fromDate, toDate, adultsCount, childrenCount);
 
 
-            //get all apartments and for each apartment - its price.
+            //get all real apartments and for each apartment - its price. (leave out waiting apartments whichare not interesting for the public site)
             //Price can either be:
             //- minimum price per night (if we do not know the dates of stay)
             //- exact price per stay (if we know number of adults, children and dates)
@@ -728,9 +728,9 @@ namespace cityLife.Controllers
             }
             else
             {
-                //get all apartments and for each apartment - its price.
+                //get all real apartments and for each apartment - its price.
                 //calculate minimum price per night (since we do not know the length of stay)
-                foreach (var anApartment in db.Apartments)
+                foreach (var anApartment in db.Apartments.Where(rec=>rec.type == ApartmentIs.Real))
                 {
                     Money minPrice = anApartment.PricePerNight(adults: 1, children: 0, weekend: false, currencyCode: theCurrency.currencyCode, atDate: FakeDateTime.Now);
                     apartmentList.Add(new ApartmentPrice { theApartment = anApartment, availability = Availability.UNKNOWN, minPricePerNight = minPrice, pricePerStay = null, nightCount = 0 });
@@ -779,7 +779,7 @@ namespace cityLife.Controllers
         /// <summary>
         /// the method  is called when the user entered booking information and pressed the search button. 
         /// The method calculates the price per each apartment and whether it is available and suitable for
-        /// the group size
+        /// the group size. the method does not fetch from DB waiting apartments - only real apartments.
         /// </summary>
         /// <param name="fromDate">check in date</param>
         /// <param name="toDate">checkout date</param>
@@ -793,8 +793,8 @@ namespace cityLife.Controllers
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
 
             List<ApartmentPrice> apartmentList = new List<ApartmentPrice>();
-            //Check apartment availability for the given dates and for the given occupation
-            foreach (var anApartment in db.Apartments)
+            //Check apartment availability for the given dates and for the given occupation. Omit waiting apartments
+            foreach (var anApartment in db.Apartments.Where(rec=>rec.type == ApartmentIs.Real))
             {
                 ApartmentPrice apartmentAndPrice = calculatePricePerStayForApartment(anApartment, db, theBookingRequest, theCurrency);
                 apartmentList.Add(apartmentAndPrice);
