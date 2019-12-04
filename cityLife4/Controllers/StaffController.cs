@@ -473,6 +473,12 @@ namespace cityLife.Controllers
                 children = 0,
                 country = ""
             };
+            if (apartmentNumber <= 0)
+            {
+                //This is a waiting apartment - the default status should be "waiting list" and color orange (Otherwise it will stay as Created and red)
+                theOrderData.status = OrderStatus.Waiting_list;
+                theOrderData.orderColor = Color.Orange;
+            }
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
 
             //Calculate expected price, assuming 2 adults and 0 children. Calculate the price in UAH
@@ -569,6 +575,17 @@ namespace cityLife.Controllers
                 orderColor = orderColor,
                 staffComments = staffComments
             };
+            if (apartmentNumber <= 0)
+            {
+                //This is a waiting apartment. Status must be either "waiting list" or "waiting deletion"
+                if (status != OrderStatus.Waiting_list && status != OrderStatus.Waiting_deletion)
+                {
+                    //Change the status to be waiting deletion
+                    theOrderData.status = OrderStatus.Waiting_deletion;
+                    theOrderData.orderColor = Color.Gray;
+                    theOrderData.price = "0";
+                }
+            }
 
             var apartmentNumbers = from anApartment in db.Apartments
                                    select anApartment.number;
@@ -618,6 +635,15 @@ namespace cityLife.Controllers
                     }
                     //At this point - if the loop was not "broken" - it means that no waiting apartment is free at these dates and the 
                     //apartmentAndPrice remains as "occupied"
+                    //Anyway - change the default color - waiting list is orange and waiting deletion is gray
+                    if (theOrderData.status == OrderStatus.Waiting_list)
+                    {
+                        theOrderData.orderColor = Color.Orange;
+                    }
+                    else if (theOrderData.status == OrderStatus.Waiting_deletion)
+                    {
+                        theOrderData.orderColor = Color.Gray;
+                    }
                 }
                 else
                 {
