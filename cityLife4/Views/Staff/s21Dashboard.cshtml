@@ -239,7 +239,12 @@
                 </tr>
 
                 @*line 3 and above - order lines (1 line for each apartment)*@
-                @{int apartmentI = 0; }
+                @{
+                    int apartmentI = 0;
+                    int realApartmentCount = 0;
+                    double totalOccupancyPercent = 0d;
+
+                 }
                 @foreach (var anApartment in apartmentDayBlocks)
                 {
 
@@ -285,10 +290,18 @@
                         }
                         <td class="dash02td rightAlign">@revenuePerApartment[apartmentI].toMoneyString()</td>
                         <td class="=dash02td rightAlign">@percentOccupancyPerApartment[apartmentI]%</td>
-                        @{apartmentI++;
+                        @{
+                            if (anApartment.First().apartmentNumber > 0)
+                            {
+                                //This is a real apartment - calculate the percentage average
+                                totalOccupancyPercent += percentOccupancyPerApartment[apartmentI];
+                                realApartmentCount++;
+                            }
+                            apartmentI++;
+
                         }
                     </tr>
-                }
+                            }
                 @*Revenu total line*@
                 <tr>
                     @{ var totalRevenue = new Money(0m, "UAH");}
@@ -306,8 +319,11 @@
 
                         }
                     }
+                    @{ 
+                        int averageOccupancyPercent = (int)Math.Round(totalOccupancyPercent / realApartmentCount);
+                    }
                     <td class="dash02td rightAlign">@totalRevenue.toMoneyString()</td>
-                    <td class="dash02td rightAlign">@Math.Round(percentOccupancyPerApartment.Average())%</td>
+                    <td class="dash02td rightAlign">@averageOccupancyPercent%</td>
                 </tr>
 
                 @*Expense total line*@
