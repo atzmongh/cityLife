@@ -18,7 +18,7 @@ namespace cityLife4
         CheckedOut = 2,
         Cancelled = 3,
         Free = 9,
-        Waiting_list = 4,   //Order is waiting to be assigned an aparmnet.
-        Waiting_deletion = 5   //Order is waiting to be deleted. (before cancelling at Booking.com for example)
+        Waiting_list = 4,
+        Waiting_deletion = 5
     }
 }

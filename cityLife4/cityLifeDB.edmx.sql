@@ -2,13 +2,13 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 10/12/2019 20:01:17
+-- Date Created: 12/09/2019 21:00:57
 -- Generated from EDMX file: C:\software\cityLife\cityLife4\cityLifeDB.edmx
 -- --------------------------------------------------
 
 SET QUOTED_IDENTIFIER OFF;
 --GO
---USE [C:\SOFTWARE\CITYLIFEDB8.MDF];
+USE [C:\SOFTWARE\CITYLIFEDB8.MDF];
 --GO
 IF SCHEMA_ID(N'dbo') IS NULL EXECUTE(N'CREATE SCHEMA [dbo]');
 --GO
@@ -17,20 +17,23 @@ IF SCHEMA_ID(N'dbo') IS NULL EXECUTE(N'CREATE SCHEMA [dbo]');
 -- Dropping existing FOREIGN KEY constraints
 -- --------------------------------------------------
 
+IF OBJECT_ID(N'[dbo].[FK_ApartmentApartmentDay]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[ApartmentDays] DROP CONSTRAINT [FK_ApartmentApartmentDay];
+--GO
 IF OBJECT_ID(N'[dbo].[FK_ApartmentApartmentPhoto]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[ApartmentPhotoes] DROP CONSTRAINT [FK_ApartmentApartmentPhoto];
+--GO
+IF OBJECT_ID(N'[dbo].[FK_ApartmentOrder]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[Orders] DROP CONSTRAINT [FK_ApartmentOrder];
 --GO
 IF OBJECT_ID(N'[dbo].[FK_ApartmentPricing]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[Pricings] DROP CONSTRAINT [FK_ApartmentPricing];
 --GO
-IF OBJECT_ID(N'[dbo].[FK_TranslationKeyTranslatio]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[Translations] DROP CONSTRAINT [FK_TranslationKeyTranslatio];
+IF OBJECT_ID(N'[dbo].[FK_CountryGuest]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[Guests] DROP CONSTRAINT [FK_CountryGuest];
 --GO
-IF OBJECT_ID(N'[dbo].[FK_LanguageTranslation]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[Translations] DROP CONSTRAINT [FK_LanguageTranslation];
---GO
-IF OBJECT_ID(N'[dbo].[FK_CurrencyPricing]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[Pricings] DROP CONSTRAINT [FK_CurrencyPricing];
+IF OBJECT_ID(N'[dbo].[FK_CurrencyApartmentDay]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[ApartmentDays] DROP CONSTRAINT [FK_CurrencyApartmentDay];
 --GO
 IF OBJECT_ID(N'[dbo].[FK_CurrencyCurrencyExchangeFrom]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[CurrencyExchanges] DROP CONSTRAINT [FK_CurrencyCurrencyExchangeFrom];
@@ -38,58 +41,55 @@ IF OBJECT_ID(N'[dbo].[FK_CurrencyCurrencyExchangeFrom]', 'F') IS NOT NULL
 IF OBJECT_ID(N'[dbo].[FK_CurrencyCurrencyExchangeTo]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[CurrencyExchanges] DROP CONSTRAINT [FK_CurrencyCurrencyExchangeTo];
 --GO
-IF OBJECT_ID(N'[dbo].[FK_CurrencyApartmentDay]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[ApartmentDays] DROP CONSTRAINT [FK_CurrencyApartmentDay];
+IF OBJECT_ID(N'[dbo].[FK_CurrencyEmployeeWorkDay]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[EmployeeWorkDays] DROP CONSTRAINT [FK_CurrencyEmployeeWorkDay];
 --GO
-IF OBJECT_ID(N'[dbo].[FK_ApartmentApartmentDay]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[ApartmentDays] DROP CONSTRAINT [FK_ApartmentApartmentDay];
---GO
-IF OBJECT_ID(N'[dbo].[FK_ErrorCodeErrorMessage]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[ErrorMessages] DROP CONSTRAINT [FK_ErrorCodeErrorMessage];
+IF OBJECT_ID(N'[dbo].[FK_CurrencyExpense]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[Expenses] DROP CONSTRAINT [FK_CurrencyExpense];
 --GO
 IF OBJECT_ID(N'[dbo].[FK_CurrencyOrder]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[Orders] DROP CONSTRAINT [FK_CurrencyOrder];
 --GO
-IF OBJECT_ID(N'[dbo].[FK_OrderApartmentDay]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[ApartmentDays] DROP CONSTRAINT [FK_OrderApartmentDay];
---GO
-IF OBJECT_ID(N'[dbo].[FK_ApartmentOrder]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[Orders] DROP CONSTRAINT [FK_ApartmentOrder];
---GO
-IF OBJECT_ID(N'[dbo].[FK_GuestOrder]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[Orders] DROP CONSTRAINT [FK_GuestOrder];
---GO
-IF OBJECT_ID(N'[dbo].[FK_CountryGuest]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[Guests] DROP CONSTRAINT [FK_CountryGuest];
+IF OBJECT_ID(N'[dbo].[FK_CurrencyPricing]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[Pricings] DROP CONSTRAINT [FK_CurrencyPricing];
 --GO
 IF OBJECT_ID(N'[dbo].[FK_EmployeeEmployeeWorkDay]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[EmployeeWorkDays] DROP CONSTRAINT [FK_EmployeeEmployeeWorkDay];
 --GO
-IF OBJECT_ID(N'[dbo].[FK_CurrencyEmployeeWorkDay]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[EmployeeWorkDays] DROP CONSTRAINT [FK_CurrencyEmployeeWorkDay];
+IF OBJECT_ID(N'[dbo].[FK_ErrorCodeErrorMessage]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[ErrorMessages] DROP CONSTRAINT [FK_ErrorCodeErrorMessage];
+--GO
+IF OBJECT_ID(N'[dbo].[FK_ExpenseTypeExpense]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[Expenses] DROP CONSTRAINT [FK_ExpenseTypeExpense];
+--GO
+IF OBJECT_ID(N'[dbo].[FK_GuestOrder]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[Orders] DROP CONSTRAINT [FK_GuestOrder];
+--GO
+IF OBJECT_ID(N'[dbo].[FK_LanguageTranslation]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[Translations] DROP CONSTRAINT [FK_LanguageTranslation];
+--GO
+IF OBJECT_ID(N'[dbo].[FK_OrderApartmentDay]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[ApartmentDays] DROP CONSTRAINT [FK_OrderApartmentDay];
+--GO
+IF OBJECT_ID(N'[dbo].[FK_TranslationKeyTranslatio]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[Translations] DROP CONSTRAINT [FK_TranslationKeyTranslatio];
 --GO
 
 -- --------------------------------------------------
 -- Dropping existing tables
 -- --------------------------------------------------
 
-IF OBJECT_ID(N'[dbo].[Apartments]', 'U') IS NOT NULL
-    DROP TABLE [dbo].[Apartments];
+IF OBJECT_ID(N'[dbo].[ApartmentDays]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[ApartmentDays];
 --GO
 IF OBJECT_ID(N'[dbo].[ApartmentPhotoes]', 'U') IS NOT NULL
     DROP TABLE [dbo].[ApartmentPhotoes];
 --GO
-IF OBJECT_ID(N'[dbo].[Pricings]', 'U') IS NOT NULL
-    DROP TABLE [dbo].[Pricings];
+IF OBJECT_ID(N'[dbo].[Apartments]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Apartments];
 --GO
-IF OBJECT_ID(N'[dbo].[Languages]', 'U') IS NOT NULL
-    DROP TABLE [dbo].[Languages];
---GO
-IF OBJECT_ID(N'[dbo].[TranslationKeys]', 'U') IS NOT NULL
-    DROP TABLE [dbo].[TranslationKeys];
---GO
-IF OBJECT_ID(N'[dbo].[Translations]', 'U') IS NOT NULL
-    DROP TABLE [dbo].[Translations];
+IF OBJECT_ID(N'[dbo].[Countries]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Countries];
 --GO
 IF OBJECT_ID(N'[dbo].[Currencies]', 'U') IS NOT NULL
     DROP TABLE [dbo].[Currencies];
@@ -97,11 +97,11 @@ IF OBJECT_ID(N'[dbo].[Currencies]', 'U') IS NOT NULL
 IF OBJECT_ID(N'[dbo].[CurrencyExchanges]', 'U') IS NOT NULL
     DROP TABLE [dbo].[CurrencyExchanges];
 --GO
-IF OBJECT_ID(N'[dbo].[ApartmentDays]', 'U') IS NOT NULL
-    DROP TABLE [dbo].[ApartmentDays];
+IF OBJECT_ID(N'[dbo].[Employees]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Employees];
 --GO
-IF OBJECT_ID(N'[dbo].[unitTests]', 'U') IS NOT NULL
-    DROP TABLE [dbo].[unitTests];
+IF OBJECT_ID(N'[dbo].[EmployeeWorkDays]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[EmployeeWorkDays];
 --GO
 IF OBJECT_ID(N'[dbo].[ErrorCodes]', 'U') IS NOT NULL
     DROP TABLE [dbo].[ErrorCodes];
@@ -109,20 +109,32 @@ IF OBJECT_ID(N'[dbo].[ErrorCodes]', 'U') IS NOT NULL
 IF OBJECT_ID(N'[dbo].[ErrorMessages]', 'U') IS NOT NULL
     DROP TABLE [dbo].[ErrorMessages];
 --GO
-IF OBJECT_ID(N'[dbo].[Orders]', 'U') IS NOT NULL
-    DROP TABLE [dbo].[Orders];
+IF OBJECT_ID(N'[dbo].[Expenses]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Expenses];
+--GO
+IF OBJECT_ID(N'[dbo].[ExpenseTypes]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[ExpenseTypes];
 --GO
 IF OBJECT_ID(N'[dbo].[Guests]', 'U') IS NOT NULL
     DROP TABLE [dbo].[Guests];
 --GO
-IF OBJECT_ID(N'[dbo].[Employees]', 'U') IS NOT NULL
-    DROP TABLE [dbo].[Employees];
+IF OBJECT_ID(N'[dbo].[Languages]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Languages];
 --GO
-IF OBJECT_ID(N'[dbo].[Countries]', 'U') IS NOT NULL
-    DROP TABLE [dbo].[Countries];
+IF OBJECT_ID(N'[dbo].[Orders]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Orders];
 --GO
-IF OBJECT_ID(N'[dbo].[EmployeeWorkDays]', 'U') IS NOT NULL
-    DROP TABLE [dbo].[EmployeeWorkDays];
+IF OBJECT_ID(N'[dbo].[Pricings]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Pricings];
+--GO
+IF OBJECT_ID(N'[dbo].[TranslationKeys]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[TranslationKeys];
+--GO
+IF OBJECT_ID(N'[dbo].[Translations]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Translations];
+--GO
+IF OBJECT_ID(N'[dbo].[unitTests]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[unitTests];
 --GO
 
 -- --------------------------------------------------
@@ -137,7 +149,8 @@ CREATE TABLE [dbo].[Apartments] (
     [descriptionKey] nvarchar(max)  NOT NULL,
     [addressKey] nvarchar(max)  NOT NULL,
     [size] smallint  NOT NULL,
-    [featuresKeys] nvarchar(max)  NULL
+    [featuresKeys] nvarchar(max)  NULL,
+    [type] int  NOT NULL
 );
 --GO
 
@@ -308,7 +321,8 @@ CREATE TABLE [dbo].[Employees] (
 -- Creating table 'Countries'
 CREATE TABLE [dbo].[Countries] (
     [code] nchar(3)  NOT NULL,
-    [name] nvarchar(max)  NOT NULL
+    [name] nvarchar(max)  NOT NULL,
+    [language] nvarchar(50)  NULL
 );
 --GO
 
@@ -321,6 +335,25 @@ CREATE TABLE [dbo].[EmployeeWorkDays] (
     [isSalaryDay] bit  NOT NULL,
     [Employee_Id] int  NOT NULL,
     [Currency_currencyCode] nchar(3)  NOT NULL
+);
+--GO
+
+-- Creating table 'Expenses'
+CREATE TABLE [dbo].[Expenses] (
+    [Id] int IDENTITY(1,1) NOT NULL,
+    [date] datetime  NOT NULL,
+    [amount] int  NOT NULL,
+    [currency_currencyCode] nchar(3)  NULL,
+    [description] nvarchar(max)  NOT NULL,
+    [expenseType_Id] int  NOT NULL
+);
+--GO
+
+-- Creating table 'ExpenseTypes'
+CREATE TABLE [dbo].[ExpenseTypes] (
+    [Id] int IDENTITY(1,1) NOT NULL,
+    [nameKey] nvarchar(20)  NOT NULL,
+    [descriptionKey] nvarchar(max)  NULL
 );
 --GO
 
@@ -427,6 +460,18 @@ ADD CONSTRAINT [PK_Countries]
 -- Creating primary key on [Id] in table 'EmployeeWorkDays'
 ALTER TABLE [dbo].[EmployeeWorkDays]
 ADD CONSTRAINT [PK_EmployeeWorkDays]
+    PRIMARY KEY CLUSTERED ([Id] ASC);
+--GO
+
+-- Creating primary key on [Id] in table 'Expenses'
+ALTER TABLE [dbo].[Expenses]
+ADD CONSTRAINT [PK_Expenses]
+    PRIMARY KEY CLUSTERED ([Id] ASC);
+--GO
+
+-- Creating primary key on [Id] in table 'ExpenseTypes'
+ALTER TABLE [dbo].[ExpenseTypes]
+ADD CONSTRAINT [PK_ExpenseTypes]
     PRIMARY KEY CLUSTERED ([Id] ASC);
 --GO
 
@@ -687,6 +732,36 @@ ADD CONSTRAINT [FK_CurrencyEmployeeWorkDay]
 CREATE INDEX [IX_FK_CurrencyEmployeeWorkDay]
 ON [dbo].[EmployeeWorkDays]
     ([Currency_currencyCode]);
+--GO
+
+-- Creating foreign key on [currency_currencyCode] in table 'Expenses'
+ALTER TABLE [dbo].[Expenses]
+ADD CONSTRAINT [FK_CurrencyExpense]
+    FOREIGN KEY ([currency_currencyCode])
+    REFERENCES [dbo].[Currencies]
+        ([currencyCode])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+--GO
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_CurrencyExpense'
+CREATE INDEX [IX_FK_CurrencyExpense]
+ON [dbo].[Expenses]
+    ([currency_currencyCode]);
+--GO
+
+-- Creating foreign key on [expenseType_Id] in table 'Expenses'
+ALTER TABLE [dbo].[Expenses]
+ADD CONSTRAINT [FK_ExpenseTypeExpense]
+    FOREIGN KEY ([expenseType_Id])
+    REFERENCES [dbo].[ExpenseTypes]
+        ([Id])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+--GO
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_ExpenseTypeExpense'
+CREATE INDEX [IX_FK_ExpenseTypeExpense]
+ON [dbo].[Expenses]
+    ([expenseType_Id]);
 --GO
 
 -- --------------------------------------------------
