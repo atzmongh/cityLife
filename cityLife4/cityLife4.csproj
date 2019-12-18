@@ -503,6 +503,7 @@
     <Content Include="messages\m010NewOrder.html" />
     <Content Include="Scripts\Db migrations\dbo.migration01.sql" />
     <Content Include="Scripts\Db migrations\dbo.migration2_3.sql" />
+    <Content Include="Scripts\Db migrations\dbo.migration2_4.sql" />
     <Content Include="styles2.css" />
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="cityLifeDB.csv" />
