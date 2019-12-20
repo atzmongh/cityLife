@@ -847,7 +847,7 @@ namespace cityLife.Controllers
             var expenseList = from expense in db.Expenses
                               where expense.date == expenseDate
                               select expense;
-            
+
             return PartialView("s30showExpenses", expenseList);
         }
 
