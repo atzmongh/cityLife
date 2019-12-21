@@ -99,7 +99,7 @@ input:-ms-input-placeholder {
 @font-face {
   font-family: 'lato-regular';
   src: url("../fonts/lato-regular.eot");
-  src: url("../fonts/lato-regular.eot") format("embedded-opentype"), url("../fonts/lato-regular.woff2") format("woff2"), url("../fonts/lato-regular.woff") format("woff"), url("../fonts/lato-regular.ttf") format("truetype"), url("../fonts/lato-regular.svg#lato-regular") format("svg"); }
+  src: url("../fonts/lato-regular.eot") format("embedded-opentype"), url("../fonts/lato-regular.ttf") format("truetype"), url("../fonts/lato-regular.svg#lato-regular") format("svg"); }
 
 @font-face {
   font-family: 'lato-medium';
@@ -186,7 +186,7 @@ p {
 @font-face {
   font-family: "clife-icons";
   src: url("../fonts/icons/clife-icons.eot");
-  src: url("../fonts/icons/clife-icons.eot?#iefix") format("eot"), url("../fonts/icons/clife-icons.woff2") format("woff2"), url("../fonts/icons/clife-icons.woff") format("woff"), url("../fonts/icons/clife-icons.ttf") format("truetype"), url("../fonts/icons/clife-icons.svg#clife-icons") format("svg"); }
+  src: url("../fonts/icons/clife-icons.eot?#iefix") format("eot"),  url("../fonts/icons/clife-icons.ttf") format("truetype"), url("../fonts/icons/clife-icons.svg#clife-icons") format("svg"); }
 
 .clife-ico {
   font-family: "clife-icons";
@@ -316,7 +316,7 @@ aside.main-sidebar .currency .dropdown-toggle .name:before {
 @font-face {
   font-family: "clife-icons";
   src: url("../fonts/icons/clife-icons.eot");
-  src: url("../fonts/icons/clife-icons.eot?#iefix") format("eot"), url("../fonts/icons/clife-icons.woff2") format("woff2"), url("../fonts/icons/clife-icons.woff") format("woff"), url("../fonts/icons/clife-icons.ttf") format("truetype"), url("../fonts/icons/clife-icons.svg#clife-icons") format("svg"); }
+  src: url("../fonts/icons/clife-icons.eot?#iefix") format("eot"),  url("../fonts/icons/clife-icons.ttf") format("truetype"), url("../fonts/icons/clife-icons.svg#clife-icons") format("svg"); }
 
 .clife-ico {
   font-family: "clife-icons";
@@ -585,7 +585,7 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
 @font-face {
   font-family: 'lato-regular';
   src: url("../fonts/lato-regular.eot");
-  src: url("../fonts/lato-regular.eot") format("embedded-opentype"), url("../fonts/lato-regular.woff2") format("woff2"), url("../fonts/lato-regular.woff") format("woff"), url("../fonts/lato-regular.ttf") format("truetype"), url("../fonts/lato-regular.svg#lato-regular") format("svg"); }
+  src: url("../fonts/lato-regular.eot") format("embedded-opentype"), url("../fonts/lato-regular.ttf") format("truetype"), url("../fonts/lato-regular.svg#lato-regular") format("svg"); }
 
 @font-face {
   font-family: 'lato-medium';
@@ -678,7 +678,7 @@ p {
 @font-face {
   font-family: "clife-icons";
   src: url("../fonts/icons/clife-icons.eot");
-  src: url("../fonts/icons/clife-icons.eot?#iefix") format("eot"), url("../fonts/icons/clife-icons.woff2") format("woff2"), url("../fonts/icons/clife-icons.woff") format("woff"), url("../fonts/icons/clife-icons.ttf") format("truetype"), url("../fonts/icons/clife-icons.svg#clife-icons") format("svg"); }
+  src: url("../fonts/icons/clife-icons.eot?#iefix") format("eot"),  url("../fonts/icons/clife-icons.ttf") format("truetype"), url("../fonts/icons/clife-icons.svg#clife-icons") format("svg"); }
 
 .clife-ico {
   font-family: "clife-icons";
@@ -1542,7 +1542,7 @@ aside.main-sidebar {
   .main-nav .personal-info {
     padding: 40px 35px 25px;
     color: #ffffff;
-    background: url("../images/mask2.png") no-repeat #00C1E5 100% 0; }
+    background: url("../images/mask.png") no-repeat #00C1E5 100% 0; }
   .main-nav .photo {
     width: 60px;
     height: 60px;
