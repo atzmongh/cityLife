@@ -281,12 +281,12 @@ namespace cityLife.Controllers
             percentOccupancyPerApartment = new List<int>();
 
             //Calculate the expenses for each date in the range
-            for (DateTime aDate = fromDate; aDate<=lastDate; aDate = aDate.AddDays(1))
+            for (DateTime aDate = fromDate; aDate <= lastDate; aDate = aDate.AddDays(1))
             {
                 //Read all expenses for the date and sum them
                 var expenseListCentsForDate = (from expense in db.Expenses
-                                      where expense.date == aDate
-                                      select expense.amount);   //The expenses are kept as cents in the DB
+                                               where expense.date == aDate
+                                               select expense.amount);   //The expenses are kept as cents in the DB
                 int expensesCentsForDate = 0;
                 if (expenseListCentsForDate.Count() > 0)
                 {
@@ -300,6 +300,11 @@ namespace cityLife.Controllers
             var sortedApartments = from anApartment in db.Apartments
                                    orderby anApartment.type, anApartment.number
                                    select anApartment;
+            Order anOrder = new Order()   //create a fictitious order with id = 0
+            {
+                Id = 0
+            };
+
             foreach (var anApartment in sortedApartments)
             {
                 var dayBlocks = new List<DayBlock>();
@@ -307,9 +312,28 @@ namespace cityLife.Controllers
                 int dayNumber = 0;
                 Money apartmentRevenue = new Money(0m, "UAH");
                 double apartmentOccupiedDays = 0;   //Use float for the percentage calculation later
+                //Get all apartment days of the current apartment for the desired month
+                var apartmentDaysForMonth = (from theApartmentDay in db.ApartmentDays
+                                            where theApartmentDay.Apartment.Id == anApartment.Id && theApartmentDay.date >= fromDate && theApartmentDay.date <= lastDate
+                                            orderby theApartmentDay.date
+                                            select theApartmentDay).ToList();
+                int apartmentDaysI = 0;
+                ApartmentDay anApartmentDay;
+                int apartmentDaysCount = apartmentDaysForMonth.Count();
                 for (var aDate = fromDate; aDate <= lastDate; aDate = aDate.AddDays(1))
                 {
-                    var anApartmentDay = db.ApartmentDays.SingleOrDefault(record => record.Apartment.Id == anApartment.Id && record.date == aDate);
+                    if (apartmentDaysCount > apartmentDaysI && apartmentDaysForMonth[apartmentDaysI].date == aDate)
+                    {
+                        //The current apartmentDays record matches the on-hand date - an apartmentDay exists
+                        anApartmentDay = apartmentDaysForMonth[apartmentDaysI];
+                        apartmentDaysI++;
+                    }
+                    else
+                    {
+                        //An apartment day does not exist - it will be null
+                        anApartmentDay = null;
+                    }
+
                     if (anApartmentDay == null || anApartmentDay.status == ApartOccuStatus.Free)
                     {
                         //This is a free day
@@ -326,7 +350,16 @@ namespace cityLife.Controllers
                     else
                     {
                         //this is a busy day. Read the order record
-                        var anOrder = db.Orders.Single(record => record.Id == anApartmentDay.Order.Id);
+                        if (anOrder.Id != anApartmentDay.Order.Id)
+                        {
+                            //We did not read this order yet - read it
+                            anOrder = db.Orders.Single(record => record.Id == anApartmentDay.Order.Id);
+                        }
+                        else
+                        {
+                            //the order is for more than one day. We have already read this order in the previous cycle in the date loop
+                        }
+                        //At this point anOrder contains the order pointed by the on-hand apartmentDay record
                         //Add the revenue of that day to the total revenu per day
                         revenuePerDay[dayNumber] += anApartmentDay.revenueAsMoney();
                         apartmentRevenue += anApartmentDay.revenueAsMoney();
