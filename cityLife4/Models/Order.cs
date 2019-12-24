@@ -33,16 +33,12 @@ namespace cityLife4
 
         public Money priceAsMoney()
         {
-            decimal priceDecimal = ((decimal)this.price) / 100;     //The price is kept in cents in the DB.
-            Money priceMoney = new Money(priceDecimal, this.Currency.currencyCode);
-            return priceMoney;
+            return new Money(this.price, this.Currency.currencyCode);
         }
 
         public Money amountPaidAsMoney()
         {
-            decimal amountPaidDecimal = ((decimal)this.amountPaid) / 100;     //The price is kept in cents in the DB.
-            Money amountPaidMoney = new Money(amountPaidDecimal, this.Currency.currencyCode);
-            return amountPaidMoney;
+            return new Money(this.amountPaid, this.Currency.currencyCode);
         }
 
         public int nights
