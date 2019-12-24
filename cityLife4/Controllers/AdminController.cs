@@ -695,11 +695,19 @@ namespace cityLife.Controllers
             Test.startTestSeries("s21dashboard");
             StaffController theStaffController = new StaffController();
             List<Money> revenuePerDay = null;
+            List<Money> expensePerDay = null;
+            List<string> expenseTypes = null;
             EmployeeWorkDay[] empWorkDaysArray = null;
             List<Employee> maidList = null;
+            List<Money> revenuPerApartment = null;
+            List<int> occupanyPercentPerApartment = null;
             var apartmentDayBlocks = theStaffController.s21dashboardPreparation(new DateTime(2018, 9, 20),
                 31,
                 ref revenuePerDay,
+                ref expensePerDay,
+                ref expenseTypes,
+                ref revenuPerApartment,
+                ref occupanyPercentPerApartment,
                 ref empWorkDaysArray,
                 ref maidList);
             int testNumber = 1;

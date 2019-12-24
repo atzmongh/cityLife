@@ -501,6 +501,9 @@
     <Content Include="images\missing landscape photo.png" />
     <Content Include="images\missing portrait photo.jpg" />
     <Content Include="messages\m010NewOrder.html" />
+    <Content Include="Scripts\Db migrations\dbo.migration01.sql" />
+    <Content Include="Scripts\Db migrations\dbo.migration2_3.sql" />
+    <Content Include="Scripts\Db migrations\dbo.migration2_4.sql" />
     <Content Include="styles2.css" />
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="cityLifeDB.csv" />
@@ -555,6 +558,9 @@
       <DependentUpon>cityLife.tt</DependentUpon>
     </Compile>
     <Compile Include="ApartmentDay.cs">
+      <DependentUpon>cityLife.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ApartmentIs.cs">
       <DependentUpon>cityLife.tt</DependentUpon>
     </Compile>
     <Compile Include="ApartmentPhoto.cs">
@@ -614,6 +620,12 @@
     <Compile Include="ErrorMessage.cs">
       <DependentUpon>cityLife.tt</DependentUpon>
     </Compile>
+    <Compile Include="Expense.cs">
+      <DependentUpon>cityLife.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ExpenseType.cs">
+      <DependentUpon>cityLife.tt</DependentUpon>
+    </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -626,6 +638,7 @@
     <Compile Include="Models\Apartment.cs" />
     <Compile Include="Models\ApartmentDays.cs" />
     <Compile Include="Models\ApartmentPhoto.cs" />
+    <Compile Include="Models\Expense.cs" />
     <Compile Include="Models\Order.cs" />
     <Compile Include="Models\Pricing.cs" />
     <Compile Include="Order.cs">
@@ -671,8 +684,8 @@
       <DependentUpon>compilerconfig.json</DependentUpon>
     </None>
     <Content Include="css\parts\s24inputElement.scss" />
-    <None Include="Properties\PublishProfiles\cityLife4 - Web Deploy.pubxml" />
-    <None Include="Properties\PublishProfiles\cityLife4 - Web Deploy1.pubxml" />
+    <None Include="Properties\PublishProfiles\cityLife4 - Web Deploy prod.pubxml" />
+    <None Include="Properties\PublishProfiles\cityLife4 - Web Deploy stage.pubxml" />
     <None Include="Properties\PublishProfiles\cityLife4VM - Web Deploy.pubxml" />
     <Content Include="Views\Public\p50OurRulesEnglish.cshtml" />
     <Content Include="Views\Public\t10welcomeMail.cshtml" />
@@ -689,6 +702,8 @@
     <Content Include="Views\Staff\s28bookingSuccess.cshtml" />
     <Content Include="Views\Admin\a30fakeTime.cshtml" />
     <Content Include="Views\Admin\a05DBMigration.cshtml" />
+    <Content Include="Views\Staff\s30showExpenses.cshtml" />
+    <Content Include="Views\Staff\s31updateExpense.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
       <SubType>Designer</SubType>

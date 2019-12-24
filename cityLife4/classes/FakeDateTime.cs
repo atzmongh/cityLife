@@ -11,6 +11,7 @@ namespace cityLife4
     /// </summary>
     public static class FakeDateTime
     {
+        private static int[] monthLengths = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
         private static TimeSpan deltaTime = new TimeSpan(0);
         /// <summary>
         /// Set fake time. From this point on the system will keep the delta between the "real time" and the "system time"
@@ -58,6 +59,25 @@ namespace cityLife4
         public static bool isFakeTimeEnabled()
         {
             return deltaTime != new TimeSpan(0);
+        }
+        /// <summary>
+        /// returns the number of days in the month. For example: if the date is 15/2/2019, the result is 28.
+        /// //If the date is 15/2/2020 the result is 29.
+        /// </summary>
+        /// <param name="aDate"></param>
+        /// <returns></returns>
+        public static int monthLength(DateTime aDate)
+        {
+            int month = aDate.Month;
+            if (month == 2 && aDate.Year % 4 == 0)
+            {
+                //This is a leap year
+                return 29;
+            }
+            else
+            {
+                return monthLengths[month];
+            }
         }
     }
 }

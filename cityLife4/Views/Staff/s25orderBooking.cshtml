@@ -69,12 +69,18 @@
     </div>
 </div>
 <div class="form-box-wrap">
-  
+
 
     <div class="field-box select-box">
         <select id="apartmentNumber" name="apartmentNumber" onchange="bookingChanged(this)">
+
             @foreach (int anApartmentNumber in theApartmentNumbers)
             {
+                if (anApartmentNumber < 0)
+                {
+                    //This is a "waiting apartment" do not include it in the list of apartments
+                    continue;
+                }
                 if (anApartmentNumber == theOrderData.apartmentNumber)
                 {
                     <option value="@anApartmentNumber" selected>@anApartmentNumber</option>
@@ -84,16 +90,49 @@
                     <option value="@anApartmentNumber">@anApartmentNumber</option>
                 }
             }
+            @*Add the "none" option which actually means a "waiting apartment"*@
+            @{
+                if (theOrderData.apartmentNumber <= 0)
+                {
+                    //The current apartment is a "waiting apartment" - select the "none" option. 
+                    <option value="@theOrderData.apartmentNumber" selected>@tBox.translate("None")</option>
+                }
+                else
+                {
+                    //The order is assigned to a normal apartment - show the "none" option, but do not select it
+                    <option value="-1">@tBox.translate("None")</option>
+                }
+            }
         </select>
         <label>
             <span class="field-name">@tBox.translate("Apartment")</span>
         </label>
     </div>
+
+    <div class="field-box select-box">
+        <select id="status" name="status" onchange="statusChanged(this)">
+            @foreach (OrderStatus aStatus in Enum.GetValues(typeof(OrderStatus)))
+            {
+                string statusName = tBox.translate(aStatus.ToString());
+                string selected = "";
+                if (aStatus == theOrderData.status)
+                {
+                    selected = "selected";
+                }
+                <option value="@aStatus" @selected>@statusName</option>
+            }
+        </select>
+        <label>
+            <span class="field-name">@tBox.translate("Status")</span>
+        </label>
+    </div>
+
 </div>
 <div>
     <div class="form-box-wrap">
         @Html.inputField("price", theOrderData.price, theOrderData.errorMessageOf("price", tBox), tBox, style: "width:48%")
-       
+        @Html.inputField("paid", theOrderData.paid, theOrderData.errorMessageOf("paid", tBox), tBox, style: "width:48%")
+
     </div>
     <div class="form-box-wrap">
         <div class="field-box select-box">
@@ -119,7 +158,7 @@
 <script>
     function bookingChanged(field) {
         var fieldId = field.id;
-
+        
         $.ajaxSetup({ cache: false });
         var bookingParameters = {};
         bookingParameters.checkinDate = $("#checkinDate").val();

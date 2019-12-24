@@ -12,19 +12,19 @@ namespace cityLife4
     using System;
     using System.Collections.Generic;
     
-    public partial class Country
+    public partial class ExpenseType
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Country()
+        public ExpenseType()
         {
-            this.Guests = new HashSet<Guest>();
+            this.Expenses = new HashSet<Expense>();
         }
     
-        public string code { get; set; }
-        public string name { get; set; }
-        public string language { get; set; }
+        public int Id { get; set; }
+        public string nameKey { get; set; }
+        public string descriptionKey { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Guest> Guests { get; set; }
+        public virtual ICollection<Expense> Expenses { get; set; }
     }
 }

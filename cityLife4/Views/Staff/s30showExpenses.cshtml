@@ -1,0 +1,31 @@
+﻿@using cityLife4;
+@using cityLife.Controllers;
+@using System.Data.Entity;
+@model  IEnumerable<Expense>
+
+@{ var expenseList = Model;
+<table style="max-width:500px;">
+    <thead>
+        <tr class="table-tr">
+            <th class="table-th">type</th>
+            <th class="table-th">amount</th>
+            <th class="table-th">desc</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var anExpense in expenseList)
+        {
+        <tr class="table-tr" onclick="updateExpense(@anExpense.Id)">
+            <td class="table-td">@anExpense.ExpenseType.nameKey</td>
+            <td class="table-td" style="text-align:right">@anExpense.expenseAsMoney().toMoneyString()</td>
+            <td class="table-td">@anExpense.description</td>
+        </tr>
+        }
+    </tbody>
+</table>
+
+}
+<input type="button" class="btn small-button" value="Add Expense" onclick="addExpense()" />
+<!--we want to show the expense form - call the "expense clicked
+           function with 0 in second parameter - that will display
+           the expense form. tdExp is a variable in s21dashboard-->

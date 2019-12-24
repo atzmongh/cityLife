@@ -1,0 +1,57 @@
+﻿@using cityLife4
+@using System.Data.Entity;
+
+@model Expense
+@{
+    TranslateBox tBox = ViewBag.tBox;
+    DbSet<ExpenseType> expenseTypes = ViewBag.expenseTypes;
+    }
+@{Expense theExpense = Model;}
+
+<form id="updateExpenseForm" method="post">
+    <input type="hidden" id="expenseId" name="expenseId" value="@theExpense.Id" />
+    <div class='field-box datepicker-box'>
+        <input type="text" id="expenseDate2" name="expenseDate" value="@theExpense.date.ToString("dd/MM/yyyy")"> <!--id is expenseDate2 because such an id already exists (in the
+                                                                                                                     add expense form)-->
+        <label for="expenseDate2">
+            <span class="field-name">@tBox.translate("Expense date")</span>
+            <span class="calendar-ico"></span>
+        </label>
+        <span class="field-error"></span>
+    </div>
+    <div class='inputBox select-box'>
+        <input list="expenseTypeList" name="expenseType" id="expenseType" class="inputElement" value="@theExpense.ExpenseType.nameKey" />
+        <datalist id="expenseTypeList">
+            @foreach (var expenseType in expenseTypes)
+            {
+                <option value="@expenseType.nameKey">@tBox.translate(expenseType.nameKey)</option>
+            }
+        </datalist>
+        <label for="expenseType" class="label">@tBox.translate("Expense Type")</label>
+        <span class="error-text"></span>
+    </div>
+    <div class="form-box-wrap">
+        @Html.inputField("amount", theExpense.expenseAsMoney().toMoneyString(showComma:false), "", tBox, style: "width:48%", fieldType: "number") <!--hide comma 
+                                                                                                                                                      because the fidl is a "number" field-->
+        <div class="field-box select-box">
+            <select id="currency2" name="currency">
+                <option value="UAH" selected>UAH</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+            </select>
+            <label>
+                <span class="field-name">@tBox.translate("Currency")</span>
+            </label>
+        </div>
+    </div>
+
+    <div class="form-box-wrap">
+        @Html.inputField("description", theExpense.description, "", tBox)
+
+    </div>
+    <input type="button" class="btn small-button" value='@tBox.translate("Update")' onclick="expenseUpdating(this)" />
+    <input type="button" class="btn small-button" value='@tBox.translate("Delete")' onclick="expenseDeleting(this)" />
+    <a class="btn" style=" min-width: 90px;height: auto;margin: 5px;" href="/staff/s21Dashboard">@tBox.translate("Cancel")</a>
+    <span id="expenseUpdatedMessage" style="display:none; background-color:darkblue; color:white">Expense updated</span>
+    <span id="expenseDeletedMessage" style="display:none; background-color:darkblue; color:white">Expense deleted</span>
+</form>

@@ -10,15 +10,18 @@
 namespace cityLife4
 {
     using System;
+    using System.Collections.Generic;
     
-    public enum OrderStatus : int
+    public partial class Expense
     {
-        Created = 0,
-        CheckedIn = 1,
-        CheckedOut = 2,
-        Cancelled = 3,
-        Free = 9,
-        Waiting_list = 4,
-        Waiting_deletion = 5
+        public int Id { get; set; }
+        public System.DateTime date { get; set; }
+        public int amount { get; set; }
+        public string currency_currencyCode { get; set; }
+        public string description { get; set; }
+        public int expenseType_Id { get; set; }
+    
+        public virtual Currency Currency { get; set; }
+        public virtual ExpenseType ExpenseType { get; set; }
     }
 }

@@ -578,6 +578,8 @@ namespace cityLife.Controllers
             }
 
             //Create or update the apartment day records (a record for each apartment-day)
+            Money pricePerDay = apartmentAndPrice.pricePerStay / dayCount;  //Note that this may cause some rounding issues. So 100.00 / 3 gives 33.33
+            int pricePerDayCents = pricePerDay.toCents();
             for (var aDay = checkIn; aDay < checkOut; aDay = aDay.AddDays(1))
             {
                 ApartmentDay anApartmentDay = db.ApartmentDays.SingleOrDefault(a => a.date == aDay && a.Apartment.Id == apartmentAndPrice.theApartment.Id);
@@ -592,14 +594,11 @@ namespace cityLife.Controllers
                         Currency = theCurrency,
                         priceFactor = 1.0m,
                         isCleaned = false,
-                        revenue = 0,
+                        revenue = pricePerDayCents,   //We spread the revenue over all the days of the order evenly. Note that we might lose 
+                                                           //some cents doing so.
                         status = ApartOccuStatus.Reserved
                     };
-                    if (aDay == checkIn)
-                    {
-                        //this is the first day of the booking - add the revenue to this day
-                        anApartmentDay.revenue = apartmentAndPrice.pricePerStay.toCents();
-                    }
+                    
                     db.ApartmentDays.Add(anApartmentDay);
                 }
                 else
@@ -610,10 +609,9 @@ namespace cityLife.Controllers
                         anApartmentDay.Order = theOrder;
                         anApartmentDay.Apartment = apartmentAndPrice.theApartment;
                         anApartmentDay.Currency = theCurrency;
-                        if (aDay == checkIn)
-                        {
-                            anApartmentDay.revenue = apartmentAndPrice.pricePerStay.toCents();
-                        }
+                       
+                        anApartmentDay.revenue = pricePerDayCents;
+                       
                         
                         anApartmentDay.status = ApartOccuStatus.Reserved;
                     }
@@ -717,7 +715,7 @@ namespace cityLife.Controllers
             BookingRequest theBookingRequest = this.setBookingRequest(fromDate, toDate, adultsCount, childrenCount);
 
 
-            //get all apartments and for each apartment - its price.
+            //get all real apartments and for each apartment - its price. (leave out waiting apartments whichare not interesting for the public site)
             //Price can either be:
             //- minimum price per night (if we do not know the dates of stay)
             //- exact price per stay (if we know number of adults, children and dates)
@@ -730,9 +728,9 @@ namespace cityLife.Controllers
             }
             else
             {
-                //get all apartments and for each apartment - its price.
+                //get all real apartments and for each apartment - its price.
                 //calculate minimum price per night (since we do not know the length of stay)
-                foreach (var anApartment in db.Apartments)
+                foreach (var anApartment in db.Apartments.Where(rec=>rec.type == ApartmentIs.Real))
                 {
                     Money minPrice = anApartment.PricePerNight(adults: 1, children: 0, weekend: false, currencyCode: theCurrency.currencyCode, atDate: FakeDateTime.Now);
                     apartmentList.Add(new ApartmentPrice { theApartment = anApartment, availability = Availability.UNKNOWN, minPricePerNight = minPrice, pricePerStay = null, nightCount = 0 });
@@ -781,7 +779,7 @@ namespace cityLife.Controllers
         /// <summary>
         /// the method  is called when the user entered booking information and pressed the search button. 
         /// The method calculates the price per each apartment and whether it is available and suitable for
-        /// the group size
+        /// the group size. the method does not fetch from DB waiting apartments - only real apartments.
         /// </summary>
         /// <param name="fromDate">check in date</param>
         /// <param name="toDate">checkout date</param>
@@ -795,8 +793,8 @@ namespace cityLife.Controllers
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
 
             List<ApartmentPrice> apartmentList = new List<ApartmentPrice>();
-            //Check apartment availability for the given dates and for the given occupation
-            foreach (var anApartment in db.Apartments)
+            //Check apartment availability for the given dates and for the given occupation. Omit waiting apartments
+            foreach (var anApartment in db.Apartments.Where(rec=>rec.type == ApartmentIs.Real))
             {
                 ApartmentPrice apartmentAndPrice = calculatePricePerStayForApartment(anApartment, db, theBookingRequest, theCurrency);
                 apartmentList.Add(apartmentAndPrice);
@@ -805,18 +803,47 @@ namespace cityLife.Controllers
             //At this point the apartment list contains the list of apartments plus the price per stay for each and whether it is suitable or not
             return apartmentList;
         }
-
         /// <summary>
-        /// the method calculates the availability and price per stay for a specific apartment
+        /// the method checks if an apartment is free in the date range of the order. It is similar to calculatePricePerStayForApartment - but
+        /// calculates only the availability part (does not take into account group size). Used mainly in order to find a waiting-list apartment suitable for the order.
+        /// A waiting list apartment is a fuctitious apartmnet, used for waiting list or waiting deletion orders.
         /// </summary>
         /// <param name="anApartment">the apartment for which we need to calculate availability</param>
         /// <param name="db"></param>
         /// <param name="theBookingRequest"></param>
-        /// <param name="theCurrency"></param>
         /// <param name="originalOrderId">In case we update an existing order - gives the original order ID which we wish to update. Otherwise
         /// it is set to 0</param>
-        /// <returns>apartment availability and price information</returns>
-        public static ApartmentPrice calculatePricePerStayForApartment(Apartment anApartment, cityLifeDBContainer1 db, BookingRequest theBookingRequest, Currency theCurrency, int originalOrderId = 0)
+        /// <returns>true is the apartment is free for these days.</returns>
+        public static bool calculateFreeDatesForApartment(Apartment anApartment, cityLifeDBContainer1 db, BookingRequest theBookingRequest, int originalOrderId = 0)
+        {
+            //Look for apartment days for that apartment and these dates. Note that we exclude from the list records belonging to the same order ID (in case of update)
+            //For example: we had an order for 1/12 until 3/12. If we added another day - we are only interestsed to know if the new day is free or not.
+            var apartmentDays = from anApartmentDay in db.ApartmentDays
+                                where anApartmentDay.Apartment.Id == anApartment.Id &&
+                                anApartmentDay.date >= theBookingRequest.checkinDate &&
+                                anApartmentDay.date < theBookingRequest.checkoutDate &&
+                                anApartmentDay.Order.Id != originalOrderId   //if the apartment day is for the same order ID - it is not "blocking" us from updating the order
+                                select anApartmentDay;
+
+            var nonFreeDays = from anApartmentDay in apartmentDays
+                              where anApartmentDay.status != ApartOccuStatus.Free
+                              select anApartmentDay;
+            return nonFreeDays.Count() == 0;  //If there are 0 non-free days - it means the apartment is free is this date range.
+        }
+
+
+
+                /// <summary>
+                /// the method calculates the availability and price per stay for a specific apartment
+                /// </summary>
+                /// <param name="anApartment">the apartment for which we need to calculate availability</param>
+                /// <param name="db"></param>
+                /// <param name="theBookingRequest"></param>
+                /// <param name="theCurrency"></param>
+                /// <param name="originalOrderId">In case we update an existing order - gives the original order ID which we wish to update. Otherwise
+                /// it is set to 0</param>
+                /// <returns>apartment availability and price information</returns>
+                public static ApartmentPrice calculatePricePerStayForApartment(Apartment anApartment, cityLifeDBContainer1 db, BookingRequest theBookingRequest, Currency theCurrency, int originalOrderId = 0)
         {
 
             ApartmentPrice apartmentAndPrice;

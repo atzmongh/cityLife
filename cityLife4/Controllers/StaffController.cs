@@ -133,35 +133,40 @@ namespace cityLife.Controllers
         [HttpGet]
         public ActionResult s21Dashboard(DateTime? fromDate, string wideDashboard = "off")
         {
+            DateTime startDate;
             if (fromDate == null && Session["fromDate"] == null)
             {
                 //Take yesterda's date as default
-                fromDate = FakeDateTime.DateNow.AddDays(-1);
-                Session["fromDate"] = fromDate;
+                startDate = FakeDateTime.DateNow.AddDays(-1);
+                Session["fromDate"] = startDate;
             }
             else if (fromDate == null)
             {
                 //fromDate is null but we have a date in the session - take it
-                fromDate = (DateTime)Session["fromDate"];
+                startDate = (DateTime)Session["fromDate"];
             }
             else
             {
                 //We have a date in "fromDate" - save it in the session variable
-                Session["fromDate"] = fromDate;
+                startDate = (DateTime)fromDate;
+                Session["fromDate"] = startDate;
             }
-            //At this point fromDate contains a date (and also Session[fromDate"] - contains the same date
+            //At this point startDate contains a date (and also Session[fromDate"] - contains the same date
 
             //Currntly for both normal mode and wide mode we dislay 31 days. The number of days can be set here.
-            int dashboardDays;
-            if (wideDashboard == "off")
-            {
-                dashboardDays = 31;
-            }
-            else
-            {
-                dashboardDays = 31;
-            }
+            //We display one month. The calculation is: the number of days displayed are equal to the month length of the starting month. 
+            //In most cases this will yield an end date which is one less that the starting date. The only exception is January 30 and 31, which will 
+            //end at 1 or 2 of March.
+            //For example: start date    end date
+            //             10/11/2019    9/12/2019
+            //             31/12/2019    30/1/2020
+            //             30/1/2019     1/3/2019 (except for leap year, where it will be 29/2/2020)
+            //             1/11/2019     30/11/2019
+            //             1/12/2019     31/12/2019
+            //             1/2/2020      29/2/2020 (2020 is leap year)
+            int dashboardDays = FakeDateTime.monthLength(startDate);
             Employee theEmployee = (Employee)Session["loggedinUser"];
+
             if (theEmployee == null)
             {
                 //No user is logged in - go to login screen
@@ -169,17 +174,33 @@ namespace cityLife.Controllers
             }
             else
             {
-                DateTime fromDateOrNow = fromDate ?? FakeDateTime.DateNow.AddDays(-1);   //start from yesterday by default
                 List<Money> revenuePerDay = null;
+                List<Money> expensePerDay = null;
+                List<string> expenseTypes = null;
                 EmployeeWorkDay[] empWorkDaysArray = null;
                 List<Employee> maidList = null;
-                var apartmentDayBlocks = s21dashboardPreparation(fromDateOrNow, dashboardDays, ref revenuePerDay, ref empWorkDaysArray, ref maidList);
+                List<Money> revenuePerApartment = null;
+                List<int> percentOccupancyPerApartment = null;
+                var apartmentDayBlocks = s21dashboardPreparation(
+                    startDate, 
+                    dashboardDays, 
+                    ref revenuePerDay,
+                    ref expensePerDay,
+                    ref expenseTypes,
+                    ref revenuePerApartment,
+                    ref percentOccupancyPerApartment,
+                    ref empWorkDaysArray, 
+                    ref maidList);
                 ViewBag.apartmentDayBlocks = apartmentDayBlocks;
                 ViewBag.revenuePerDay = revenuePerDay;
+                ViewBag.expensePerDay = expensePerDay;
+                ViewBag.expenseTypes = expenseTypes;
+                ViewBag.revenuPerApartment = revenuePerApartment;
+                ViewBag.percentOccupancyPerApartment = percentOccupancyPerApartment;
                 ViewBag.empWorkDaysArray = empWorkDaysArray;
                 TranslateBox tBox = this.setTbox("RU");
                 ViewBag.tBox = tBox;
-                ViewBag.fromDate = fromDateOrNow;
+                ViewBag.fromDate = startDate;
                 ViewBag.today = FakeDateTime.Now;
                 ViewBag.wideDashboard = wideDashboard == "on" ? "checked" : "";
                 ViewBag.dashboardDays = dashboardDays;
@@ -202,12 +223,16 @@ namespace cityLife.Controllers
         }
 
         /// <summary>
-        /// The function reads the orders for all apartments starting from the date set by the user and for 31 days and 3 days (depending on 
-        /// dashboard type)
+        /// The function reads the orders for all apartments starting from the date set by the user and for a full month (30 or 31 days,
+        /// and for February 28 or 29 days)
         /// </summary>
         ///<param name="fromDate">starting date of the dashboard</param>
-        ///<param name="days">the number of days we wish to display.(depends on dashboard type - normal or wide)</param>
+        ///<param name="days">the number of days we wish to display.(depends on the starting month)</param>
         ///<param name="revenuePerDay">An output parameter - will contain the list of revenues per day</param>
+        ///<param name="expensePerDay">total expenses for each day</param>
+        ///<param name="percentOccupancyPerApartment">Number of days the apartment is occupied divided by total number of days (rounded to 
+        ///whole percent)</param>
+        ///<param name="revenuePerApartment">Total revenue per apartment for that month</param>
         ///<param name="empWorkDaysArray">An array containing an employeeWorkDay record for each day in the month.
         ///Days for which no record found - will be null. Days for which more than one recrod found - will contain
         ///the last record. </param>
@@ -215,10 +240,15 @@ namespace cityLife.Controllers
         /// <returns>List of apartment orders. For each apartment:
         /// list of DayBlocks.
         /// A dayBlock is either a single free day, or an order which can span 1 or more days. Note that a day block may not 
-        /// be identical to the corresponding order because the order may start before the "fromDate" or end after the "fromDate+31".</returns>
+        /// be identical to the corresponding order because the order may start before the "fromDate" or end after the "fromDate+31".
+        /// Note  that the list contains first all real apartments, then "waiting" apartments</returns>
         public List<List<DayBlock>> s21dashboardPreparation(DateTime fromDate,
             int days,
             ref List<Money> revenuePerDay,
+            ref List<Money> expensePerDay,
+            ref List<string> expenseTypes,
+            ref List<Money> revenuePerApartment,
+            ref List<int> percentOccupancyPerApartment,
             ref EmployeeWorkDay[] empWorkDaysArray,
             ref List<Employee> maidList)
         {
@@ -236,24 +266,74 @@ namespace cityLife.Controllers
 
             //a 2 dimensional array - a list of apartments, and for each apartment - a list of day blocks
             //where each day block is either a free day or an order.
-
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
             var apartmentDayBlocks = new List<List<DayBlock>>();
             revenuePerDay = new List<Money>();
-            for (int i = 0; i < days + 1; i++)
+            expensePerDay = new List<Money>();
+            for (int i = 0; i < days; i++)
             {
                 revenuePerDay.Add(new Money(0m, "UAH"));
             }
 
-            var lastDate = fromDate.AddDays(days);
-            cityLifeDBContainer1 db = new cityLifeDBContainer1();
-            foreach (var anApartment in db.Apartments)
+
+            var lastDate = fromDate.AddDays(days - 1);
+            revenuePerApartment = new List<Money>();
+            percentOccupancyPerApartment = new List<int>();
+
+            //Calculate the expenses for each date in the range
+            for (DateTime aDate = fromDate; aDate <= lastDate; aDate = aDate.AddDays(1))
+            {
+                //Read all expenses for the date and sum them
+                var expenseListCentsForDate = (from expense in db.Expenses
+                                               where expense.date == aDate
+                                               select expense.amount);   //The expenses are kept as cents in the DB
+                int expensesCentsForDate = 0;
+                if (expenseListCentsForDate.Count() > 0)
+                {
+                    expensesCentsForDate = expenseListCentsForDate.Sum();
+                }
+                Money expensesForDate = new Money(expensesCentsForDate, "UAH");
+                expensePerDay.Add(expensesForDate);
+            }
+
+            //Sort apartments by type (first all "normal" apartments then the "waiting" apartments), then by their number
+            var sortedApartments = from anApartment in db.Apartments
+                                   orderby anApartment.type, anApartment.number
+                                   select anApartment;
+            Order anOrder = new Order()   //create a fictitious order with id = 0
+            {
+                Id = 0
+            };
+
+            foreach (var anApartment in sortedApartments)
             {
                 var dayBlocks = new List<DayBlock>();
                 DayBlock aDayBlock = null;
                 int dayNumber = 0;
+                Money apartmentRevenue = new Money(0m, "UAH");
+                double apartmentOccupiedDays = 0;   //Use float for the percentage calculation later
+                //Get all apartment days of the current apartment for the desired month
+                var apartmentDaysForMonth = (from theApartmentDay in db.ApartmentDays
+                                            where theApartmentDay.Apartment.Id == anApartment.Id && theApartmentDay.date >= fromDate && theApartmentDay.date <= lastDate
+                                            orderby theApartmentDay.date
+                                            select theApartmentDay).ToList();
+                int apartmentDaysI = 0;
+                ApartmentDay anApartmentDay;
+                int apartmentDaysCount = apartmentDaysForMonth.Count();
                 for (var aDate = fromDate; aDate <= lastDate; aDate = aDate.AddDays(1))
                 {
-                    var anApartmentDay = db.ApartmentDays.SingleOrDefault(record => record.Apartment.Id == anApartment.Id && record.date == aDate);
+                    if (apartmentDaysCount > apartmentDaysI && apartmentDaysForMonth[apartmentDaysI].date == aDate)
+                    {
+                        //The current apartmentDays record matches the on-hand date - an apartmentDay exists
+                        anApartmentDay = apartmentDaysForMonth[apartmentDaysI];
+                        apartmentDaysI++;
+                    }
+                    else
+                    {
+                        //An apartment day does not exist - it will be null
+                        anApartmentDay = null;
+                    }
+
                     if (anApartmentDay == null || anApartmentDay.status == ApartOccuStatus.Free)
                     {
                         //This is a free day
@@ -270,9 +350,20 @@ namespace cityLife.Controllers
                     else
                     {
                         //this is a busy day. Read the order record
-                        var anOrder = db.Orders.Single(record => record.Id == anApartmentDay.Order.Id);
+                        if (anOrder.Id != anApartmentDay.Order.Id)
+                        {
+                            //We did not read this order yet - read it
+                            anOrder = db.Orders.Single(record => record.Id == anApartmentDay.Order.Id);
+                        }
+                        else
+                        {
+                            //the order is for more than one day. We have already read this order in the previous cycle in the date loop
+                        }
+                        //At this point anOrder contains the order pointed by the on-hand apartmentDay record
                         //Add the revenue of that day to the total revenu per day
                         revenuePerDay[dayNumber] += anApartmentDay.revenueAsMoney();
+                        apartmentRevenue += anApartmentDay.revenueAsMoney();
+                        apartmentOccupiedDays++;
                         if (aDayBlock == null)
                         {
                             //This is the first time we see this order - open a new DayBlock object. Note that if the report starts from 
@@ -306,8 +397,14 @@ namespace cityLife.Controllers
                     dayBlocks.Add(aDayBlock);
                     aDayBlock = null;
                 }
-                //Add the dayBlocks list into the apartmentDayBlocks
+                //Add the dayBlocks list into the apartmentDayBlocks. Check if it is a "waiting" apartment.
                 apartmentDayBlocks.Add(dayBlocks);
+                
+                //Add the apartment revenue and apartment occupacy percentage - only for "normal" apartments
+                revenuePerApartment.Add(apartmentRevenue);
+                double apartmentOccupancyPercent = apartmentOccupiedDays / days * 100.0;
+                int apartmentOccupancyPercentRounded = (int)Math.Round(apartmentOccupancyPercent);
+                percentOccupancyPerApartment.Add(apartmentOccupancyPercentRounded);
             }
             //At this point the apartmentDayBlocks variable contaiins a list of list of day blocks 
 
@@ -324,7 +421,13 @@ namespace cityLife.Controllers
                 int dayNumber = (int)Math.Round((anEmpWorkDays.dateAndTime.Date - fromDate).TotalDays, 0);
                 empWorkDaysArray[dayNumber] = anEmpWorkDays;
             }
+
             maidList = db.Employees.Where(emp => emp.role == "maid").ToList();  //Add all maids to the maid list
+           
+            expenseTypes = (from expenseType in db.ExpenseTypes
+                                  select expenseType.nameKey).ToList();
+            
+            
 
             return apartmentDayBlocks;
 
@@ -403,6 +506,12 @@ namespace cityLife.Controllers
                 children = 0,
                 country = ""
             };
+            if (apartmentNumber <= 0)
+            {
+                //This is a waiting apartment - the default status should be "waiting list" and color orange (Otherwise it will stay as Created and red)
+                theOrderData.status = OrderStatus.Waiting_list;
+                theOrderData.orderColor = Color.Orange;
+            }
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
 
             //Calculate expected price, assuming 2 adults and 0 children. Calculate the price in UAH
@@ -499,6 +608,17 @@ namespace cityLife.Controllers
                 orderColor = orderColor,
                 staffComments = staffComments
             };
+            if (apartmentNumber <= 0)
+            {
+                //This is a waiting apartment. Status must be either "waiting list" or "waiting deletion"
+                if (status != OrderStatus.Waiting_list && status != OrderStatus.Waiting_deletion)
+                {
+                    //Change the status to be waiting deletion
+                    theOrderData.status = OrderStatus.Waiting_deletion;
+                    theOrderData.orderColor = Color.Gray;
+                    theOrderData.price = "0";
+                }
+            }
 
             var apartmentNumbers = from anApartment in db.Apartments
                                    select anApartment.number;
@@ -516,17 +636,66 @@ namespace cityLife.Controllers
                 Money paidAmountM = new Money(Paid, "UAH");
 
                 Currency currentCurrency = db.Currencies.Single(a => a.currencyCode == "UAH");   //The staff application works currently only with UAH
-                ApartmentPrice apartmentAndPrice = PublicController.calculatePricePerStayForApartment(theAparatment, db, theBookingRequest, currentCurrency, orderId);
+
+                ApartmentPrice apartmentAndPrice = new ApartmentPrice()
+                {
+                    availability = Availability.OCCUPIED   //Set occupied as default value. If not replaced - will stay as occupied
+                };
+                if (theOrderData.status == OrderStatus.Waiting_list || theOrderData.status == OrderStatus.Waiting_deletion)
+                {
+                    //This is either a waiting list order or an order waiting deletion - Find the first "waiting apartment" that is free for these dates
+                    //and assign the order to that fictitious apartment
+                    //We sort the apartments in ascending order. That means that apartment -3 will be before -2, and before -1. This is done to be consistent 
+                    //with what we do when displaying the real apartments and "waiting" apartments. (See s21dashBoardPreparation)
+                    var waitingApartments = from anApartment in db.Apartments
+                                            where anApartment.type == ApartmentIs.Waiting
+                                            orderby anApartment.number
+                                            select anApartment;
+                    foreach(var anApartment in waitingApartments)
+                    {
+                        if (PublicController.calculateFreeDatesForApartment(anApartment, db, theBookingRequest, orderId) == true)
+                        {
+                            //The waiting apartment is free for these dates - assign that apartment to the order
+                            apartmentAndPrice = new ApartmentPrice()
+                            {
+                                 availability = Availability.AVAILABLE,
+                                 theApartment = anApartment,
+                                 nightCount = theOrderData.nights
+                            };
+                            theOrderData.apartmentNumber = anApartment.number;
+                            break;
+                        }
+                    }
+                    //At this point - if the loop was not "broken" - it means that no waiting apartment is free at these dates and the 
+                    //apartmentAndPrice remains as "occupied"
+                    //Anyway - change the default color - waiting list is orange and waiting deletion is gray
+                    if (theOrderData.status == OrderStatus.Waiting_list)
+                    {
+                        theOrderData.orderColor = Color.Orange;
+                    }
+                    else if (theOrderData.status == OrderStatus.Waiting_deletion)
+                    {
+                        theOrderData.orderColor = Color.Gray;
+                    }
+                }
+                else
+                {
+                    //This is a normal order - check apartment availability and price
+                    apartmentAndPrice = PublicController.calculatePricePerStayForApartment(theAparatment, db, theBookingRequest, currentCurrency, orderId);
+                }
+                
                 Country theCountry = db.Countries.SingleOrDefault(a => a.name == Country);
                 if (apartmentAndPrice.availability == Availability.OCCUPIED)
                 {
                     //the apartment is not available, although it seemed to be available. Perhaps it was taken in the last minutes
+                    //If the order is a waiting order - no "waiting apartment" was free for these dastes.
                     theOrderData.setErrorMessageFor("comments", "These dates are not available for that apartment");
                     return View("s23addUpdateOrder");
                 }
                 else
                 {
                     //Complete the booking
+                    //At this point we do not care if this is a normal order or a waiting order. 
                     apartmentAndPrice.pricePerStay = priceM;  //enter the actual price to be paid, rather than the calculated price.
                     Order theOrder = PublicController.p27createUpdateOrder(db, theBookingRequest, apartmentAndPrice, theOrderData, theCountry, tBox);
 
@@ -656,6 +825,160 @@ namespace cityLife.Controllers
             }
             db.SaveChanges();
         }
+        /// <summary>
+        /// The function adds an expense reported by the user in s21dashboard.
+        /// </summary>
+        /// <param name="expenseDate"></param>
+        /// <param name="expenseType">either one of the existing expense types in expenseTypes table or a new expense type
+        /// If new - that expense type will be added to the expenseTypes table</param>
+        /// <param name="amount">expense amount (as integer)</param>
+        /// <param name="currency">currency code</param>
+        /// <param name="description"></param>
+        /// <returns>the new expense amount for that date in UAH without currency symbol and cents</returns>
+        [HttpPost]
+        public string s29addExpense(string expenseDate, string expenseType, int amount, string currency, string description)
+        {
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+            //Check if that expense type exists
+            var expenseTypeRec = db.ExpenseTypes.SingleOrDefault(rec => rec.nameKey == expenseType);
+            if (expenseTypeRec == null)
+            {
+                //This expense type does not exist in the expenseTypes table - add it
+                expenseTypeRec = new ExpenseType()
+                {
+                     nameKey = expenseType
+                };
+                db.ExpenseTypes.Add(expenseTypeRec);
+            }
+            //At this point the expense type exists in expenseTypeRec record
+            Currency theCurrency = db.Currencies.Single(rec => rec.currencyCode == currency);   //We assume it must be in the DB
+            DateTime theExpenseDate = DateTime.ParseExact(expenseDate, "dd/MM/yyyy", null);
+            Expense theExpense = new Expense()
+            {
+                 amount = amount * 100,   //The amount is kept in cents in the DB
+                 Currency = theCurrency,
+                 date = theExpenseDate,
+                 description = description,
+                 ExpenseType = expenseTypeRec
+            };
+            db.Expenses.Add(theExpense);
+            db.SaveChanges();
+
+            return calculateExpensesForDate(theExpenseDate);
+        }
+
+        /// <summary>
+        /// Creates a list of expenses for the date selected by the user
+        /// </summary>
+        /// <param name="expenseDate">the date in </param>
+        /// <returns></returns>
+        [HttpGet]
+        public PartialViewResult s30showExpensesForDate(string expenseDateSt)
+        {
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+            DateTime expenseDate = DateTime.ParseExact(expenseDateSt, "yyyy-MM-dd",null);
+            var expenseList = from expense in db.Expenses
+                              where expense.date == expenseDate
+                              select expense;
+
+            return PartialView("s30showExpenses", expenseList);
+        }
+
+        /// <summary>
+        /// The method gets is called when the user presses an existing expense in the expense list. The method creates the 
+        /// expense update form
+        /// </summary>
+        /// <param name="expenseId"></param>
+        /// <returns>the form containing the expense fields: type, amount, description, and an update, delete and cancel buttons</returns>
+        [HttpGet]
+        public PartialViewResult s31updateExpense(int expenseId)
+        {
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+            Expense theExpense = db.Expenses.Single(rec => rec.Id == expenseId);
+            TranslateBox tBox = this.setTbox("RU");
+            ViewBag.tBox = tBox;
+            ViewBag.expenseTypes = db.ExpenseTypes;
+            return PartialView("s31updateExpense", theExpense);
+
+        }
+        /// <summary>
+        /// gets the updated expense data and updates the DB
+        /// </summary>
+        /// <param name="expenseDate"></param>
+        /// <param name="expenseType"></param>
+        /// <param name="amount"></param>
+        /// <param name="currency"></param>
+        /// <param name="description"></param>
+        /// <param name="expenseId">the id of the expense being updated</param>
+        /// <returns>the new total expenses for that date in UAH, without cents and currency sign</returns>
+        [HttpPost]
+        public string s31updateExpense(string expenseDate, string expenseType, int amount, string currency, string description, int expenseId)
+        {
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+            //Check if that expense type exists
+            var expenseTypeRec = db.ExpenseTypes.SingleOrDefault(rec => rec.nameKey == expenseType);
+            if (expenseTypeRec == null)
+            {
+                //This expense type does not exist in the expenseTypes table - add it
+                expenseTypeRec = new ExpenseType()
+                {
+                    nameKey = expenseType
+                };
+                db.ExpenseTypes.Add(expenseTypeRec);
+            }
+            //At this point the expense type exists in expenseTypeRec record
+            Currency theCurrency = db.Currencies.Single(rec => rec.currencyCode == currency);   //We assume it must be in the DB
+            DateTime theExpenseDate = DateTime.ParseExact(expenseDate, "dd/MM/yyyy", null);
+            //Read the existing expense
+            Expense theExpense = db.Expenses.Single(rec => rec.Id == expenseId);
+            theExpense.amount = amount * 100;
+            theExpense.Currency = theCurrency;
+            theExpense.date = theExpenseDate;
+            theExpense.description = description;
+            theExpense.ExpenseType = expenseTypeRec;
+           
+            db.SaveChanges();
+
+            return calculateExpensesForDate(theExpenseDate);
+        }
+
+        [HttpPost]
+        public string s32deleteExpense(int expenseId)
+        {
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+
+            Expense theExpense = db.Expenses.Single(rec => rec.Id == expenseId);
+            DateTime theExpenseDate = theExpense.date;
+            db.Expenses.Remove(theExpense);
+            db.SaveChanges();
+
+            return calculateExpensesForDate(theExpenseDate);
+        }
+
+        /// <summary>
+        /// Calculate the  amount of expenses for that date (as money string)
+        /// </summary>
+        /// <param name="aDate">the date for which we want to calcualte the expenses</param>
+        /// <returns>total expenses as string (without currency and cents in UAH)</returns>
+        private string calculateExpensesForDate(DateTime theExpenseDate)
+        {
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
+            var expensesForDate = from expense in db.Expenses
+                                  where expense.date == theExpenseDate
+                                  select expense;
+            Money totalExpensesForDate = new Money(0m, "UAH");
+            foreach (var anExpense in expensesForDate)
+            {
+                totalExpensesForDate += anExpense.expenseAsMoney();
+            }
+            string totalExpensesSt = totalExpensesForDate.toMoneyString();
+            if (totalExpensesSt == "0")
+            {
+                totalExpensesSt = "";   //show empty cell when 0
+            }
+            return totalExpensesSt;
+        }
+
 
         /// <summary>
         /// This method is an auxiliary method to create the translation box and to insert it if needed to the Session variable

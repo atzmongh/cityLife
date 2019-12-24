@@ -9,6 +9,10 @@
     DateTime today = ViewBag.today;
     List<List<DayBlock>> apartmentDayBlocks = ViewBag.apartmentDayBlocks;
     List<Money> revenuePerDay = ViewBag.revenuePerDay;
+    List<Money> expensePerDay = ViewBag.expensePerDay;
+    List<string> expenseTypes = ViewBag.expenseTypes;
+    List<Money> revenuePerApartment = ViewBag.revenuPerApartment;
+    List<int> percentOccupancyPerApartment = ViewBag.percentOccupancyPerApartment;
     EmployeeWorkDay[] empWorkDaysArray = ViewBag.empWorkDaysArray;
     int highlightOrderId = ViewBag.highlightOrderId;
     string wideDashboard = ViewBag.wideDashboard;   //contains either the word "checked" or empty
@@ -153,6 +157,11 @@
         color:darkblue;
         text-decoration:underline;
     }
+    .selectCell{
+        cursor:pointer;
+    }
+    
+
 </style>
 <div class="main-wrapper reset-indent">
     <form id="fromDateForm" method="get" action="s21Dashboard">
@@ -172,7 +181,7 @@
     
     <span id="highlightOrderId" data-order-id="@highlightOrderId"></span>  <!--keep the order which needs to be highlighted (or 0 if none -->
     <div style="display:flex">
-        @*first column - apartment numbers, rev and maid*@
+        @*first column - apartment numbers, rev, expense and maid*@
         <div class="dash01">
             <table>
                 <tr><td class="dash01td">date</td></tr>
@@ -180,9 +189,20 @@
                 @foreach (var anApartment in apartmentDayBlocks)
                 {
                     int apartmentNumber = anApartment.First().apartmentNumber;
-                    <tr><td class="dash01td @high">@apartmentNumber</td></tr>
+                    if (apartmentNumber > 0)
+                    {
+                        //this is a real apartment
+                        <tr><td class="dash01td @high">@apartmentNumber</td></tr>
+                    }
+                    else
+                    {
+                        //This is a "waiting" apartment
+                        <tr><td class="dash01td @high">Wt</td></tr>
+                    }
+
                 }
                 <tr><td>rev.</td></tr>
+                <tr><td>exp</td></tr>
                 <tr><td>maid</td></tr>
             </table>
         </div>
@@ -195,7 +215,7 @@
                     @for (DateTime aDate = fromDate; aDate < lastDate; aDate = aDate.AddDays(1))
                     {
                         string todaysBackground = (aDate.Date == today.Date ? "today" : "");  //Check if the date is today - put a different color
-    string weekendBackground = "";
+                        string weekendBackground = "";
                         if (aDate.Date.DayOfWeek == DayOfWeek.Sunday || aDate.Date.DayOfWeek == DayOfWeek.Saturday)
                         {
                             //This is a weekend - highlight the column header in orange
@@ -204,6 +224,8 @@
 
                         <th class="dash02th @wide @weekendBackground @todaysBackground">@aDate.ToString("dd/MM")</th> <!--"wide" will make a wider column-->
                     }
+                    <th class="dash02th"></th>
+                    <th class="dash02th"></th>
                 </tr>
                 @*line 2 - day line*@
                 <tr>
@@ -212,57 +234,78 @@
                         string todaysBackground = (aDate.Date == today.Date ? "today" : "");  //Check if the date is today - put a different color
                         <th class="dash02th @wide @todaysBackground">@aDate.ToString("ddd")</th>
                     }
+                    <th class="dash02th">@tBox.translate("revenue")</th>
+                    <th class="dash02th">@tBox.translate("occ%")</th>
                 </tr>
 
                 @*line 3 and above - order lines (1 line for each apartment)*@
+                @{
+                    int apartmentI = 0;
+                    int realApartmentCount = 0;
+                    double totalOccupancyPercent = 0d;
+
+                 }
                 @foreach (var anApartment in apartmentDayBlocks)
-    {
-                <tr style="background-color:@backgroundColors[colorIndex]">
-                    @{
-                        colorIndex++;
-                        colorIndex %= backgroundColors.Count();  //Advance the color index, and wrap around in case it is larger than the array
-                                                                 //of available colors
-                    }
-                    @foreach (var aDAyBlock in anApartment)
-                    {
-                        if (aDAyBlock.status == OrderStatus.Free)
-                        {
-                            //This is a free day
-                            <td class="dash02td @wide @high" data-apartment-id="@anApartment.First().apartmentNumber"
-                                data-date="@aDAyBlock.firstDate" onclick="addOrder(this)"></td>
+                {
+
+                    <tr style="background-color:@backgroundColors[colorIndex]">
+                        @{
+                            colorIndex++;
+                            colorIndex %= backgroundColors.Count();  //Advance the color index, and wrap around in case it is larger than the array
+                                                                     //of available colors
                         }
-                        else
+                        @foreach (var aDAyBlock in anApartment)
                         {
-                            //This is a busy day (or days)
-                            string line1;
-                            string line2;
-                            string line3 = "";
-                            if (wideDashboard == "checked")
+                            if (aDAyBlock.status == OrderStatus.Free)
                             {
-                                //This is a wide dashboard. Prepare the data that should be displayed on the order line
-                                line1 = aDAyBlock.phone + " (" + aDAyBlock.adults + "+" + aDAyBlock.children + ") " + aDAyBlock.name;
-                                line2 = aDAyBlock.price + "/" + aDAyBlock.paid + " - " + aDAyBlock.checkout.ToString("dd/MM/yyyy");
-                                line3 = aDAyBlock.expectedArrival + " " + aDAyBlock.staffComments;
+                                //This is a free day
+                                <td class="dash02td @wide @high" data-apartment-id="@anApartment.First().apartmentNumber"
+                                    data-date="@aDAyBlock.firstDate" onclick="addOrder(this)"></td>
                             }
                             else
                             {
-                                line1 = aDAyBlock.name;
-                                line2 = aDAyBlock.price;
+                                //This is a busy day (or days)
+                                string line1;
+                                string line2;
+                                string line3 = "";
+                                if (wideDashboard == "checked")
+                                {
+                                    //This is a wide dashboard. Prepare the data that should be displayed on the order line
+                                    line1 = aDAyBlock.phone + " (" + aDAyBlock.adults + "+" + aDAyBlock.children + ") " + aDAyBlock.name;
+                                    line2 = aDAyBlock.price + "/" + aDAyBlock.paid + " - " + aDAyBlock.checkout.ToString("dd/MM/yyyy");
+                                    line3 = aDAyBlock.expectedArrival + " " + aDAyBlock.staffComments;
+                                }
+                                else
+                                {
+                                    line1 = aDAyBlock.name;
+                                    line2 = aDAyBlock.price;
+                                }
+                                string color = aDAyBlock.orderColor.ToString();
+                                string cssColor = "order" + color;   //e.g. orderRed, orderGreen - we prepared such CSS classes
+                                <td class="dash02td @wide @high @cssColor" colspan="@aDAyBlock.days" data-order-id="@aDAyBlock.orderId" id="@aDAyBlock.orderId"
+                                    onclick="showOrder(this)">
+                                    @line1 <br /> @line2 <br />@line3
+                                </td>
                             }
-                            string color = aDAyBlock.orderColor.ToString();
-                            string cssColor = "order" + color;   //e.g. orderRed, orderGreen - we prepared such CSS classes
-                            <td class="dash02td @wide @high @cssColor" colspan="@aDAyBlock.days" data-order-id="@aDAyBlock.orderId" id="@aDAyBlock.orderId"
-                                onclick="showOrder(this)">
-                                @line1 <br /> @line2 <br />@line3
-                            </td>
                         }
-                    }
-                </tr>
-                }
+                        <td class="dash02td rightAlign">@revenuePerApartment[apartmentI].toMoneyString()</td>
+                        <td class="=dash02td rightAlign">@percentOccupancyPerApartment[apartmentI]%</td>
+                        @{
+                            if (anApartment.First().apartmentNumber > 0)
+                            {
+                                //This is a real apartment - calculate the percentage average
+                                totalOccupancyPercent += percentOccupancyPerApartment[apartmentI];
+                                realApartmentCount++;
+                            }
+                            apartmentI++;
+
+                        }
+                    </tr>
+                            }
                 @*Revenu total line*@
                 <tr>
                     @{ var totalRevenue = new Money(0m, "UAH");}
-                    @foreach(var aRevenue in revenuePerDay)
+                    @foreach (var aRevenue in revenuePerDay)
                     {
                         if (aRevenue.isZero())
                         {
@@ -272,67 +315,164 @@
                         {
                             <td class="dash02td">@aRevenue.toMoneyString(showCents: false)</td>
                             totalRevenue += aRevenue;
-                            
+
 
                         }
                     }
+                    @{ 
+                        int averageOccupancyPercent = (int)Math.Round(totalOccupancyPercent / realApartmentCount);
+                    }
+                    <td class="dash02td rightAlign">@totalRevenue.toMoneyString()</td>
+                    <td class="dash02td rightAlign">@averageOccupancyPercent%</td>
+                </tr>
+
+                @*Expense total line*@
+                @{
+                    DateTime theDate = fromDate;
+                }
+                <tr>
+                    @{ var totalExpense = new Money(0m, "UAH");}
+                    @foreach (var anExpense in expensePerDay)
+                    {
+                        if (anExpense.isZero())
+                        {
+                            <td class="dash02td selectCell" data-date='@theDate.ToString("yyyy-MM-dd")' onclick="expenseClicked(this,false)" ></td>
+                        }
+                        else
+                        {
+                            <td class="dash02td selectCell" data-date='@theDate.ToString("yyyy-MM-dd")' onclick="expenseClicked(this,true)">
+                    @anExpense.toMoneyString(showCents: false)</td>
+                            totalExpense += anExpense;
+                        }
+                        theDate = theDate.AddDays(1);
+                    }
+                    <td class="dash02td rightAlign">@totalExpense.toMoneyString()</td>
+                    <td class="dash02td rightAlign"></td>
                 </tr>
 
                 @*Maid on duty line*@
-                @{ 
-                    DateTime theDate = fromDate;
+                @{
+                    theDate = fromDate;
                 }
                 <tr>
                     @foreach (var anEmpWorkDay in empWorkDaysArray)
                     {
                         if (anEmpWorkDay == null)
                         {
-                            <td class="dash02td" onclick="displayMaidList(this)" data-emp-id="0" 
-                                data-date='@theDate.ToString("yyyy-MM-dd")'></td>  @*date-emp-id=0 denotes that an employee is not assigned to that day
-                                                                                     date-date gives the date of the current cell*@
-                        }
-                        else
-                        {
-                            string greenCss = "";
-                            if (anEmpWorkDay.isSalaryDay)
-                            {
-                                greenCss = "orderGreen";
+                            <td class="dash02td selectCell" onclick="displayMaidList(this)" data-emp-id="0"
+                                data-date='@theDate.ToString("yyyy-MM-dd")'></td> @*date-emp-id=0 denotes that an employee is not assigned to that day
+                    date-date gives the date of the current cell*@
                             }
-                            <td class="dash02td @greenCss" onclick="displayMaidList(this)" 
-                                data-emp-id="@anEmpWorkDay.Employee.Id" 
-                                data-date='@theDate.ToString("yyyy-MM-dd")'>@anEmpWorkDay.Employee.name</td>
+                            else
+                            {
+                                string greenCss = "";
+                                if (anEmpWorkDay.isSalaryDay)
+                                {
+                                    greenCss = "orderGreen";
+                                }
+                                <td class="dash02td @greenCss selectCell" onclick="displayMaidList(this)"
+                                    data-emp-id="@anEmpWorkDay.Employee.Id"
+                                    data-date='@theDate.ToString("yyyy-MM-dd")'>
+                                    @anEmpWorkDay.Employee.name
+                                </td>
+                            }
+                            theDate = theDate.AddDays(1);
                         }
-                        theDate = theDate.AddDays(1);
-                    }
                 </tr>
 
             </table>
         </div>
     </div>
     <div style="padding:2px;">@tBox.translate("Total revenue"):@totalRevenue.toMoneyString(showCents:false)</div>
-    <div style="padding:4px;max-width:400px;" id="s22OrderDetails">
+
+    <!--This part contgains all forms which are displayed under the main grid. Contains 6 forms, where each time only 
+        one is displayed and the rest are hidden-->
+    <div id="s20underTheGrid">
+        <!--div for the order details info (when the user clicks on an existing order)-->
+        <div style="padding:4px;max-width:400px;" id="s22OrderDetails">
 
 
-    </div>
-    <div id="newOrderDates" class="hidden">
-        <span style="float:left">@tBox.translate("Apartment Number")</span>
-        <span id="apartmentNumber" style="float:right"></span>
-        <br />
-        <span style="float:left">@tBox.translate("Checkin Date")</span>
-        <span id="checkinDate" style="float:right"></span>
-        <br />
-        <span style="float:left">@tBox.translate("Checkout Date")</span>
-        <span id="checkoutDate" style="float:right"></span>
-        <br />
-        <a id="addOrderButton" class="btn" href="/staff/s23updateOrder">@tBox.translate("New Order")</a>
+        </div>
+        <!--div for info about new order dates (when the user clicks on an empty cell)-->
+        <div id="newOrderDates" class="hidden">
+            <span style="float:left">@tBox.translate("Apartment Number")</span>
+            <span id="apartmentNumber" style="float:right"></span>
+            <br />
+            <span style="float:left">@tBox.translate("Checkin Date")</span>
+            <span id="checkinDate" style="float:right"></span>
+            <br />
+            <span style="float:left">@tBox.translate("Checkout Date")</span>
+            <span id="checkoutDate" style="float:right"></span>
+            <br />
+            <a id="addOrderButton" class="btn" href="/staff/s23updateOrder">@tBox.translate("New Order")</a>
 
-    </div>
-    <div id="maidList" class="hidden">
-        @foreach (var aMaid in maidList)
-        {
-            <input type="radio" name="maid" value="@aMaid.Id" data-maid-name="@aMaid.name" onclick="setMaid(this)" />@aMaid.name
-        }
-        <input type="radio" name="maid" value="0" data-maid-name="" onclick="setMaid(this)" />none
+        </div>
+        <!--div for the maid list (when the user clicks on a maid line)-->
+        <div id="maidList" class="hidden">
+            @foreach (var aMaid in maidList)
+            {
+                <input type="radio" name="maid" value="@aMaid.Id" data-maid-name="@aMaid.name" onclick="setMaid(this)" />@aMaid.name
+            }
+            <input type="radio" name="maid" value="0" data-maid-name="" onclick="setMaid(this)" />none
+        </div>
+
+
+        <!--div for the "add expense" form (when clicking on an empty expense cell)-->
+        <div id="addExpense" style="max-width:500px;" class="hidden">
+            <form id="addExpenseForm" method="post">
+                <div class='field-box datepicker-box'>
+                    <input type="text" id="expenseDate" name="expenseDate">
+                    <label for="expenseDate">
+                        <span class="field-name">@tBox.translate("Expense date")</span>
+                        <span class="calendar-ico"></span>
+                    </label>
+                    <span class="field-error"></span>
+                </div>
+                <div class='inputBox select-box'>
+                    <input list="expenseTypeList" name="expenseType" id="expenseType" class="inputElement" />
+                    <datalist id="expenseTypeList">
+                        @foreach (var expenseType in expenseTypes)
+                        {
+                            <option value="@expenseType">@tBox.translate(expenseType)</option>
+                        }
+                    </datalist>
+                    <label for="expenseType" class="label">@tBox.translate("Expense Type")</label>
+                    <span class="error-text"></span>
+                </div>
+                <div class="form-box-wrap">
+                    @Html.inputField("amount", "", "", tBox, style: "width:48%", fieldType: "number")
+                    <div class="field-box select-box">
+                        <select id="currency" name="currency">
+                            <option value="UAH" selected>UAH</option>
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                        </select>
+                        <label>
+                            <span class="field-name">@tBox.translate("Currency")</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-box-wrap">
+                    @Html.inputField("description", "", "", tBox)
+
+                </div>
+                <input type="button" class="btn small-button" value='@tBox.translate("Add")' onclick="sendExpense(this)" />
+                <a class="btn" style=" min-width: 90px;height: auto;margin: 5px;" href="/staff/s21Dashboard">@tBox.translate("Cancel")</a>
+                <span id="expenseAddedMessage" style="display:none; background-color:darkblue; color:white">Expense Added</span>
+            </form>
+        </div>
+
+
+        <!--div for the table showing all expenses for that date (when clicking on a non-empty expense cell)-->
+        <div id="s30showExpenses">
+
+        </div>
+
+        <!--div for the update expense form-->
+        <div id="s31updateExpense" style="max-width:550px;">
+
+        </div>
     </div>
 </div>
 
@@ -348,12 +488,21 @@
                 dateFormat: "d MM, yy",
                 firstDay: 1
             });
+        $("#expenseDate")
+            .datepicker({
+                defaultDate: "+0d",
+                numberOfMonths: 1,
+                dateFormat: "dd/mm/yy",
+                firstDay: 1
+            });
         //highlight the default order (if it should be highlighted)
         var orderId = document.getElementById("highlightOrderId").dataset.orderId;
         if (orderId != 0) {
             var td = document.getElementById(orderId);
             showOrder(td);  //We do the same as if a user would click on an occupied cell.
         }
+
+        //Initialize the currency dropdown in expense form
 
     }
 
@@ -367,6 +516,11 @@
     var cellClickCounter = 0;
 
 
+    //The function hides all forms under the grid except the one given in the parameter
+    function hideAllExcept(div) {
+        $("#s20underTheGrid").children().addClass("hidden");
+        $(div).removeClass("hidden");
+    }
     function showOrder(td) {
         // var orderId = td.dataset.orderId;
         if (lastSelectedTd != null) {
@@ -376,14 +530,11 @@
         lastSelectedTd = td;
         var orderIdJson = { orderId: td.dataset.orderId };
         $.get("/staff/s22OrderDetails", orderIdJson).done(displayOrderDetails);
-
-       // $.getJSON("/staff/s22OrderDetails", orderIdJson).done(displayOrderDetails);
     }
 
     function displayOrderDetails(orderDetailsHTML) {
-        $("#s22OrderDetails").empty();
-        $("#maidList").addClass("hidden");
-        $("#s22OrderDetails").append(orderDetailsHTML);
+        hideAllExcept("#s22OrderDetails");
+        $("#s22OrderDetails").html(orderDetailsHTML);
     }
 
     
@@ -442,12 +593,20 @@
     }
     //convert a Date object to dd/mm/yyyy
     function formatDateddmmyyyy(aDate) {
-        var ddmmyyyy = aDate.getDate() + "/" + (aDate.getMonth() + 1) + "/" + aDate.getFullYear();
+        var day = aDate.getDate();
+        var zeroDay = day <= 9 ? "0" : "";
+        var month = aDate.getMonth() + 1;
+        var zeroMonth = month <= 9 ? "0" : "";
+        var ddmmyyyy = zeroDay + day + "/" + zeroMonth + month + "/" + aDate.getFullYear();   //create the string dd/mm/yyyy. Note that dd and mm will always have 2 digits
         return ddmmyyyy;
     }
     //convert a Date object to yyyy-mm-dd
     function formatDateyyyymmdd(aDate) {
-        var yyyymmdd = aDate.getFullYear() + "-" + (aDate.getMonth() + 1) + "-" + aDate.getDate();
+        var day = aDate.getDate();
+        var zeroDay = day <= 9 ? "0" : "";
+        var month = aDate.getMonth() + 1;
+        var zeroMonth = month <= 9 ? "0" : "";
+        var yyyymmdd = aDate.getFullYear() + "-" + zeroMonth + month + "-" + zeroDay + day;
         return yyyymmdd;
     }
     //returns a date which is 1 day later
@@ -478,9 +637,8 @@
             '&apartmentNumber=' + apartmentNumber + '">@tBox.translate("Add Order") </a>' +
                 '</div>';
 
-        $("#s22OrderDetails").empty();
-        $("#maidList").addClass("hidden");
-            $("#s22OrderDetails").append(html);
+        hideAllExcept("#s22OrderDetails");
+        $("#s22OrderDetails").html(html);
     }
 
     //returns the difference between d1 and d2 (actually d2 minus d1)
@@ -496,27 +654,121 @@
 
     var tdMaid=null;  //contains: data-emp-id= emp_id and data-date = the date of that cell. If no 
     function displayMaidList(tdEmp) {
-        if (tdMaid != null) {
-            $(tdMaid).removeClass("highlight");
-        }
+        
+        $(tdMaid).removeClass("highlight");   //If tdMaid is null - the command is ignored.
+        $(tdExp) .removeClass("highlight");
+        
         $(tdEmp).addClass("highlight");
         tdMaid = tdEmp;  //Keep the cell that was pressed by the user. When the user selects a new maid from the list of radio buttons - we will
-                         //know to which cell it was related
-        $("#s22OrderDetails").empty();
-        $("#newOrderDates").addClass("hidden");
-
-        //display the list of maids with 
-        $("#maidList").removeClass("hidden");
+        //know to which cell it was related
+        hideAllExcept("#maidList");
     }
 
     //the user pressed a radio button of a maid - this maid should be assigned to the date previously selected by the user 
     //(and kept in "tdMaid")
     function setMaid(maidRadio) {
-        $(tdMaid).empty();
-        tdMaid.append(maidRadio.dataset.maidName);
+        $(tdMaid).text(maidRadio.dataset.maidName);
         var maidDay = new Object();
         maidDay.maidId = maidRadio.value;
         maidDay.date = tdMaid.dataset.date;
         $.post("/staff/s28AddUpdateMaid", maidDay);
+    }
+
+    //The function is called when an expense cell is clicked. 
+    //param 1: the cell clicked
+    //param 2: whether the expense cell contained an expense or not. 
+    var tdExp = null;
+    function expenseClicked(tdExpense, expenseIsPositive) {
+        var expenseDate = tdExpense.dataset.date;  //the date format is yyyy-mm-dd
+        var theDate = new Date(expenseDate);
+        var ddmmyyyy = formatDateddmmyyyy(theDate);
+        $("#expenseDate").val(ddmmyyyy);
+        tdExpense.text
+        
+        //Clean all other pieces of information which may exist under the grid
+        $(tdMaid).removeClass("highlight");   //If tdMaid or tdExpense is null - the command is ignored.
+        $(tdExp).removeClass("highlight");  //remove highlight from the previous expense cell 
+        $(tdExpense).addClass("highlight");
+        tdExp = tdExpense;  //Keep the cell that was pressed by the user. When the user selects a new expense from the list of radio buttons - we will
+        //know to which cell it was related
+        if (tdExpense.innerText != "") {
+            //the cell contains expenses - show a table with a list of expenses for that day
+            var expenseDateParam = new Object();
+            expenseDateParam.expenseDateSt = expenseDate;
+            $.get("/staff/s30showExpensesForDate", expenseDateParam, showExpenseList);
+           
+        }
+        else {
+            //There are no expenses for that day - show the "add class" form
+            hideAllExcept("#addExpense");
+        }
+    }
+
+    function showExpenseList(expenseListHTML) {
+        hideAllExcept("#s30showExpenses");
+        $("#s30showExpenses").html(expenseListHTML);
+    }
+    //perform ajax call to send the expense form to the backend - staff controller s29addExpense
+    function sendExpense() {
+        var formParams = $("#addExpenseForm").serialize();
+        $.post("/staff/s29addExpense", formParams,expenseAdded);
+    }
+
+    //get response from staff controller s29addExpense. The callback returns the total amount of expenses for that day after adding the new expense.
+    function expenseAdded(totalExpenseForDay) {
+        $(tdExp).text(totalExpenseForDay);
+        $("#expenseType").val("");
+        $("#amount").val("");
+        $("#description").val("");
+        $("#expenseAddedMessage").fadeIn(1000, () => $("#expenseAddedMessage").fadeOut(1000));
+
+    }
+    //the function is called by on click in s30showExpenses
+    function addExpense() {
+        hideAllExcept("#addExpense");
+    }
+
+    //The function is called by on click in s30showExpenses (for each expense line)
+    function updateExpense(expenseId) {
+        var expense = new Object();
+        expense.expenseId = expenseId;
+        $.get("/staff/s31updateExpense", expense, showUpdateForm);
+    }
+    function showUpdateForm(updateForm) {
+        hideAllExcept("#s31updateExpense");
+        $("#s31updateExpense").html(updateForm);
+        $("#currency2").select2({
+            minimumResultsForSearch: Infinity
+        });
+        var expenseDate = $("#expenseDate2");
+        expenseDate.datepicker({
+           // defaultDate: "5 Feb 2019",
+            numberOfMonths: 1,
+            dateFormat: "dd/mm/yy",   
+            firstDay: 1
+        });
+    }
+
+    function expenseUpdating(btn) {
+        var formParams = $("#updateExpenseForm").serialize();
+        $.post("/staff/s31updateExpense", formParams, expenseUpdated);
+        
+    }
+
+    function expenseUpdated(totalExpenseForDay) {
+        $(tdExp).text(totalExpenseForDay);
+        $("#expenseUpdatedMessage").fadeIn(1000, () => $("#expenseUpdatedMessage").fadeOut(1000, () => $("#s31updateExpense").empty()));
+    }
+
+    function expenseDeleting(btn) {
+        var expenseId = $("#expenseId").val();
+        var formParams = new Object();
+        formParams.expenseId = expenseId;
+        $.post("/staff/s32deleteExpense", formParams, expenseDeleted);
+    }
+
+    function expenseDeleted(totalExpenseForDay) {
+        $(tdExp).text(totalExpenseForDay);
+        $("#expenseDeletedMessage").fadeIn(1000, () => $("#expenseDeletedMessage").fadeOut(1000, () => $("#s31updateExpense").empty()));
     }
 </script>

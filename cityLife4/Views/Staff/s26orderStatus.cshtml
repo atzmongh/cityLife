@@ -40,26 +40,10 @@
             <span class="field-name">@tBox.translate("Order Color")</span>
         </label>
     </div>
-    <div class="field-box select-box">
-        <select id="status" name="status" onchange="statusChanged(this)">
-            @foreach (OrderStatus aStatus in Enum.GetValues(typeof(OrderStatus)))
-            {
-                string statusName = tBox.translate(aStatus.ToString());
-                string selected = "";
-                if (aStatus == theOrderData.status)
-                {
-                    selected = "selected";
-                }
-                <option value="@aStatus" @selected>@statusName</option>
-            }
-        </select>
-        <label>
-            <span class="field-name">@tBox.translate("Status")</span>
-        </label>
-    </div>
+  
 </div>
 
-@Html.inputField("paid", theOrderData.paid, theOrderData.errorMessageOf("paid", tBox), tBox, style: "width:48%")
+
 
 <input type="submit" class="btn small-button" value='@tBox.translate(action)' />
 <a class="btn" style=" min-width: 90px;height: auto;margin: 5px;" href="/staff/s21Dashboard">@tBox.translate("Cancel")</a>
