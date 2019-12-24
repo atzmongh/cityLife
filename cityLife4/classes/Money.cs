@@ -31,11 +31,6 @@ namespace cityLife4
             amount = m.amount;
             currencyCode = m.currencyCode;
         }
-        public Money(int cents, string aCurrencyCode)
-        {
-            amount = (decimal)cents / 100;
-            currencyCode = aCurrencyCode;
-        }
         /// <summary>
         /// This constructor accepts the amount in cents and creates a money object. This is the way
         /// Money is held in the DB
