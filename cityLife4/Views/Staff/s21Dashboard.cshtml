@@ -12,6 +12,7 @@
     List<Money> expensePerDay = ViewBag.expensePerDay;
     List<string> expenseTypes = ViewBag.expenseTypes;
     List<Money> revenuePerApartment = ViewBag.revenuPerApartment;
+    List<double> aveargeDaysPerApartment = ViewBag.aveargeDaysPerApartment;
     List<int> percentOccupancyPerApartment = ViewBag.percentOccupancyPerApartment;
     EmployeeWorkDay[] empWorkDaysArray = ViewBag.empWorkDaysArray;
     int highlightOrderId = ViewBag.highlightOrderId;
@@ -226,6 +227,7 @@
                     }
                     <th class="dash02th"></th>
                     <th class="dash02th"></th>
+                    <th class="dash02th"></th>
                 </tr>
                 @*line 2 - day line*@
                 <tr>
@@ -236,6 +238,7 @@
                     }
                     <th class="dash02th">@tBox.translate("revenue")</th>
                     <th class="dash02th">@tBox.translate("occ%")</th>
+                    <th class="dash02th">@tBox.translate("days")</th>
                 </tr>
 
                 @*line 3 and above - order lines (1 line for each apartment)*@
@@ -248,59 +251,60 @@
                 @foreach (var anApartment in apartmentDayBlocks)
                 {
 
-                    <tr style="background-color:@backgroundColors[colorIndex]">
-                        @{
-                            colorIndex++;
-                            colorIndex %= backgroundColors.Count();  //Advance the color index, and wrap around in case it is larger than the array
-                                                                     //of available colors
-                        }
-                        @foreach (var aDAyBlock in anApartment)
+                <tr style="background-color:@backgroundColors[colorIndex]">
+                    @{
+                        colorIndex++;
+                        colorIndex %= backgroundColors.Count();  //Advance the color index, and wrap around in case it is larger than the array
+                                                                 //of available colors
+                    }
+                    @foreach (var aDAyBlock in anApartment)
+                    {
+                        if (aDAyBlock.status == OrderStatus.Free)
                         {
-                            if (aDAyBlock.status == OrderStatus.Free)
+                            //This is a free day
+                            <td class="dash02td @wide @high" data-apartment-id="@anApartment.First().apartmentNumber"
+                                data-date="@aDAyBlock.firstDate" onclick="addOrder(this)"></td>
+                        }
+                        else
+                        {
+                            //This is a busy day (or days)
+                            string line1;
+                            string line2;
+                            string line3 = "";
+                            if (wideDashboard == "checked")
                             {
-                                //This is a free day
-                                <td class="dash02td @wide @high" data-apartment-id="@anApartment.First().apartmentNumber"
-                                    data-date="@aDAyBlock.firstDate" onclick="addOrder(this)"></td>
+                                //This is a wide dashboard. Prepare the data that should be displayed on the order line
+                                line1 = aDAyBlock.phone + " (" + aDAyBlock.adults + "+" + aDAyBlock.children + ") " + aDAyBlock.name;
+                                line2 = aDAyBlock.price + "/" + aDAyBlock.paid + " - " + aDAyBlock.checkout.ToString("dd/MM/yyyy");
+                                line3 = aDAyBlock.expectedArrival + " " + aDAyBlock.staffComments;
                             }
                             else
                             {
-                                //This is a busy day (or days)
-                                string line1;
-                                string line2;
-                                string line3 = "";
-                                if (wideDashboard == "checked")
-                                {
-                                    //This is a wide dashboard. Prepare the data that should be displayed on the order line
-                                    line1 = aDAyBlock.phone + " (" + aDAyBlock.adults + "+" + aDAyBlock.children + ") " + aDAyBlock.name;
-                                    line2 = aDAyBlock.price + "/" + aDAyBlock.paid + " - " + aDAyBlock.checkout.ToString("dd/MM/yyyy");
-                                    line3 = aDAyBlock.expectedArrival + " " + aDAyBlock.staffComments;
-                                }
-                                else
-                                {
-                                    line1 = aDAyBlock.name;
-                                    line2 = aDAyBlock.price;
-                                }
-                                string color = aDAyBlock.orderColor.ToString();
-                                string cssColor = "order" + color;   //e.g. orderRed, orderGreen - we prepared such CSS classes
-                                <td class="dash02td @wide @high @cssColor" colspan="@aDAyBlock.days" data-order-id="@aDAyBlock.orderId" id="@aDAyBlock.orderId"
-                                    onclick="showOrder(this)">
-                                    @line1 <br /> @line2 <br />@line3
-                                </td>
+                                line1 = aDAyBlock.name;
+                                line2 = aDAyBlock.price;
                             }
+                            string color = aDAyBlock.orderColor.ToString();
+                            string cssColor = "order" + color;   //e.g. orderRed, orderGreen - we prepared such CSS classes
+                            <td class="dash02td @wide @high @cssColor" colspan="@aDAyBlock.days" data-order-id="@aDAyBlock.orderId" id="@aDAyBlock.orderId"
+                                onclick="showOrder(this)">
+                                @line1 <br /> @line2 <br />@line3
+                            </td>
                         }
-                        <td class="dash02td rightAlign">@revenuePerApartment[apartmentI].toMoneyString()</td>
-                        <td class="=dash02td rightAlign">@percentOccupancyPerApartment[apartmentI]%</td>
-                        @{
-                            if (anApartment.First().apartmentNumber > 0)
-                            {
-                                //This is a real apartment - calculate the percentage average
-                                totalOccupancyPercent += percentOccupancyPerApartment[apartmentI];
-                                realApartmentCount++;
-                            }
-                            apartmentI++;
+                    }
+                    <td class="dash02td rightAlign">@revenuePerApartment[apartmentI].toMoneyString()</td>
+                    <td class="=dash02td rightAlign">@percentOccupancyPerApartment[apartmentI]%</td>
+                    <td class="=dash02td rightAlign">@string.Format("{0:F1}", aveargeDaysPerApartment[apartmentI])</td>
+                    @{
+                        if (anApartment.First().apartmentNumber > 0)
+                        {
+                            //This is a real apartment - calculate the percentage average
+                            totalOccupancyPercent += percentOccupancyPerApartment[apartmentI];
+                            realApartmentCount++;
+                        }
+                        apartmentI++;
 
-                        }
-                    </tr>
+                    }
+                </tr>
                             }
                 @*Revenu total line*@
                 <tr>

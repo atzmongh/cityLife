@@ -180,6 +180,7 @@ namespace cityLife.Controllers
                 EmployeeWorkDay[] empWorkDaysArray = null;
                 List<Employee> maidList = null;
                 List<Money> revenuePerApartment = null;
+                List<double> aveargeDaysPerApartment = null;
                 List<int> percentOccupancyPerApartment = null;
                 var apartmentDayBlocks = s21dashboardPreparation(
                     startDate, 
@@ -188,6 +189,7 @@ namespace cityLife.Controllers
                     ref expensePerDay,
                     ref expenseTypes,
                     ref revenuePerApartment,
+                    ref aveargeDaysPerApartment,
                     ref percentOccupancyPerApartment,
                     ref empWorkDaysArray, 
                     ref maidList);
@@ -196,6 +198,7 @@ namespace cityLife.Controllers
                 ViewBag.expensePerDay = expensePerDay;
                 ViewBag.expenseTypes = expenseTypes;
                 ViewBag.revenuPerApartment = revenuePerApartment;
+                ViewBag.aveargeDaysPerApartment = aveargeDaysPerApartment;
                 ViewBag.percentOccupancyPerApartment = percentOccupancyPerApartment;
                 ViewBag.empWorkDaysArray = empWorkDaysArray;
                 TranslateBox tBox = this.setTbox("RU");
@@ -233,6 +236,9 @@ namespace cityLife.Controllers
         ///<param name="percentOccupancyPerApartment">Number of days the apartment is occupied divided by total number of days (rounded to 
         ///whole percent)</param>
         ///<param name="revenuePerApartment">Total revenue per apartment for that month</param>
+        ///<param name="averageDaysPerApartment">contains the average number of days per rent for each apartment. We include in this average
+        ///only rents that have started in the displayed month. IF a rent started in that month and spans to the next month
+        ///the average takes into account the total time for that rent - not only the portion will falls in this month</param>
         ///<param name="empWorkDaysArray">An array containing an employeeWorkDay record for each day in the month.
         ///Days for which no record found - will be null. Days for which more than one recrod found - will contain
         ///the last record. </param>
@@ -248,6 +254,7 @@ namespace cityLife.Controllers
             ref List<Money> expensePerDay,
             ref List<string> expenseTypes,
             ref List<Money> revenuePerApartment,
+            ref List<double> averageDaysPerApartment,
             ref List<int> percentOccupancyPerApartment,
             ref EmployeeWorkDay[] empWorkDaysArray,
             ref List<Employee> maidList)
@@ -278,6 +285,7 @@ namespace cityLife.Controllers
 
             var lastDate = fromDate.AddDays(days - 1);
             revenuePerApartment = new List<Money>();
+            averageDaysPerApartment = new List<double>();
             percentOccupancyPerApartment = new List<int>();
 
             //Calculate the expenses for each date in the range
@@ -312,6 +320,10 @@ namespace cityLife.Controllers
                 int dayNumber = 0;
                 Money apartmentRevenue = new Money(0m, "UAH");
                 double apartmentOccupiedDays = 0;   //Use float for the percentage calculation later
+                double totalRents = 0.0;    //Counter for how many orders are during the month for that apartment.
+                                            //We keep it as double in order to calculate the average (which should be in float)
+                int totalRentDays = 0;      //the total amount of rented days for that apartment in that month. We take into account only rents that started
+                                            //in the displayed month.
                 //Get all apartment days of the current apartment for the desired month
                 var apartmentDaysForMonth = (from theApartmentDay in db.ApartmentDays
                                             where theApartmentDay.Apartment.Id == anApartment.Id && theApartmentDay.date >= fromDate && theApartmentDay.date <= lastDate
@@ -354,6 +366,18 @@ namespace cityLife.Controllers
                         {
                             //We did not read this order yet - read it
                             anOrder = db.Orders.Single(record => record.Id == anApartmentDay.Order.Id);
+                            //Check if this order started today
+                            if (anOrder.checkinDate == aDate)
+                            {
+                                //take this order into account for calculation of average days per rent
+                                totalRents++;
+                                totalRentDays += anOrder.dayCount;
+                            }
+                            else
+                            {
+                                //This is a new order but it started before the first day of the dispalyed month - do not take it into consideration
+                                //for calculating average rent days.
+                            }
                         }
                         else
                         {
@@ -405,6 +429,14 @@ namespace cityLife.Controllers
                 double apartmentOccupancyPercent = apartmentOccupiedDays / days * 100.0;
                 int apartmentOccupancyPercentRounded = (int)Math.Round(apartmentOccupancyPercent);
                 percentOccupancyPerApartment.Add(apartmentOccupancyPercentRounded);
+
+                //calculate the average rent days per apartment
+                double averageRentDays = 0.0;
+                if (totalRents > 0)
+                {
+                    averageRentDays = totalRentDays / totalRents;
+                }
+                averageDaysPerApartment.Add(averageRentDays);
             }
             //At this point the apartmentDayBlocks variable contaiins a list of list of day blocks 
 
