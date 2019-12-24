@@ -31,10 +31,16 @@ namespace cityLife4
             amount = m.amount;
             currencyCode = m.currencyCode;
         }
-        public Money(int cents, string aCurrencyCode)
+        /// <summary>
+        /// This constructor accepts the amount in cents and creates a money object. This is the way
+        /// Money is held in the DB
+        /// </summary>
+        /// <param name="sumInCents">amount in cents (so 12.50 is actually 1250)</param>
+        /// <param name="aCurrencyCode"></param>
+        public Money(int sumInCents, string aCurrencyCode)
         {
-            amount = (decimal)cents / 100;
-            currencyCode = aCurrencyCode;
+            this.amount = ((decimal)sumInCents) / 100;
+            this.currencyCode = aCurrencyCode;
         }
         /// <summary>
         /// The constructor gets a string containing: $1,234.56. If currencyCode exists - uses it as the currency, regardless if thre is a currency symbol 

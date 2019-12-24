@@ -684,6 +684,7 @@
       <DependentUpon>compilerconfig.json</DependentUpon>
     </None>
     <Content Include="css\parts\s24inputElement.scss" />
+    <Content Include="libman.json" />
     <None Include="Properties\PublishProfiles\cityLife4 - Web Deploy prod.pubxml" />
     <None Include="Properties\PublishProfiles\cityLife4 - Web Deploy stage.pubxml" />
     <None Include="Properties\PublishProfiles\cityLife4VM - Web Deploy.pubxml" />
