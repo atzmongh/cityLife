@@ -57,7 +57,7 @@
 
     .dash02 {
         border: 1px solid;
-    width: 100%;
+        width: 100%;
         display: flex;
         flex-wrap: nowrap;
         overflow-x: auto;
@@ -72,7 +72,7 @@
         padding-bottom: 2px;
         text-align: center;
         background-color: #4CAF50;
-        color:  white;
+        color: white;
         border: 1px solid #ddd;
         padding: 2px;
         width: 50px;
@@ -91,20 +91,27 @@
         white-space: nowrap;
         line-height: 15px;
     }
-    .wide{
-        width:200px;
-       
-        text-align:left;
+    .dash02total{
+        font-size:13px;
+        font-weight:bold;
     }
+
+    .wide {
+        width: 200px;
+        text-align: left;
+    }
+
     .high {
         height: 45px;
         line-height: 15px;
     }
+
     .leftAlign {
         text-align: left;
     }
-    .rightAlign{
-        text-align:right;
+
+    .rightAlign {
+        text-align: right;
     }
 
     .orderRed {
@@ -114,17 +121,18 @@
 
     .orderOrange {
         background-color: darkorange;
-        color:white;
+        color: white;
     }
 
     .orderGreen {
         background-color: aquamarine;
     }
 
-    .orderBlue{
-        background-color:lightblue;
-        color:black;
+    .orderBlue {
+        background-color: lightblue;
+        color: black;
     }
+
     .orderGray {
         background-color: darkgray;
         color: white;
@@ -133,6 +141,7 @@
     .today {
         background-color: brown;
     }
+
     .weekend {
         background-color: orange
     }
@@ -140,29 +149,32 @@
     .hidden {
         display: none;
     }
-    .highlight{
-        background-color:darkslateblue;
-        color:white;
+
+    .highlight {
+        background-color: darkslateblue;
+        color: white;
     }
+
     .selectedLeft {
         border-left: 2px solid darkslateBlue;
         border-top: 2px solid darkslateBlue;
         border-bottom: 2px solid darkslateBlue;
     }
+
     .selectedRight {
         border-right: 2px solid darkslateBlue;
         border-top: 2px solid darkslateBlue;
         border-bottom: 2px solid darkslateBlue;
     }
-    .hyperlink{
-        color:darkblue;
-        text-decoration:underline;
-    }
-    .selectCell{
-        cursor:pointer;
-    }
-    
 
+    .hyperlink {
+        color: darkblue;
+        text-decoration: underline;
+    }
+
+    .selectCell {
+        cursor: pointer;
+    }
 </style>
 <div class="main-wrapper reset-indent">
     <form id="fromDateForm" method="get" action="s21Dashboard">
@@ -179,7 +191,7 @@
     </form>
 
 
-    
+
     <span id="highlightOrderId" data-order-id="@highlightOrderId"></span>  <!--keep the order which needs to be highlighted (or 0 if none -->
     <div style="display:flex">
         @*first column - apartment numbers, rev, expense and maid*@
@@ -246,66 +258,68 @@
                     int apartmentI = 0;
                     int realApartmentCount = 0;
                     double totalOccupancyPercent = 0d;
+                    double totalDaysPerRent = 0d;
 
-                 }
+                }
                 @foreach (var anApartment in apartmentDayBlocks)
                 {
 
-                <tr style="background-color:@backgroundColors[colorIndex]">
-                    @{
-                        colorIndex++;
-                        colorIndex %= backgroundColors.Count();  //Advance the color index, and wrap around in case it is larger than the array
-                                                                 //of available colors
-                    }
-                    @foreach (var aDAyBlock in anApartment)
-                    {
-                        if (aDAyBlock.status == OrderStatus.Free)
-                        {
-                            //This is a free day
-                            <td class="dash02td @wide @high" data-apartment-id="@anApartment.First().apartmentNumber"
-                                data-date="@aDAyBlock.firstDate" onclick="addOrder(this)"></td>
+                    <tr style="background-color:@backgroundColors[colorIndex]">
+                        @{
+                            colorIndex++;
+                            colorIndex %= backgroundColors.Count();  //Advance the color index, and wrap around in case it is larger than the array
+                                                                     //of available colors
                         }
-                        else
+                        @foreach (var aDAyBlock in anApartment)
                         {
-                            //This is a busy day (or days)
-                            string line1;
-                            string line2;
-                            string line3 = "";
-                            if (wideDashboard == "checked")
+                            if (aDAyBlock.status == OrderStatus.Free)
                             {
-                                //This is a wide dashboard. Prepare the data that should be displayed on the order line
-                                line1 = aDAyBlock.phone + " (" + aDAyBlock.adults + "+" + aDAyBlock.children + ") " + aDAyBlock.name;
-                                line2 = aDAyBlock.price + "/" + aDAyBlock.paid + " - " + aDAyBlock.checkout.ToString("dd/MM/yyyy");
-                                line3 = aDAyBlock.expectedArrival + " " + aDAyBlock.staffComments;
+                                //This is a free day
+                                <td class="dash02td @wide @high" data-apartment-id="@anApartment.First().apartmentNumber"
+                                    data-date="@aDAyBlock.firstDate" onclick="addOrder(this)"></td>
                             }
                             else
                             {
-                                line1 = aDAyBlock.name;
-                                line2 = aDAyBlock.price;
+                                //This is a busy day (or days)
+                                string line1;
+                                string line2;
+                                string line3 = "";
+                                if (wideDashboard == "checked")
+                                {
+                                    //This is a wide dashboard. Prepare the data that should be displayed on the order line
+                                    line1 = aDAyBlock.phone + " (" + aDAyBlock.adults + "+" + aDAyBlock.children + ") " + aDAyBlock.name;
+                                    line2 = aDAyBlock.price + "/" + aDAyBlock.paid + " - " + aDAyBlock.checkout.ToString("dd/MM/yyyy");
+                                    line3 = aDAyBlock.expectedArrival + " " + aDAyBlock.staffComments;
+                                }
+                                else
+                                {
+                                    line1 = aDAyBlock.name;
+                                    line2 = aDAyBlock.price;
+                                }
+                                string color = aDAyBlock.orderColor.ToString();
+                                string cssColor = "order" + color;   //e.g. orderRed, orderGreen - we prepared such CSS classes
+                                <td class="dash02td @wide @high @cssColor" colspan="@aDAyBlock.days" data-order-id="@aDAyBlock.orderId" id="@aDAyBlock.orderId"
+                                    onclick="showOrder(this)">
+                                    @line1 <br /> @line2 <br />@line3
+                                </td>
                             }
-                            string color = aDAyBlock.orderColor.ToString();
-                            string cssColor = "order" + color;   //e.g. orderRed, orderGreen - we prepared such CSS classes
-                            <td class="dash02td @wide @high @cssColor" colspan="@aDAyBlock.days" data-order-id="@aDAyBlock.orderId" id="@aDAyBlock.orderId"
-                                onclick="showOrder(this)">
-                                @line1 <br /> @line2 <br />@line3
-                            </td>
                         }
-                    }
-                    <td class="dash02td rightAlign">@revenuePerApartment[apartmentI].toMoneyString()</td>
-                    <td class="=dash02td rightAlign">@percentOccupancyPerApartment[apartmentI]%</td>
-                    <td class="=dash02td rightAlign">@string.Format("{0:F1}", aveargeDaysPerApartment[apartmentI])</td>
-                    @{
-                        if (anApartment.First().apartmentNumber > 0)
-                        {
-                            //This is a real apartment - calculate the percentage average
-                            totalOccupancyPercent += percentOccupancyPerApartment[apartmentI];
-                            realApartmentCount++;
-                        }
-                        apartmentI++;
+                        <td class="dash02td rightAlign">@revenuePerApartment[apartmentI].toMoneyString()</td>
+                        <td class="=dash02td rightAlign">@percentOccupancyPerApartment[apartmentI]%</td>
+                        <td class="=dash02td rightAlign">@string.Format("{0:F1}", aveargeDaysPerApartment[apartmentI])</td>
+                        @{
+                            if (anApartment.First().apartmentNumber > 0)
+                            {
+                                //This is a real apartment - calculate the percentage average and the average rent days
+                                totalOccupancyPercent += percentOccupancyPerApartment[apartmentI];
+                                totalDaysPerRent += aveargeDaysPerApartment[apartmentI];
+                                realApartmentCount++;
+                            }
+                            apartmentI++;
 
-                    }
-                </tr>
-                            }
+                        }
+                    </tr>
+                }
                 @*Revenu total line*@
                 <tr>
                     @{ var totalRevenue = new Money(0m, "UAH");}
@@ -323,11 +337,13 @@
 
                         }
                     }
-                    @{ 
+                    @{
                         int averageOccupancyPercent = (int)Math.Round(totalOccupancyPercent / realApartmentCount);
+                        double averageDaysPerRent = totalDaysPerRent / realApartmentCount;
                     }
-                    <td class="dash02td rightAlign">@totalRevenue.toMoneyString()</td>
-                    <td class="dash02td rightAlign">@averageOccupancyPercent%</td>
+                    <td class="dash02td dash02total rightAlign">@totalRevenue.toMoneyString()</td>
+                    <td class="dash02td dash02total rightAlign">@averageOccupancyPercent%</td>
+                    <td class="dash02td dash02total rightAlign">@string.Format("{0:F1}", averageDaysPerRent)</td>
                 </tr>
 
                 @*Expense total line*@
@@ -340,17 +356,19 @@
                     {
                         if (anExpense.isZero())
                         {
-                            <td class="dash02td selectCell" data-date='@theDate.ToString("yyyy-MM-dd")' onclick="expenseClicked(this,false)" ></td>
+                            <td class="dash02td selectCell" data-date='@theDate.ToString("yyyy-MM-dd")' onclick="expenseClicked(this,false)"></td>
                         }
                         else
                         {
                             <td class="dash02td selectCell" data-date='@theDate.ToString("yyyy-MM-dd")' onclick="expenseClicked(this,true)">
-                    @anExpense.toMoneyString(showCents: false)</td>
+                                @anExpense.toMoneyString(showCents: false)
+                            </td>
                             totalExpense += anExpense;
                         }
                         theDate = theDate.AddDays(1);
                     }
-                    <td class="dash02td rightAlign">@totalExpense.toMoneyString()</td>
+                    <td class="dash02td dash02total rightAlign">@totalExpense.toMoneyString()</td>
+                    <td class="dash02td rightAlign"></td>
                     <td class="dash02td rightAlign"></td>
                 </tr>
 
@@ -365,7 +383,7 @@
                         {
                             <td class="dash02td selectCell" onclick="displayMaidList(this)" data-emp-id="0"
                                 data-date='@theDate.ToString("yyyy-MM-dd")'></td> @*date-emp-id=0 denotes that an employee is not assigned to that day
-                    date-date gives the date of the current cell*@
+                date-date gives the date of the current cell*@
                             }
                             else
                             {
@@ -382,14 +400,18 @@
                             }
                             theDate = theDate.AddDays(1);
                         }
+                    <td class="dash02td dash02total rightAlign">@((totalRevenue - totalExpense).toMoneyString())</td>
+                    <td class="dash02td rightAlign"></td>
+                    <td class="dash02td rightAlign"></td>
+
                 </tr>
 
             </table>
         </div>
     </div>
-    <div style="padding:2px;">@tBox.translate("Total revenue"):@totalRevenue.toMoneyString(showCents:false)</div>
+    <div style="padding:2px;">@tBox.translate("Total revenue"):@totalRevenue.toMoneyString(showCents: false)</div>
 
-    <!--This part contgains all forms which are displayed under the main grid. Contains 6 forms, where each time only 
+    <!--This part contgains all forms which are displayed under the main grid. Contains 6 forms, where each time only
         one is displayed and the rest are hidden-->
     <div id="s20underTheGrid">
         <!--div for the order details info (when the user clicks on an existing order)-->
@@ -541,7 +563,7 @@
         $("#s22OrderDetails").html(orderDetailsHTML);
     }
 
-    
+
 
     function addOrder(td) {
         cellClickCounter++;
@@ -568,18 +590,18 @@
             displayCheckinOutDates(apartmentNumber, checkinDate, checkoutDate, nights);
         }
         else {
-            //The user clicked even number of times on a cell = collect the checkout date. Note that the user presses the 
+            //The user clicked even number of times on a cell = collect the checkout date. Note that the user presses the
             //last date - not the checkout date (which is one day later.)
             var secondApartmentNumber = td.dataset.apartmentId;
             if (apartmentNumber != secondApartmentNumber) {
-                //The second click was for a different apartment number - start the process again. 
+                //The second click was for a different apartment number - start the process again.
                 //perform this by a recursive call to addOrder
                 addOrder(td);
                 return;
             }
             $(td).addClass("selectedRight");
             lastSelectedRight = td;
-            lastDate = new Date(td.dataset.date);  
+            lastDate = new Date(td.dataset.date);
             checkoutDate = nextDate(lastDate);
             nights = diffDays(checkinDate, checkoutDate);
             if (nights <= 0) {
@@ -591,7 +613,7 @@
                 addOrder(rightTD);
                 return;
             }
-            
+
             displayCheckinOutDates(apartmentNumber, checkinDate, checkoutDate, nights);
         }
     }
@@ -656,19 +678,19 @@
         return ndays;
     }
 
-    var tdMaid=null;  //contains: data-emp-id= emp_id and data-date = the date of that cell. If no 
+    var tdMaid=null;  //contains: data-emp-id= emp_id and data-date = the date of that cell. If no
     function displayMaidList(tdEmp) {
-        
+
         $(tdMaid).removeClass("highlight");   //If tdMaid is null - the command is ignored.
         $(tdExp) .removeClass("highlight");
-        
+
         $(tdEmp).addClass("highlight");
         tdMaid = tdEmp;  //Keep the cell that was pressed by the user. When the user selects a new maid from the list of radio buttons - we will
         //know to which cell it was related
         hideAllExcept("#maidList");
     }
 
-    //the user pressed a radio button of a maid - this maid should be assigned to the date previously selected by the user 
+    //the user pressed a radio button of a maid - this maid should be assigned to the date previously selected by the user
     //(and kept in "tdMaid")
     function setMaid(maidRadio) {
         $(tdMaid).text(maidRadio.dataset.maidName);
@@ -678,9 +700,9 @@
         $.post("/staff/s28AddUpdateMaid", maidDay);
     }
 
-    //The function is called when an expense cell is clicked. 
+    //The function is called when an expense cell is clicked.
     //param 1: the cell clicked
-    //param 2: whether the expense cell contained an expense or not. 
+    //param 2: whether the expense cell contained an expense or not.
     var tdExp = null;
     function expenseClicked(tdExpense, expenseIsPositive) {
         var expenseDate = tdExpense.dataset.date;  //the date format is yyyy-mm-dd
@@ -688,10 +710,10 @@
         var ddmmyyyy = formatDateddmmyyyy(theDate);
         $("#expenseDate").val(ddmmyyyy);
         tdExpense.text
-        
+
         //Clean all other pieces of information which may exist under the grid
         $(tdMaid).removeClass("highlight");   //If tdMaid or tdExpense is null - the command is ignored.
-        $(tdExp).removeClass("highlight");  //remove highlight from the previous expense cell 
+        $(tdExp).removeClass("highlight");  //remove highlight from the previous expense cell
         $(tdExpense).addClass("highlight");
         tdExp = tdExpense;  //Keep the cell that was pressed by the user. When the user selects a new expense from the list of radio buttons - we will
         //know to which cell it was related
@@ -700,7 +722,7 @@
             var expenseDateParam = new Object();
             expenseDateParam.expenseDateSt = expenseDate;
             $.get("/staff/s30showExpensesForDate", expenseDateParam, showExpenseList);
-           
+
         }
         else {
             //There are no expenses for that day - show the "add class" form
@@ -748,7 +770,7 @@
         expenseDate.datepicker({
            // defaultDate: "5 Feb 2019",
             numberOfMonths: 1,
-            dateFormat: "dd/mm/yy",   
+            dateFormat: "dd/mm/yy",
             firstDay: 1
         });
     }
@@ -756,7 +778,7 @@
     function expenseUpdating(btn) {
         var formParams = $("#updateExpenseForm").serialize();
         $.post("/staff/s31updateExpense", formParams, expenseUpdated);
-        
+
     }
 
     function expenseUpdated(totalExpenseForDay) {

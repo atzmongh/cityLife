@@ -443,7 +443,7 @@ namespace cityLife.Controllers
             //Calculate the list of employee work days. The list contains a single record for each day (or null, if no employee is assigned
             //for that day). If 2 employees are assigned for the same day - only one is taken (the last one)
             //empWorkDaysList = new List<EmployeeWorkDay>();
-            empWorkDaysArray = new EmployeeWorkDay[days + 1];
+            empWorkDaysArray = new EmployeeWorkDay[days];
             var empWorkDays = from anEmpWorkDay in db.EmployeeWorkDays
                               where anEmpWorkDay.dateAndTime >= fromDate && anEmpWorkDay.dateAndTime <= lastDate
                               orderby anEmpWorkDay.dateAndTime
