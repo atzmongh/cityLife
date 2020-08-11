@@ -536,7 +536,8 @@ namespace cityLife.Controllers
                 nights = Order.dateDifference(checkout, checkin),
                 adults = 2,
                 children = 0,
-                country = ""
+                country = "",
+                bookedBy = BookedBy.booking.ToString()
             };
             if (apartmentNumber <= 0)
             {
@@ -588,7 +589,7 @@ namespace cityLife.Controllers
         [HttpPost]
         public ActionResult s25addUpdateOrder(int orderId, int apartmentNumber, string Email, string Name, string Country, string Phone, string ArrivalTime,
             string SpecialRequest, DateTime CheckinDate, DateTime CheckoutDate, int Adults, int Children, string Price, string Paid,
-            string BookedBy, string confirmationNumber, OrderStatus status, Color orderColor, string staffComments)
+            string bookedBy, string confirmationNumber, OrderStatus status, Color orderColor, string staffComments)
         {
             //Perform validity checks on the input
             TranslateBox tBox = new TranslateBox("RU", "RU", "dontShowAsterisks");
@@ -630,7 +631,7 @@ namespace cityLife.Controllers
                 checkin = CheckinDate,
                 checkout = CheckoutDate,
                 apartmentNumber = apartmentNumber,
-                bookedBy = BookedBy,
+                bookedBy = bookedBy,
                 confirmationNumber = confirmationNumber,
                 nights = nights,
                 orderId = orderId,

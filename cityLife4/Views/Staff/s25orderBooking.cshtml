@@ -137,11 +137,16 @@
     <div class="form-box-wrap">
         <div class="field-box select-box">
             <select name="bookedBy">
-                <option value="me" >@tBox.translate("Me")</option>
-                <option value="guest">@tBox.translate("Guest")</option>
-                <option value="booking" selected>@tBox.translate("Booking.com")</option>
-                <option value="airbnb">@tBox.translate("Airbnb")</option>
-                <option value="other">@tBox.translate("Other")</option>
+                @foreach(BookedBy aBookedBy in Enum.GetValues(typeof(BookedBy)))
+                {
+                    string selected = "";
+                    string bookedBy = aBookedBy.ToString();
+                    if (bookedBy == theOrderData.bookedBy)
+                    {
+                        selected = "selected";
+                    }
+                    <option value="@bookedBy" @selected>@tBox.translate(bookedBy)</option>
+                }
             </select>
             <label>
                 <span class="field-name">@tBox.translate("Booked By")</span>

@@ -6,6 +6,20 @@ using System.Web;
 
 namespace cityLife4
 {
+    
+    /// <summary>
+    /// BookedBy enum - it was not declared in the DB level, and for some strange reason could not be declared in its
+    /// own file. Note that in the DB we keep the string values of the enum.
+    /// </summary>
+    public enum BookedBy
+    {
+        me,
+        guest,
+        booking,
+        airbnb,
+        other
+    }
+
     /// <summary>
     /// Money represents an amount of money in a specific currency.
     /// </summary>
