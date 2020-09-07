@@ -704,6 +704,7 @@
     <Content Include="Views\Admin\a05DBMigration.cshtml" />
     <Content Include="Views\Staff\s30showExpenses.cshtml" />
     <Content Include="Views\Staff\s31updateExpense.cshtml" />
+    <Content Include="Views\Staff\s33revenueReport.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
       <SubType>Designer</SubType>

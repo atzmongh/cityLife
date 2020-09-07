@@ -8,6 +8,7 @@ using cityLife;
 using cityLife4;
 
 using System.Text.RegularExpressions;
+using System.Data.Entity.Core.Metadata.Edm;
 
 namespace cityLife.Controllers
 {
@@ -62,6 +63,19 @@ namespace cityLife.Controllers
         public string firstDate;
     }
 
+    public class RevenuAndOccupancyList
+    {
+        public List<Money> revenuePerApartment;
+        public List<int> percentOccupancyPerApartment;
+        public Money expenses;
+
+        public RevenuAndOccupancyList(List<Money> revenue, List<int> occupancy, Money exp)
+        {
+            revenuePerApartment = revenue;
+            percentOccupancyPerApartment = occupancy;
+            expenses = exp;
+        }
+    }
 
 
 
@@ -183,15 +197,15 @@ namespace cityLife.Controllers
                 List<double> aveargeDaysPerApartment = null;
                 List<int> percentOccupancyPerApartment = null;
                 var apartmentDayBlocks = s21dashboardPreparation(
-                    startDate, 
-                    dashboardDays, 
+                    startDate,
+                    dashboardDays,
                     ref revenuePerDay,
                     ref expensePerDay,
                     ref expenseTypes,
                     ref revenuePerApartment,
                     ref aveargeDaysPerApartment,
                     ref percentOccupancyPerApartment,
-                    ref empWorkDaysArray, 
+                    ref empWorkDaysArray,
                     ref maidList);
                 ViewBag.apartmentDayBlocks = apartmentDayBlocks;
                 ViewBag.revenuePerDay = revenuePerDay;
@@ -324,11 +338,11 @@ namespace cityLife.Controllers
                                             //We keep it as double in order to calculate the average (which should be in float)
                 int totalRentDays = 0;      //the total amount of rented days for that apartment in that month. We take into account only rents that started
                                             //in the displayed month.
-                //Get all apartment days of the current apartment for the desired month
+                                            //Get all apartment days of the current apartment for the desired month
                 var apartmentDaysForMonth = (from theApartmentDay in db.ApartmentDays
-                                            where theApartmentDay.Apartment.Id == anApartment.Id && theApartmentDay.date >= fromDate && theApartmentDay.date <= lastDate
-                                            orderby theApartmentDay.date
-                                            select theApartmentDay).ToList();
+                                             where theApartmentDay.Apartment.Id == anApartment.Id && theApartmentDay.date >= fromDate && theApartmentDay.date <= lastDate
+                                             orderby theApartmentDay.date
+                                             select theApartmentDay).ToList();
                 int apartmentDaysI = 0;
                 ApartmentDay anApartmentDay;
                 int apartmentDaysCount = apartmentDaysForMonth.Count();
@@ -423,7 +437,7 @@ namespace cityLife.Controllers
                 }
                 //Add the dayBlocks list into the apartmentDayBlocks. Check if it is a "waiting" apartment.
                 apartmentDayBlocks.Add(dayBlocks);
-                
+
                 //Add the apartment revenue and apartment occupacy percentage - only for "normal" apartments
                 revenuePerApartment.Add(apartmentRevenue);
                 double apartmentOccupancyPercent = apartmentOccupiedDays / days * 100.0;
@@ -455,11 +469,11 @@ namespace cityLife.Controllers
             }
 
             maidList = db.Employees.Where(emp => emp.role == "maid").ToList();  //Add all maids to the maid list
-           
+
             expenseTypes = (from expenseType in db.ExpenseTypes
-                                  select expenseType.nameKey).ToList();
-            
-            
+                            select expenseType.nameKey).ToList();
+
+
 
             return apartmentDayBlocks;
 
@@ -684,16 +698,16 @@ namespace cityLife.Controllers
                                             where anApartment.type == ApartmentIs.Waiting
                                             orderby anApartment.number
                                             select anApartment;
-                    foreach(var anApartment in waitingApartments)
+                    foreach (var anApartment in waitingApartments)
                     {
                         if (PublicController.calculateFreeDatesForApartment(anApartment, db, theBookingRequest, orderId) == true)
                         {
                             //The waiting apartment is free for these dates - assign that apartment to the order
                             apartmentAndPrice = new ApartmentPrice()
                             {
-                                 availability = Availability.AVAILABLE,
-                                 theApartment = anApartment,
-                                 nightCount = theOrderData.nights
+                                availability = Availability.AVAILABLE,
+                                theApartment = anApartment,
+                                nightCount = theOrderData.nights
                             };
                             theOrderData.apartmentNumber = anApartment.number;
                             break;
@@ -716,7 +730,7 @@ namespace cityLife.Controllers
                     //This is a normal order - check apartment availability and price
                     apartmentAndPrice = PublicController.calculatePricePerStayForApartment(theAparatment, db, theBookingRequest, currentCurrency, orderId);
                 }
-                
+
                 Country theCountry = db.Countries.SingleOrDefault(a => a.name == Country);
                 if (apartmentAndPrice.availability == Availability.OCCUPIED)
                 {
@@ -879,7 +893,7 @@ namespace cityLife.Controllers
                 //This expense type does not exist in the expenseTypes table - add it
                 expenseTypeRec = new ExpenseType()
                 {
-                     nameKey = expenseType
+                    nameKey = expenseType
                 };
                 db.ExpenseTypes.Add(expenseTypeRec);
             }
@@ -888,11 +902,11 @@ namespace cityLife.Controllers
             DateTime theExpenseDate = DateTime.ParseExact(expenseDate, "dd/MM/yyyy", null);
             Expense theExpense = new Expense()
             {
-                 amount = amount * 100,   //The amount is kept in cents in the DB
-                 Currency = theCurrency,
-                 date = theExpenseDate,
-                 description = description,
-                 ExpenseType = expenseTypeRec
+                amount = amount * 100,   //The amount is kept in cents in the DB
+                Currency = theCurrency,
+                date = theExpenseDate,
+                description = description,
+                ExpenseType = expenseTypeRec
             };
             db.Expenses.Add(theExpense);
             db.SaveChanges();
@@ -909,7 +923,7 @@ namespace cityLife.Controllers
         public PartialViewResult s30showExpensesForDate(string expenseDateSt)
         {
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
-            DateTime expenseDate = DateTime.ParseExact(expenseDateSt, "yyyy-MM-dd",null);
+            DateTime expenseDate = DateTime.ParseExact(expenseDateSt, "yyyy-MM-dd", null);
             var expenseList = from expense in db.Expenses
                               where expense.date == expenseDate
                               select expense;
@@ -969,7 +983,7 @@ namespace cityLife.Controllers
             theExpense.date = theExpenseDate;
             theExpense.description = description;
             theExpense.ExpenseType = expenseTypeRec;
-           
+
             db.SaveChanges();
 
             return calculateExpensesForDate(theExpenseDate);
@@ -986,6 +1000,69 @@ namespace cityLife.Controllers
             db.SaveChanges();
 
             return calculateExpensesForDate(theExpenseDate);
+        }
+
+        /// <summary>
+        /// The report shows 2 columns for each month: revenu for each apartment and occupancy percentage. Stargin at 
+        /// 10/2019 until today
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public ActionResult s33revenueReport()
+        {
+            Employee theEmployee = (Employee)Session["loggedinUser"];
+
+            if (theEmployee == null)
+            {
+                //No user is logged in - go to login screen
+                return s10login();
+            }
+            //The dictionary holds for each month - the list of revenues (per apartment) and occupancy percentage
+            Dictionary<DateTime, RevenuAndOccupancyList> revenuePerMonth = new Dictionary<DateTime, RevenuAndOccupancyList>();
+            //Loop over all months from the starting month until today. Starting date is hard coded to be November 2019
+            for (DateTime startDate = new DateTime(2019, 11, 01);
+                startDate <= FakeDateTime.Now;
+                startDate = startDate.AddMonths(1))
+            {
+                int dashboardDays = FakeDateTime.monthLength(startDate);
+                List<Money> revenuePerDay = null;
+                List<Money> expensePerDay = null;
+                List<string> expenseTypes = null;
+                EmployeeWorkDay[] empWorkDaysArray = null;
+                List<Employee> maidList = null;
+                List<Money> revenuePerApartment = null;
+                List<double> aveargeDaysPerApartment = null;
+                List<int> percentOccupancyPerApartment = null;
+                var apartmentDayBlocks = s21dashboardPreparation(
+                    startDate,
+                    dashboardDays,
+                    ref revenuePerDay,
+                    ref expensePerDay,
+                    ref expenseTypes,
+                    ref revenuePerApartment,
+                    ref aveargeDaysPerApartment,
+                    ref percentOccupancyPerApartment,
+                    ref empWorkDaysArray,
+                    ref maidList);
+
+                //Insert the month statistics into the dictionary
+                Money totalExpensesPerMonth = new Money(0, "UAH");
+                foreach (Money aMoney in revenuePerApartment)
+                {
+                    totalExpensesPerMonth += aMoney;
+                }
+                revenuePerMonth.Add(key: startDate,
+                                    value: new RevenuAndOccupancyList(revenuePerApartment,
+                                    percentOccupancyPerApartment,
+                                    totalExpensesPerMonth));
+            }
+            //At this point the dictionary revenuePerMonth contains the revenue and occupancy % for each apartment and for each 
+            //month
+            TranslateBox tBox = this.setTbox("RU");
+            ViewBag.tBox = tBox;
+            ViewBag.today = FakeDateTime.Now;
+            ViewBag.employee = theEmployee;
+            return View("s33revenueReport");
         }
 
         /// <summary>
