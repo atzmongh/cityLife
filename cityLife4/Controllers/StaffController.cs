@@ -1019,6 +1019,8 @@ namespace cityLife.Controllers
             }
             //The dictionary holds for each month - the list of revenues (per apartment) and occupancy percentage
             Dictionary<DateTime, RevenuAndOccupancyList> revenuePerMonth = new Dictionary<DateTime, RevenuAndOccupancyList>();
+            List<int> apartmentNumbers = new List<int>();
+            List<List<DayBlock>> apartmentDayBlocks = new List<List<DayBlock>>();
             //Loop over all months from the starting month until today. Starting date is hard coded to be November 2019
             for (DateTime startDate = new DateTime(2019, 11, 01);
                 startDate <= FakeDateTime.Now;
@@ -1033,7 +1035,7 @@ namespace cityLife.Controllers
                 List<Money> revenuePerApartment = null;
                 List<double> aveargeDaysPerApartment = null;
                 List<int> percentOccupancyPerApartment = null;
-                var apartmentDayBlocks = s21dashboardPreparation(
+                apartmentDayBlocks = s21dashboardPreparation(
                     startDate,
                     dashboardDays,
                     ref revenuePerDay,
@@ -1058,10 +1060,21 @@ namespace cityLife.Controllers
             }
             //At this point the dictionary revenuePerMonth contains the revenue and occupancy % for each apartment and for each 
             //month
+            //Create the apartment list
+            foreach(List<DayBlock> anApartmentDays in apartmentDayBlocks)
+            {
+                apartmentNumbers.Add(anApartmentDays.First().apartmentNumber);
+            }
+            //calculate the average revenue per apartment
+            List<Money> averageRevenuePerApartment = new List<Money>();
+            for(int apartmentI = 0; apartmentI < apartmentNumbers.Count(); apartmentI++)
+            {
+                foreach
+            }
             TranslateBox tBox = this.setTbox("RU");
             ViewBag.tBox = tBox;
-            ViewBag.today = FakeDateTime.Now;
-            ViewBag.employee = theEmployee;
+            ViewBag.apartmentNumbers = apartmentNumbers;
+            ViewBag.revenuePerMonth = revenuePerMonth;
             return View("s33revenueReport");
         }
 
