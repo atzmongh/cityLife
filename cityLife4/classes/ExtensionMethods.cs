@@ -59,6 +59,16 @@ namespace cityLife4
             return mvcString;
         }
 
+        public static Money Sum(this IEnumerable<Money> listOfMoney)
+        {
+            return listOfMoney.Aggregate((x, y) => x + y);
+        }
+
+        public static Money Sum<T>(this IEnumerable<T> listOfMoney, Func<T, Money> selector)
+        {
+            return listOfMoney.Select(selector).Aggregate((x, y) => x + y);
+        }
+
     }
 }
 

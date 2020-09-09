@@ -7,8 +7,10 @@ using System.Web.Mvc;
 using cityLife;
 using cityLife4;
 
+
 using System.Text.RegularExpressions;
 using System.Data.Entity.Core.Metadata.Edm;
+using System.Data;
 
 namespace cityLife.Controllers
 {
@@ -63,17 +65,14 @@ namespace cityLife.Controllers
         public string firstDate;
     }
 
-    public class RevenuAndOccupancyList
+    public class RevenueAndOccupancy
     {
-        public List<Money> revenuePerApartment;
-        public List<int> percentOccupancyPerApartment;
-        public Money expenses;
-
-        public RevenuAndOccupancyList(List<Money> revenue, List<int> occupancy, Money exp)
+        public Money revenue;
+        public int percentOccupancy;
+        public RevenueAndOccupancy(Money rev, int percentOcc)
         {
-            revenuePerApartment = revenue;
-            percentOccupancyPerApartment = occupancy;
-            expenses = exp;
+            revenue = rev;
+            percentOccupancy = percentOcc;
         }
     }
 
@@ -1008,8 +1007,9 @@ namespace cityLife.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public ActionResult s33revenueReport()
+        public ActionResult s33revenueReport(int year)
         {
+            cityLifeDBContainer1 db = new cityLifeDBContainer1();
             Employee theEmployee = (Employee)Session["loggedinUser"];
 
             if (theEmployee == null)
@@ -1017,14 +1017,23 @@ namespace cityLife.Controllers
                 //No user is logged in - go to login screen
                 return s10login();
             }
-            //The dictionary holds for each month - the list of revenues (per apartment) and occupancy percentage
-            Dictionary<DateTime, RevenuAndOccupancyList> revenuePerMonth = new Dictionary<DateTime, RevenuAndOccupancyList>();
+            //The 2 dimensional array holds the following data:
+            //rows: 1 row per apartment, and then: total revenue, expenses, net revenue
+            //columns: 1 column per month, then total
+            //See: https://docs.google.com/spreadsheets/d/1-xa-eSMR8yv7E8f9GBTBTVFPfG-ko9Ask8akpfHB-4Q/edit#gid=0
+            //for an example of the report
+            //Array dimensions: number of rows equal the number of apartment plus 3 (total, expenses, net)
+            // Number of columns - 13 (12 months plus total column)
+            int apartmentCount = db.Apartments.Count();
+            RevenueAndOccupancy[,] revenueArray = new RevenueAndOccupancy[apartmentCount+3,13];
             List<int> apartmentNumbers = new List<int>();
             List<List<DayBlock>> apartmentDayBlocks = new List<List<DayBlock>>();
             //Loop over all months from the starting month until today. Starting date is hard coded to be November 2019
-            for (DateTime startDate = new DateTime(2019, 11, 01);
-                startDate <= FakeDateTime.Now;
-                startDate = startDate.AddMonths(1))
+            int rowI = 0;
+            int columnI = 0;
+            for (DateTime startDate = new DateTime(year,1,1); //starting from 1 January in the requested year
+                startDate <= new DateTime(year,12,1);
+                startDate = startDate.AddMonths(1),columnI++)
             {
                 int dashboardDays = FakeDateTime.monthLength(startDate);
                 List<Money> revenuePerDay = null;
@@ -1047,18 +1056,36 @@ namespace cityLife.Controllers
                     ref empWorkDaysArray,
                     ref maidList);
 
-                //Insert the month statistics into the dictionary
-                Money totalExpensesPerMonth = new Money(0, "UAH");
-                foreach (Money aMoney in revenuePerApartment)
+                //Insert the month statistics into the array
+                Money totalExpensesPerMonth = revenuePerApartment.Sum();
+                //Enter the revenue and percent occupancy of each apartment for the on-hand month.
+                for (rowI = 0; rowI < revenuePerApartment.Count(); rowI++)
                 {
-                    totalExpensesPerMonth += aMoney;
+                    RevenueAndOccupancy theRevenueOcc =
+                        new RevenueAndOccupancy(revenuePerApartment[rowI], percentOccupancyPerApartment[rowI]);
+                    revenueArray[rowI, columnI] = theRevenueOcc;
                 }
-                revenuePerMonth.Add(key: startDate,
-                                    value: new RevenuAndOccupancyList(revenuePerApartment,
-                                    percentOccupancyPerApartment,
-                                    totalExpensesPerMonth));
+                //add total revenue row
+                RevenueAndOccupancy totalRevenueForMonth = 
+                    new RevenueAndOccupancy(revenuePerApartment.Sum(), (int)percentOccupancyPerApartment.Average());
+                revenueArray[rowI++, columnI] = totalRevenueForMonth;
+                //add expense row
+                RevenueAndOccupancy totalExpenseForMonth = new RevenueAndOccupancy(expensePerDay.Sum(), 0);
+                revenueArray[rowI++, columnI] = totalExpenseForMonth;
+                //add net revenue row
+                RevenueAndOccupancy netRevenueForMonth =
+                    new RevenueAndOccupancy(totalRevenueForMonth.revenue - totalExpenseForMonth.revenue, 0);
+                revenueArray[rowI, columnI] = netRevenueForMonth;
+                //At this point the array column contain all revenues and occupancy for each apartment for the specific month.
+                //It also contains total revenue, expenses and net revenue for that month.
             }
-            //At this point the dictionary revenuePerMonth contains the revenue and occupancy % for each apartment and for each 
+            //At this point the array contains revenue and occupancy data about all months in the year.
+            //Add total column
+            for (rowI = 0; rowI < apartmentCount; rowI++)
+            {
+                RevenueAndOccupancy totalForApartment = 
+                    new RevenueAndOccupancy(revenueArray.GetRow(rowI))
+            }
             //month
             //Create the apartment list
             foreach(List<DayBlock> anApartmentDays in apartmentDayBlocks)
