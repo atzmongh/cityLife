@@ -67,12 +67,104 @@ namespace cityLife.Controllers
 
     public class RevenueAndOccupancy
     {
-        public Money revenue;
-        public int percentOccupancy;
-        public RevenueAndOccupancy(Money rev, int percentOcc)
+        public Money revenue { get; private set; } = new Money(0m, "UAH");
+        public int occupiedDays { get; private set; } = 0;
+
+        private int totalDaysInMonth = 30;
+        /// <summary>
+        /// number of days in the month represented by this 
+        /// </summary>
+        /// <param name="totalDays"></param>
+        public RevenueAndOccupancy(int totalDays)
         {
-            revenue = rev;
-            percentOccupancy = percentOcc;
+            if (totalDays > 0)
+            {
+                totalDaysInMonth = totalDays;
+            }
+        }
+        public double percentOccupancy()
+        {
+            return (double)occupiedDays / totalDaysInMonth;
+        }
+        /// <summary>
+        /// Add revenue for a single day. We assume that each day where we had a revenue - is also an occupied
+        /// day, so we increase the occupied days count.
+        /// </summary>
+        /// <param name="amount"></param>
+        public void addDaysRevenue(Money amount)
+        {
+            revenue += amount;
+            occupiedDays++;
+        }
+    }
+    public class RevenueOccupancyForYear
+    {
+        /// <summary>
+        /// the array has 13 elements, as the 0 element is not used. Element 1 represents January,etc.
+        /// </summary>
+        public RevenueAndOccupancy[] revOccForYear
+        {
+            get; private set;
+        } = new RevenueAndOccupancy[13];
+        private int theYear;
+        public RevenueOccupancyForYear(int year)
+        {
+            for (int month = 1; month <= 12; month++)
+            {
+                revOccForYear[month] = new RevenueAndOccupancy(DateTime.DaysInMonth(year, month));
+            }
+            theYear = year;
+        }
+        /// <summary>
+        /// Add revenue for a specific day. It will also add 1 to the count of occupied days
+        /// </summary>
+        /// <param name="aDate"></param>
+        /// <param name="amount"></param>
+        public void addDaysRevenue(DateTime aDate, Money amount)
+        {
+            revOccForYear[aDate.Month].addDaysRevenue(amount);
+        }
+        public Money totalRevenueForYear()
+        {
+            return revOccForYear.Sum(el => el.revenue);
+        }
+        public double averageOccupancyForYear()
+        {
+            return revOccForYear.Average(el => el.percentOccupancy());
+        }
+        public RevenueAndOccupancy revOccForMonth(int month)
+        {
+            if (month >=1 && month <= 12){
+                return revOccForYear[month];
+            }
+            else
+            {
+                throw new AppException(124, null, month);
+            }
+        }
+        /// <summary>
+        /// The static method gets a list of yearly statistics, and returns the sum of all the revenues and
+        /// the average of all the occupied days
+        /// </summary>
+        /// <param name=""></param>
+        /// <returns></returns>
+        public static RevenueOccupancyForYear total(IEnumerable<RevenueOccupancyForYear> yearlyStatiaticsForApartments)
+        {
+            int year = yearlyStatiaticsForApartments.First().theYear;  //assuming all of them are for the same year
+            RevenueOccupancyForYear totalStatistics = new RevenueOccupancyForYear(year);
+            for (int aMonth = 1; aMonth<=12; aMonth++)
+            {
+                Money totalMoney = new Money(0m, "UAH");
+                double  totalOccupancy = 0d;
+                foreach(var yearlyStatistics in yearlyStatiaticsForApartments)
+                {
+                    totalMoney += yearlyStatistics.revOccForMonth(aMonth).revenue;
+                    totalOccupancy += yearlyStatistics.revOccForMonth(aMonth).percentOccupancy();
+                }
+                double averageOccupacy = totalOccupancy / yearlyStatiaticsForApartments.Count();
+                totalStatistics.
+
+            }
         }
     }
 
@@ -1017,54 +1109,26 @@ namespace cityLife.Controllers
                 //No user is logged in - go to login screen
                 return s10login();
             }
-            //The 2 dimensional array holds the following data:
-            //rows: 1 row per apartment, and then: total revenue, expenses, net revenue
-            //columns: 1 column per month, then total
+            year = 2020;  //For now we hard-code the year to be 2020.
+
+            //The key of the dictionary is the apartment number. The value is the revenue and occupancy 
+            //statistics for each month in the year for that apartment
+            Dictionary<int, RevenueOccupancyForYear> revenueMatrix = new Dictionary<int, RevenueOccupancyForYear>();
             //See: https://docs.google.com/spreadsheets/d/1-xa-eSMR8yv7E8f9GBTBTVFPfG-ko9Ask8akpfHB-4Q/edit#gid=0
             //for an example of the report
-            //Array dimensions: number of rows equal the number of apartment plus 3 (total, expenses, net)
-            // Number of columns - 13 (12 months plus total column)
-            int apartmentCount = db.Apartments.Count();
-            RevenueAndOccupancy[,] revenueArray = new RevenueAndOccupancy[apartmentCount+3,13];
-            List<int> apartmentNumbers = new List<int>();
-            List<List<DayBlock>> apartmentDayBlocks = new List<List<DayBlock>>();
-            //Loop over all months from the starting month until today. Starting date is hard coded to be November 2019
-            int rowI = 0;
-            int columnI = 0;
-            for (DateTime startDate = new DateTime(year,1,1); //starting from 1 January in the requested year
-                startDate <= new DateTime(year,12,1);
-                startDate = startDate.AddMonths(1),columnI++)
+            var apartmentDays = from anApartmentDays in db.ApartmentDays
+                                where anApartmentDays.status != ApartOccuStatus.Free
+                                && anApartmentDays.date.Year == year
+                                select anApartmentDays;
+            foreach(var anApartmentDays in apartmentDays)
             {
-                int dashboardDays = FakeDateTime.monthLength(startDate);
-                List<Money> revenuePerDay = null;
-                List<Money> expensePerDay = null;
-                List<string> expenseTypes = null;
-                EmployeeWorkDay[] empWorkDaysArray = null;
-                List<Employee> maidList = null;
-                List<Money> revenuePerApartment = null;
-                List<double> aveargeDaysPerApartment = null;
-                List<int> percentOccupancyPerApartment = null;
-                apartmentDayBlocks = s21dashboardPreparation(
-                    startDate,
-                    dashboardDays,
-                    ref revenuePerDay,
-                    ref expensePerDay,
-                    ref expenseTypes,
-                    ref revenuePerApartment,
-                    ref aveargeDaysPerApartment,
-                    ref percentOccupancyPerApartment,
-                    ref empWorkDaysArray,
-                    ref maidList);
-
-                //Insert the month statistics into the array
-                Money totalExpensesPerMonth = revenuePerApartment.Sum();
-                //Enter the revenue and percent occupancy of each apartment for the on-hand month.
-                for (rowI = 0; rowI < revenuePerApartment.Count(); rowI++)
+                int apartmentNumber = anApartmentDays.Apartment.number;
+                if (!revenueMatrix.ContainsKey(apartmentNumber))
                 {
-                    RevenueAndOccupancy theRevenueOcc =
-                        new RevenueAndOccupancy(revenuePerApartment[rowI], percentOccupancyPerApartment[rowI]);
-                    revenueArray[rowI, columnI] = theRevenueOcc;
+                    revenueMatrix.Add(apartmentNumber, new RevenueOccupancyForYear(year));
                 }
+                revenueMatrix[apartmentNumber].addDaysRevenue(anApartmentDays.date, anApartmentDays.revenueAsMoney());
+            }
                 //add total revenue row
                 RevenueAndOccupancy totalRevenueForMonth = 
                     new RevenueAndOccupancy(revenuePerApartment.Sum(), (int)percentOccupancyPerApartment.Average());
