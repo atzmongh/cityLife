@@ -3,9 +3,12 @@
 @{
     ViewBag.Title = "s33RevenuReport";
     Layout = "~/Views/sharing/_staffLayout.cshtml";
+    Dictionary2d<int, int, RevenueAndOccupancy> revenueMatrix = ViewBag.revenueMatrix;
+    Dictionary<int, Money> expensesPerMonth = ViewBag.expensesPerMonth;
+    List<int> apartmentNumbers = ViewBag.apartmentList;
     TranslateBox tBox = ViewBag.tBox;
-    List<int> apartmentNumbers = ViewBag.apartmentNumbers;
-    Dictionary<DateTime, RevenuAndOccupancyList> revenuePerMonth = ViewBag.revenuePerMonth;
+    int year = ViewBag.year;
+    Employee theEmployee = ViewBag.employee;
     string[] backgroundColors = { "aliceblue", "antiquewhite", "gainsboro", "lavender", "lightskyblue", "lemonchiffon" };
     int colorIndex = 0;
 
@@ -76,6 +79,7 @@
     .dash02total {
         font-size: 13px;
         font-weight: bold;
+        text-align:center;
     }
 
     .wide {
@@ -165,7 +169,7 @@
         <div class="dash01">
             <table>
                 <tr><td class="dash01td">date</td></tr>
-                <tr><td class="dash01td">day</td></tr>
+                <tr><td class="dash01td"></td></tr>
                 @foreach (int apartmentNumber in apartmentNumbers)
                 {
                     if (apartmentNumber > 0)
@@ -182,6 +186,7 @@
                 }
                 <tr><td>rev.</td></tr>
                 <tr><td>exp</td></tr>
+                <tr><td>net</td></tr>
             </table>
         </div>
         @*the table with all orders*@
@@ -189,530 +194,123 @@
             <table style="table-layout:fixed; width:100%">
                 @*line 1 - date line*@
                 <tr>
-                    @foreach (DateTime aDate in revenuePerMonth.Keys)
+                    @for (int month = 1; month <= 12; month++)
                     {
-                        <th colspan="2" class="dash02th">@aDate.ToString("MM/yyyy")</th>
+                        <th colspan="2" class="dash02th">@string.Format("{0,2}/{1}", month, year)</th>
                     }
-                    <th class="dash02th"></th>  @*total revenue*@
-                    <th class="dash02th"></th>  @*average occupancy %*@
+                    <th colspan="2" class="dash02th">Total</th>
                 </tr>
 
-                @*line 2 and above - revenue/occupancy lines (1 line for each apartment, 2 columns for each month)*@
-                @{
-                    int apartmentI = 0;
-                    int realApartmentCount = 0;
-                    double totalOccupancyPercent = 0d;
-                    double totalDaysPerRent = 0d;
-
-                }
-                @for (apartmentI = 0; apartmentI < apartmentNumbers.Count(); apartmentI++)
-                {
-            <tr style="background-color:@backgroundColors[colorIndex]">
-                @{
-                    colorIndex++;
-                    colorIndex %= backgroundColors.Count();  //Advance the color index, and wrap around in case it
-                                                             //is larger than the array of available colors
-                }
-                @foreach (var aMonthRevenue in revenuePerMonth)
-                {
-                    <td class="dash02td">
-                        @aMonthRevenue.Value.revenuePerApartment[apartmentI].toMoneyString()
-                    </td>
-                    <td class="dash02td">
-                        @aMonthRevenue.Value.percentOccupancyPerApartment[apartmentI]%
-                    </td>
-                }
-                <td class="dash02td rightAlign">@revenuePerApartment[apartmentI].toMoneyString()</td>
-                <td class="=dash02td rightAlign">@percentOccupancyPerApartment[apartmentI]%</td>
-                @{
-                    if (anApartment.First().apartmentNumber > 0)
+                @*line 2 - revenue and occupancy titles*@
+                <tr>
+                    @for (int month = 1; month <= 13; month++)
                     {
-                        //This is a real apartment - calculate the percentage average and the average rent days
-                        totalOccupancyPercent += percentOccupancyPerApartment[apartmentI];
-                        totalDaysPerRent += aveargeDaysPerApartment[apartmentI];
-                        realApartmentCount++;
+                        <th class="dash02th">rev</th>
+                        <th class="dash02th">occ%</th>
                     }
-                    apartmentI++;
-
-                }
-            </tr>
+                </tr>
+                @*line 3 and above - revenue/occupancy lines (1 line for each apartment, 2 columns for each month)*@
+               
+                @for (int apartmentI = 0; apartmentI < apartmentNumbers.Count(); apartmentI++)
+                {
+                    <tr style="background-color:@backgroundColors[colorIndex]">
+                        @{
+                            colorIndex++;
+                            colorIndex %= backgroundColors.Count();  //Advance the color index, and wrap around in case it
+                                                                     //is larger than the array of available colors
+                            var apartmentRevenue = revenueMatrix.getByRowsKey(apartmentNumbers[apartmentI]);
+                        }
+                        @*display the 12 revenue and occupancy columns*@
+                        @foreach (var aMonthRevenue in apartmentRevenue)
+                        {
+                            <td class="dash02td">
+                                @aMonthRevenue.Value.revenue.toMoneyString()
+                            </td>
+                            int percentOccupancy =
+                                (int)(aMonthRevenue.Value.percentOccupancy() * 100);
+                            <td class="dash02td">
+                                @percentOccupancy%
+                            </td>
+                        }
+                        @*display total revenue and average occupancy*@
+                        <td class="dash02total">
+                        @apartmentRevenue.Sum(rev => rev.Value.revenue).toMoneyString()
+                        </td>
+                        <td class="dash02total">
+                        @apartmentRevenue.Average(rev => rev.Value.percentOccupancy() * 100)%
+                        </td>
+                    </tr>
                 }
                 @*Revenu total line*@
                 <tr>
-                    @{ var totalRevenue = new Money(0m, "UAH");}
-                    @foreach (var aRevenue in revenuePerDay)
+                    @{ 
+                        Money grandTotalRevenue = new Money(0, "UAH");
+                        double averageOccupancy = 0d;
+                        Dictionary<int, Money> revenuePerMonth = new Dictionary<int, Money>();
+                     }
+                    @for (int month = 1; month <= 12; month++)
                     {
-                        if (aRevenue.isZero())
-                        {
-                            <td class="dash02td"></td>
-                        }
-                        else
-                        {
-                            <td class="dash02td">@aRevenue.toMoneyString(showCents: false)</td>
-                            totalRevenue += aRevenue;
+                        var revenueForMonth = revenueMatrix.getByColumnsKey(month);
+                        var totalRevenueForMonth = revenueForMonth.Sum(rev => rev.Value.revenue);
+                        grandTotalRevenue += totalRevenueForMonth;
+                        revenuePerMonth.Add(month, totalRevenueForMonth);
+                        <td class="dash02total">@totalRevenueForMonth.toMoneyString()</td>
 
+                        double percentOccupancy =
+                            revenueForMonth.Average(rev => rev.Value.percentOccupancy()) * 100;
+                        averageOccupancy += percentOccupancy;
 
-                        }
+                        <td class="dash02total">@Math.Round(percentOccupancy)%</td>
                     }
-                    @{
-                        int averageOccupancyPercent = (int)Math.Round(totalOccupancyPercent / realApartmentCount);
-                        double averageDaysPerRent = totalDaysPerRent / realApartmentCount;
+                    @{ 
+                        averageOccupancy = averageOccupancy / 12;
                     }
-                    <td class="dash02td dash02total rightAlign">@totalRevenue.toMoneyString()</td>
-                    <td class="dash02td dash02total rightAlign">@averageOccupancyPercent%</td>
-                    <td class="dash02td dash02total rightAlign">@string.Format("{0:F1}", averageDaysPerRent)</td>
+                    <td class="dash02total">@grandTotalRevenue.toMoneyString()</td>
+                    <td class="dash02total">@averageOccupancy%</td>
                 </tr>
-
-                @*Expense total line*@
-                @{
-                    DateTime theDate = fromDate;
+                @*expenses line*@
+            <tr>
+                @for (int month = 1; month <= 12; month++)
+                {
+                    if (expensesPerMonth.ContainsKey(month))
+                    {
+                        <td class="dash02total">@expensesPerMonth[month].toMoneyString()</td>
+                    }
+                    else
+                    {
+                        <td class="dash02total">0</td>
+                    }
+                    <td class="dash02total"></td>
                 }
-                <tr>
-                    @{ var totalExpense = new Money(0m, "UAH");}
-                    @foreach (var anExpense in expensePerDay)
-                    {
-                        if (anExpense.isZero())
-                        {
-                            <td class="dash02td selectCell" data-date='@theDate.ToString("yyyy-MM-dd")' onclick="expenseClicked(this,false)"></td>
-                        }
-                        else
-                        {
-                            <td class="dash02td selectCell" data-date='@theDate.ToString("yyyy-MM-dd")' onclick="expenseClicked(this,true)">
-                                @anExpense.toMoneyString(showCents: false)
-                            </td>
-                            totalExpense += anExpense;
-                        }
-                        theDate = theDate.AddDays(1);
-                    }
-                    <td class="dash02td dash02total rightAlign">@totalExpense.toMoneyString()</td>
-                    <td class="dash02td rightAlign"></td>
-                    <td class="dash02td rightAlign"></td>
-                </tr>
-
-                @*Maid on duty line*@
-                @{
-                    theDate = fromDate;
+                @*display expenses grand total*@
+                @{ 
+                    Money grandTotalExpenses = expensesPerMonth.Sum(rec => rec.Value);
                 }
+                <td class="dash02total">@grandTotalExpenses.toMoneyString()</td>
+            </tr>
+                @*net revenue - total revenue minus expenses*@
                 <tr>
-                    @foreach (var anEmpWorkDay in empWorkDaysArray)
+                    @for (int month = 1; month<=12; month++)
                     {
-                        if (anEmpWorkDay == null)
+                        Money expensesForMonth = new Money(0,"UAH");
+                        Money revenueForMonth = new Money(0, "UAH");
+                        if (expensesPerMonth.ContainsKey(month))
                         {
-                            <td class="dash02td selectCell" onclick="displayMaidList(this)" data-emp-id="0"
-                                data-date='@theDate.ToString("yyyy-MM-dd")'></td>
-                            @*date-emp-id=0 denotes that an employee is not assigned to that day
-                                date-date gives the date of the current cell*@
+                            expensesForMonth = expensesPerMonth[month];
                         }
-                        else
+                        if (revenuePerMonth.ContainsKey(month))
                         {
-                            string greenCss = "";
-                            if (anEmpWorkDay.isSalaryDay)
-                            {
-                                greenCss = "orderGreen";
-                            }
-                            <td class="dash02td @greenCss selectCell" onclick="displayMaidList(this)"
-                                data-emp-id="@anEmpWorkDay.Employee.Id"
-                                data-date='@theDate.ToString("yyyy-MM-dd")'>
-                                @anEmpWorkDay.Employee.name
-                            </td>
+                            revenueForMonth = revenuePerMonth[month];
                         }
-                        theDate = theDate.AddDays(1);
+                        Money netRevenue = revenueForMonth - expensesForMonth;
+                        <td class="dash02total">@netRevenue.toMoneyString()</td>
+                        <td></td>
                     }
-                    <td class="dash02td dash02total rightAlign">@((totalRevenue - totalExpense).toMoneyString())</td>
-                    <td class="dash02td rightAlign"></td>
-                    <td class="dash02td rightAlign"></td>
-
+                    @{ 
+                        Money grandNetRevenue = grandTotalRevenue - grandTotalExpenses;
+                    }
+                    <td class="dash02total">@grandNetRevenue.toMoneyString()</td>
+                    <td></td>
                 </tr>
-
             </table>
-        </div>
-    </div>
-    <div style="padding:2px;">@tBox.translate("Total revenue"):@totalRevenue.toMoneyString(showCents: false)</div>
 
-    <!--This part contgains all forms which are displayed under the main grid. Contains 6 forms, where each time only
-        one is displayed and the rest are hidden-->
-    <div id="s20underTheGrid">
-        <!--div for the order details info (when the user clicks on an existing order)-->
-        <div style="padding:4px;max-width:400px;" id="s22OrderDetails">
-
-
-        </div>
-        <!--div for info about new order dates (when the user clicks on an empty cell)-->
-        <div id="newOrderDates" class="hidden">
-            <span style="float:left">@tBox.translate("Apartment Number")</span>
-            <span id="apartmentNumber" style="float:right"></span>
-            <br />
-            <span style="float:left">@tBox.translate("Checkin Date")</span>
-            <span id="checkinDate" style="float:right"></span>
-            <br />
-            <span style="float:left">@tBox.translate("Checkout Date")</span>
-            <span id="checkoutDate" style="float:right"></span>
-            <br />
-            <a id="addOrderButton" class="btn" href="/staff/s23updateOrder">@tBox.translate("New Order")</a>
-
-        </div>
-        <!--div for the maid list (when the user clicks on a maid line)-->
-        <div id="maidList" class="hidden">
-            @foreach (var aMaid in maidList)
-            {
-                <input type="radio" name="maid" value="@aMaid.Id" data-maid-name="@aMaid.name" onclick="setMaid(this)" />@aMaid.name
-            }
-            <input type="radio" name="maid" value="0" data-maid-name="" onclick="setMaid(this)" />none
-        </div>
-
-
-        <!--div for the "add expense" form (when clicking on an empty expense cell)-->
-        <div id="addExpense" style="max-width:500px;" class="hidden">
-            <form id="addExpenseForm" method="post">
-                <div class='field-box datepicker-box'>
-                    <input type="text" id="expenseDate" name="expenseDate">
-                    <label for="expenseDate">
-                        <span class="field-name">@tBox.translate("Expense date")</span>
-                        <span class="calendar-ico"></span>
-                    </label>
-                    <span class="field-error"></span>
-                </div>
-                <div class='inputBox select-box'>
-                    <input list="expenseTypeList" name="expenseType" id="expenseType" class="inputElement" />
-                    <datalist id="expenseTypeList">
-                        @foreach (var expenseType in expenseTypes)
-                        {
-                            <option value="@expenseType">@tBox.translate(expenseType)</option>
-                        }
-                    </datalist>
-                    <label for="expenseType" class="label">@tBox.translate("Expense Type")</label>
-                    <span class="error-text"></span>
-                </div>
-                <div class="form-box-wrap">
-                    @Html.inputField("amount", "", "", tBox, style: "width:48%", fieldType: "number")
-                    <div class="field-box select-box">
-                        <select id="currency" name="currency">
-                            <option value="UAH" selected>UAH</option>
-                            <option value="USD">USD</option>
-                            <option value="EUR">EUR</option>
-                        </select>
-                        <label>
-                            <span class="field-name">@tBox.translate("Currency")</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="form-box-wrap">
-                    @Html.inputField("description", "", "", tBox)
-
-                </div>
-                <input type="button" class="btn small-button" value='@tBox.translate("Add")' onclick="sendExpense(this)" />
-                <a class="btn" style=" min-width: 90px;height: auto;margin: 5px;" href="/staff/s21Dashboard">@tBox.translate("Cancel")</a>
-                <span id="expenseAddedMessage" style="display:none; background-color:darkblue; color:white">Expense Added</span>
-            </form>
-        </div>
-
-
-        <!--div for the table showing all expenses for that date (when clicking on a non-empty expense cell)-->
-        <div id="s30showExpenses">
-
-        </div>
-
-        <!--div for the update expense form-->
-        <div id="s31updateExpense" style="max-width:550px;">
-
-        </div>
-    </div>
-</div>
-
-<script>
-    $(document).ready(initialize);
-
-    function initialize() {
-        //Initialize date picker
-        $("#fromDate")
-            .datepicker({
-                defaultDate: "+0d",
-                numberOfMonths: 1,
-                dateFormat: "d MM, yy",
-                firstDay: 1
-            });
-        $("#expenseDate")
-            .datepicker({
-                defaultDate: "+0d",
-                numberOfMonths: 1,
-                dateFormat: "dd/mm/yy",
-                firstDay: 1
-            });
-        //highlight the default order (if it should be highlighted)
-        var orderId = document.getElementById("highlightOrderId").dataset.orderId;
-        if (orderId != 0) {
-            var td = document.getElementById(orderId);
-            showOrder(td);  //We do the same as if a user would click on an occupied cell.
-        }
-
-        //Initialize the currency dropdown in expense form
-
-    }
-
-    var lastSelectedTd = null;
-    var lastSelectedLeft = null;
-    var lastSelectedRight = null;
-    var apartmentNumber = "0";
-    var checkinDate = new Date();
-    var checkoutDate = new Date();
-    var nights = 0;
-    var cellClickCounter = 0;
-
-
-    //The function hides all forms under the grid except the one given in the parameter
-    function hideAllExcept(div) {
-        $("#s20underTheGrid").children().addClass("hidden");
-        $(div).removeClass("hidden");
-    }
-    function showOrder(td) {
-        // var orderId = td.dataset.orderId;
-        if (lastSelectedTd != null) {
-            $(lastSelectedTd).removeClass("highlight");
-        }
-        $(td).addClass("highlight");
-        lastSelectedTd = td;
-        var orderIdJson = { orderId: td.dataset.orderId };
-        $.get("/staff/s22OrderDetails", orderIdJson).done(displayOrderDetails);
-    }
-
-    function displayOrderDetails(orderDetailsHTML) {
-        hideAllExcept("#s22OrderDetails");
-        $("#s22OrderDetails").html(orderDetailsHTML);
-    }
-
-
-
-    function addOrder(td) {
-        cellClickCounter++;
-        if (lastSelectedTd != null) {
-            //remove highlighting from a previous booking that was selected
-            $(lastSelectedTd).removeClass("highlight");
-            lastSelectedTd = null;
-        }
-        if (cellClickCounter % 2 == 1) {
-            //The user clicked odd number of times on a free cell - it means we need to collect apartment number and checkin date
-            //We assume a one night stay
-            if (lastSelectedLeft != null) {
-                $(lastSelectedLeft).removeClass("selectedLeft");
-            }
-            if (lastSelectedRight != null) {
-                $(lastSelectedRight).removeClass("selectedRight");
-            }
-            $(td).addClass("selectedLeft");
-            lastSelectedLeft = td;
-            apartmentNumber = td.dataset.apartmentId;
-            checkinDate = new Date(td.dataset.date);
-            nights = 1;
-            var checkoutDate = nextDate(checkinDate);
-            displayCheckinOutDates(apartmentNumber, checkinDate, checkoutDate, nights);
-        }
-        else {
-            //The user clicked even number of times on a cell = collect the checkout date. Note that the user presses the
-            //last date - not the checkout date (which is one day later.)
-            var secondApartmentNumber = td.dataset.apartmentId;
-            if (apartmentNumber != secondApartmentNumber) {
-                //The second click was for a different apartment number - start the process again.
-                //perform this by a recursive call to addOrder
-                addOrder(td);
-                return;
-            }
-            $(td).addClass("selectedRight");
-            lastSelectedRight = td;
-            lastDate = new Date(td.dataset.date);
-            checkoutDate = nextDate(lastDate);
-            nights = diffDays(checkinDate, checkoutDate);
-            if (nights <= 0) {
-                //The second click was for a day before the first click - reverse the checkin and checkout dates
-                //We do it by a recursive call to "addOrder"
-                var leftTD = lastSelectedRight;
-                var rightTD = lastSelectedLeft;
-                addOrder(leftTD);
-                addOrder(rightTD);
-                return;
-            }
-
-            displayCheckinOutDates(apartmentNumber, checkinDate, checkoutDate, nights);
-        }
-    }
-    //convert a Date object to dd/mm/yyyy
-    function formatDateddmmyyyy(aDate) {
-        var day = aDate.getDate();
-        var zeroDay = day <= 9 ? "0" : "";
-        var month = aDate.getMonth() + 1;
-        var zeroMonth = month <= 9 ? "0" : "";
-        var ddmmyyyy = zeroDay + day + "/" + zeroMonth + month + "/" + aDate.getFullYear();   //create the string dd/mm/yyyy. Note that dd and mm will always have 2 digits
-        return ddmmyyyy;
-    }
-    //convert a Date object to yyyy-mm-dd
-    function formatDateyyyymmdd(aDate) {
-        var day = aDate.getDate();
-        var zeroDay = day <= 9 ? "0" : "";
-        var month = aDate.getMonth() + 1;
-        var zeroMonth = month <= 9 ? "0" : "";
-        var yyyymmdd = aDate.getFullYear() + "-" + zeroMonth + month + "-" + zeroDay + day;
-        return yyyymmdd;
-    }
-    //returns a date which is 1 day later
-    function nextDate(aDate) {
-        var nextDate = new Date(aDate);
-        var nextDay = aDate.getDate() + 1;
-        nextDate.setDate(nextDay);
-        return nextDate;
-    }
-
-    function displayCheckinOutDates(apartmentNumber, checkinDate, checkoutDate, nights) {
-        var html = '<div>' +
-                '<span style="float:left">@tBox.translate("Apartment Number")</span>' +
-                '<span id="apartmentNumber" style="float:right">' + apartmentNumber + '</span>' +
-                '<br />' +
-                '<span style="float:left">@tBox.translate("Checkin Date")</span>' +
-                '<span id="checkinDate" style="float:right">' + formatDateddmmyyyy(checkinDate) + '</span>' +
-                '<br />' +
-                '<span style="float:left">@tBox.translate("Checkout Date")</span>' +
-                '<span id="checkinDate" style="float:right">' + formatDateddmmyyyy(checkoutDate) + '</span>' +
-                '<br />' +
-                '<span style="float:left">@tBox.translate("nights")</span>' +
-                '<span id="checkinDate" style="float:right">' + nights + '</span>' +
-            '<br />' +
-            '<a class="btn" href="/staff/s24addOrder?checkin=' + formatDateyyyymmdd(checkinDate) +
-            '&checkout=' + formatDateyyyymmdd(checkoutDate) +
-            '&nights=' + nights +
-            '&apartmentNumber=' + apartmentNumber + '">@tBox.translate("Add Order") </a>' +
-                '</div>';
-
-        hideAllExcept("#s22OrderDetails");
-        $("#s22OrderDetails").html(html);
-    }
-
-    //returns the difference between d1 and d2 (actually d2 minus d1)
-    function diffDays(d1, d2) {
-        var ndays;
-        var tv1 = d1.getTime();  // msec since 1970
-        var tv2 = d2.getTime();
-
-        ndays = (tv2 - tv1) / 1000 / 86400;
-        ndays = Math.round(ndays - 0.5);
-        return ndays;
-    }
-
-    var tdMaid=null;  //contains: data-emp-id= emp_id and data-date = the date of that cell. If no
-    function displayMaidList(tdEmp) {
-
-        $(tdMaid).removeClass("highlight");   //If tdMaid is null - the command is ignored.
-        $(tdExp) .removeClass("highlight");
-
-        $(tdEmp).addClass("highlight");
-        tdMaid = tdEmp;  //Keep the cell that was pressed by the user. When the user selects a new maid from the list of radio buttons - we will
-        //know to which cell it was related
-        hideAllExcept("#maidList");
-    }
-
-    //the user pressed a radio button of a maid - this maid should be assigned to the date previously selected by the user
-    //(and kept in "tdMaid")
-    function setMaid(maidRadio) {
-        $(tdMaid).text(maidRadio.dataset.maidName);
-        var maidDay = new Object();
-        maidDay.maidId = maidRadio.value;
-        maidDay.date = tdMaid.dataset.date;
-        $.post("/staff/s28AddUpdateMaid", maidDay);
-    }
-
-    //The function is called when an expense cell is clicked.
-    //param 1: the cell clicked
-    //param 2: whether the expense cell contained an expense or not.
-    var tdExp = null;
-    function expenseClicked(tdExpense, expenseIsPositive) {
-        var expenseDate = tdExpense.dataset.date;  //the date format is yyyy-mm-dd
-        var theDate = new Date(expenseDate);
-        var ddmmyyyy = formatDateddmmyyyy(theDate);
-        $("#expenseDate").val(ddmmyyyy);
-        tdExpense.text
-
-        //Clean all other pieces of information which may exist under the grid
-        $(tdMaid).removeClass("highlight");   //If tdMaid or tdExpense is null - the command is ignored.
-        $(tdExp).removeClass("highlight");  //remove highlight from the previous expense cell
-        $(tdExpense).addClass("highlight");
-        tdExp = tdExpense;  //Keep the cell that was pressed by the user. When the user selects a new expense from the list of radio buttons - we will
-        //know to which cell it was related
-        if (tdExpense.innerText != "") {
-            //the cell contains expenses - show a table with a list of expenses for that day
-            var expenseDateParam = new Object();
-            expenseDateParam.expenseDateSt = expenseDate;
-            $.get("/staff/s30showExpensesForDate", expenseDateParam, showExpenseList);
-
-        }
-        else {
-            //There are no expenses for that day - show the "add class" form
-            hideAllExcept("#addExpense");
-        }
-    }
-
-    function showExpenseList(expenseListHTML) {
-        hideAllExcept("#s30showExpenses");
-        $("#s30showExpenses").html(expenseListHTML);
-    }
-    //perform ajax call to send the expense form to the backend - staff controller s29addExpense
-    function sendExpense() {
-        var formParams = $("#addExpenseForm").serialize();
-        $.post("/staff/s29addExpense", formParams,expenseAdded);
-    }
-
-    //get response from staff controller s29addExpense. The callback returns the total amount of expenses for that day after adding the new expense.
-    function expenseAdded(totalExpenseForDay) {
-        $(tdExp).text(totalExpenseForDay);
-        $("#expenseType").val("");
-        $("#amount").val("");
-        $("#description").val("");
-        $("#expenseAddedMessage").fadeIn(1000, () => $("#expenseAddedMessage").fadeOut(1000));
-
-    }
-    //the function is called by on click in s30showExpenses
-    function addExpense() {
-        hideAllExcept("#addExpense");
-    }
-
-    //The function is called by on click in s30showExpenses (for each expense line)
-    function updateExpense(expenseId) {
-        var expense = new Object();
-        expense.expenseId = expenseId;
-        $.get("/staff/s31updateExpense", expense, showUpdateForm);
-    }
-    function showUpdateForm(updateForm) {
-        hideAllExcept("#s31updateExpense");
-        $("#s31updateExpense").html(updateForm);
-        $("#currency2").select2({
-            minimumResultsForSearch: Infinity
-        });
-        var expenseDate = $("#expenseDate2");
-        expenseDate.datepicker({
-           // defaultDate: "5 Feb 2019",
-            numberOfMonths: 1,
-            dateFormat: "dd/mm/yy",
-            firstDay: 1
-        });
-    }
-
-    function expenseUpdating(btn) {
-        var formParams = $("#updateExpenseForm").serialize();
-        $.post("/staff/s31updateExpense", formParams, expenseUpdated);
-
-    }
-
-    function expenseUpdated(totalExpenseForDay) {
-        $(tdExp).text(totalExpenseForDay);
-        $("#expenseUpdatedMessage").fadeIn(1000, () => $("#expenseUpdatedMessage").fadeOut(1000, () => $("#s31updateExpense").empty()));
-    }
-
-    function expenseDeleting(btn) {
-        var expenseId = $("#expenseId").val();
-        var formParams = new Object();
-        formParams.expenseId = expenseId;
-        $.post("/staff/s32deleteExpense", formParams, expenseDeleted);
-    }
-
-    function expenseDeleted(totalExpenseForDay) {
-        $(tdExp).text(totalExpenseForDay);
-        $("#expenseDeletedMessage").fadeIn(1000, () => $("#expenseDeletedMessage").fadeOut(1000, () => $("#s31updateExpense").empty()));
-    }
-</script>

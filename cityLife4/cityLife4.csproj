@@ -586,6 +586,7 @@
       <DependentUpon>cityLifeDB.edmx</DependentUpon>
     </Compile>
     <Compile Include="classes\AppException.cs" />
+    <Compile Include="classes\Dictionary2d.cs" />
     <Compile Include="classes\ExtensionMethods.cs" />
     <Compile Include="classes\FakeDateTime.cs" />
     <Compile Include="classes\Message.cs" />

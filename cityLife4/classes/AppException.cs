@@ -35,7 +35,8 @@ namespace cityLife4
             {121, "country list file should have exactly 2 fields. Line contains {0} fields. Line content:{1}" },
             {122, "mail could not be sent. to:{0} mail name:{1}" },
             {123,"SQL statement for query {0} was: {1}" },
-            {124, "Invalid month number. Expected values between 1 to 12. Actual value:{0}" }
+            {124, "Invalid month number. Expected values between 1 to 12. Actual value:{0}" },
+            {125, "Trying to add an element to a 2 dimensional dictionary. Both keys already exist. Keys are:{0} and {1}" }
 
 
 
