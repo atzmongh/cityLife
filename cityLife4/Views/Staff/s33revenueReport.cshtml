@@ -11,7 +11,8 @@
     Employee theEmployee = ViewBag.employee;
     string[] backgroundColors = { "aliceblue", "antiquewhite", "gainsboro", "lavender", "lightskyblue", "lemonchiffon" };
     int colorIndex = 0;
-
+    int currentMonth = FakeDateTime.DateNow.Month;
+    int currentYear = FakeDateTime.DateNow.Year;
 }
 
 
@@ -79,7 +80,7 @@
     .dash02total {
         font-size: 13px;
         font-weight: bold;
-        text-align:center;
+        text-align: center;
     }
 
     .wide {
@@ -163,7 +164,81 @@
     }
 </style>
 <div class="main-wrapper reset-indent">
+    <form id="monthRangeForm" method="get" action="s33RevenueReport">
+        <div class="page-heading">
 
+            @tBox.translate("Revenue Report")
+            <div class="form-box-wrap" style="width:920px;">
+                <div class="field-box select-box" style="padding-right:10px;">
+                    <select name="fromMonth">
+                        <option selected>1</option>
+                        @for (int month = 2; month <= 12; month++)
+                        {
+                            <option>@month</option>
+                        }
+                    </select>
+                    <label>
+                        <span class="field-name">@tBox.translate("from month")</span>
+                    </label>
+                </div>
+                <div class="field-box select-box" style="padding-right:10px;">
+                    <select name="fromYear">
+                        @for (int theYear = 2019; theYear <= 2021; theYear++)
+                        {
+                            if (currentYear == theYear)
+                            {
+                                <option selected>@theYear</option>
+                            }
+                            else
+                            {
+                                <option>@theYear</option>
+                            }
+                        }
+                    </select>
+                    <label>
+                        <span class="field-name">@tBox.translate("from year")</span>
+                    </label>
+                </div>
+                <div class="field-box select-box" style="padding-right:10px;">
+                    <select name="toMonth">
+                        @for (int month = 1; month <= 12; month++)
+                        {
+                            if (month == currentMonth)
+                            {
+                                <option selected>@month</option>
+                            }
+                            else
+                            {
+                                <option>@month</option>
+                            }
+                        }
+                    </select>
+                    <label>
+                        <span class="field-name">@tBox.translate("to month")</span>
+                    </label>
+                </div>
+                <div class="field-box select-box" style="padding-right:10px;">
+                    <select name="toYear">
+                        @for (int theYear = 2019; theYear <= 2021; theYear++)
+                        {
+                            if (currentYear == theYear)
+                            {
+                                <option selected>@theYear</option>
+                            }
+                            else
+                            {
+                                <option>@theYear</option>
+                            }
+                        }
+                    </select>
+                    <label>
+                        <span class="field-name">@tBox.translate("to year")</span>
+                    </label>
+                </div>
+                <button id="filterRevenue" class="btn" type="submit">@tBox.translate("OK")</button>
+            </div>
+        </div>
+    </form>
     <div style="display:flex">
         @*first column - apartment numbers, rev, expense*@
         <div class="dash01">
@@ -210,7 +285,7 @@
                     }
                 </tr>
                 @*line 3 and above - revenue/occupancy lines (1 line for each apartment, 2 columns for each month)*@
-               
+
                 @for (int apartmentI = 0; apartmentI < apartmentNumbers.Count(); apartmentI++)
                 {
                     <tr style="background-color:@backgroundColors[colorIndex]">
@@ -234,20 +309,20 @@
                         }
                         @*display total revenue and average occupancy*@
                         <td class="dash02total">
-                        @apartmentRevenue.Sum(rev => rev.Value.revenue).toMoneyString()
+                            @apartmentRevenue.Sum(rev => rev.Value.revenue).toMoneyString()
                         </td>
                         <td class="dash02total">
-                        @apartmentRevenue.Average(rev => rev.Value.percentOccupancy() * 100)%
+                            @apartmentRevenue.Average(rev => rev.Value.percentOccupancy() * 100)%
                         </td>
                     </tr>
                 }
                 @*Revenu total line*@
                 <tr>
-                    @{ 
+                    @{
                         Money grandTotalRevenue = new Money(0, "UAH");
                         double averageOccupancy = 0d;
                         Dictionary<int, Money> revenuePerMonth = new Dictionary<int, Money>();
-                     }
+                    }
                     @for (int month = 1; month <= 12; month++)
                     {
                         var revenueForMonth = revenueMatrix.getByColumnsKey(month);
@@ -262,37 +337,37 @@
 
                         <td class="dash02total">@Math.Round(percentOccupancy)%</td>
                     }
-                    @{ 
+                    @{
                         averageOccupancy = averageOccupancy / 12;
                     }
                     <td class="dash02total">@grandTotalRevenue.toMoneyString()</td>
                     <td class="dash02total">@averageOccupancy%</td>
                 </tr>
                 @*expenses line*@
-            <tr>
-                @for (int month = 1; month <= 12; month++)
-                {
-                    if (expensesPerMonth.ContainsKey(month))
+                <tr>
+                    @for (int month = 1; month <= 12; month++)
                     {
-                        <td class="dash02total">@expensesPerMonth[month].toMoneyString()</td>
+                        if (expensesPerMonth.ContainsKey(month))
+                        {
+                            <td class="dash02total">@expensesPerMonth[month].toMoneyString()</td>
+                        }
+                        else
+                        {
+                            <td class="dash02total">0</td>
+                        }
+                        <td class="dash02total"></td>
                     }
-                    else
-                    {
-                        <td class="dash02total">0</td>
+                    @*display expenses grand total*@
+                    @{
+                        Money grandTotalExpenses = expensesPerMonth.Sum(rec => rec.Value);
                     }
-                    <td class="dash02total"></td>
-                }
-                @*display expenses grand total*@
-                @{ 
-                    Money grandTotalExpenses = expensesPerMonth.Sum(rec => rec.Value);
-                }
-                <td class="dash02total">@grandTotalExpenses.toMoneyString()</td>
-            </tr>
+                    <td class="dash02total">@grandTotalExpenses.toMoneyString()</td>
+                </tr>
                 @*net revenue - total revenue minus expenses*@
                 <tr>
-                    @for (int month = 1; month<=12; month++)
+                    @for (int month = 1; month <= 12; month++)
                     {
-                        Money expensesForMonth = new Money(0,"UAH");
+                        Money expensesForMonth = new Money(0, "UAH");
                         Money revenueForMonth = new Money(0, "UAH");
                         if (expensesPerMonth.ContainsKey(month))
                         {
@@ -306,11 +381,14 @@
                         <td class="dash02total">@netRevenue.toMoneyString()</td>
                         <td></td>
                     }
-                    @{ 
+                    @{
                         Money grandNetRevenue = grandTotalRevenue - grandTotalExpenses;
                     }
                     <td class="dash02total">@grandNetRevenue.toMoneyString()</td>
                     <td></td>
                 </tr>
             </table>
+        </div>
+    </div>
+</div>
 
