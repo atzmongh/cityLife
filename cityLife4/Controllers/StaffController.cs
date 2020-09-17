@@ -11,6 +11,7 @@ using cityLife4;
 using System.Text.RegularExpressions;
 using System.Data.Entity.Core.Metadata.Edm;
 using System.Data;
+using System.Web.WebSockets;
 
 namespace cityLife.Controllers
 {
@@ -1031,7 +1032,7 @@ namespace cityLife.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public ActionResult s33revenueReport()
+        public ActionResult s33revenueReport(int? _fromMonth, int? _fromYear, int? _toMonth, int? _toYear)
         {
             cityLifeDBContainer1 db = new cityLifeDBContainer1();
             Employee theEmployee = (Employee)Session["loggedinUser"];
@@ -1041,7 +1042,26 @@ namespace cityLife.Controllers
                 //No user is logged in - go to login screen
                 return s10login();
             }
-            int year = 2019;  //For now we hard-code the year to be 2020.
+            int fromMonth, fromYear, toMonth, toYear;
+            if (_fromMonth == null)
+            {
+                //This is the initial request for this screen - no dates were entered by the user 
+                //set default dates
+                fromMonth = 1;
+                fromYear = 2019;// FakeDateTime.DateNow.Year;
+                toMonth = FakeDateTime.DateNow.Month;
+                toYear = fromYear;
+            }
+            else
+            {
+                fromMonth = (int)_fromMonth;
+                fromYear = (int)_fromYear;
+                toMonth = (int)_toMonth;
+                toYear = (int)_toYear;
+            }
+            DateTime fromDate = new DateTime(fromYear, fromMonth, 1);
+            DateTime toDate = new DateTime(toYear, toMonth, 1).AddMonths(1);  //if toMonth = 12 and toYear = 2020, then
+                                                                              //toYear will be 1/1/2021 00:00
 
             //The key of the dictionary is the apartment number. The value is the revenue and occupancy 
             //statistics for each month in the year for that apartment
@@ -1049,13 +1069,14 @@ namespace cityLife.Controllers
             //for an example of the report
             var apartmentDays = from anApartmentDays in db.ApartmentDays
                                 where anApartmentDays.status != ApartOccuStatus.Free
-                                && anApartmentDays.date.Year == year
+                                && anApartmentDays.date >= fromDate && anApartmentDays.date < toDate
                                 select anApartmentDays;
             Dictionary2d<int, int, RevenueAndOccupancy> revenueMatrix = new Dictionary2d<int, int, RevenueAndOccupancy>();
             foreach (var anApartmentDays in apartmentDays)
             {
                 int apartmentNumber = anApartmentDays.Apartment.number;
                 int month = anApartmentDays.date.Month;
+                int year = anApartmentDays.date.Year;
                 if (revenueMatrix.containsKeys(apartmentNumber, month))
                 {
                     //revenue statistics for an appartment and month exist - add this days revenue to the 
@@ -1075,7 +1096,7 @@ namespace cityLife.Controllers
 
             //Calculate expenses
             var expenses = from anExpense in db.Expenses
-                           where anExpense.date.Year == year
+                           where anExpense.date >= fromDate && anExpense.date < toDate
                            select anExpense;
             Dictionary<int, Money> expensesPerMonth = new Dictionary<int, Money>();
             foreach(var anExpense in expenses)
@@ -1095,7 +1116,12 @@ namespace cityLife.Controllers
             ViewBag.apartmentList = revenueMatrix.getRowKeys();
             TranslateBox tBox = this.setTbox("RU");
             ViewBag.tBox = tBox;
-            ViewBag.year = year;
+            ViewBag.fromDate = fromDate;
+            ViewBag.toDate = toDate;
+            //ViewBag.fromMonth = fromMonth;
+            //ViewBag.fromYear = fromYear;
+            //ViewBag.toMonth = toMonth;
+            //ViewBag.toYear = toYear;
             ViewBag.employee = theEmployee;
             return View("s33revenueReport");
         }

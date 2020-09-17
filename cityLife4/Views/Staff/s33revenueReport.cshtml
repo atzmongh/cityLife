@@ -7,12 +7,15 @@
     Dictionary<int, Money> expensesPerMonth = ViewBag.expensesPerMonth;
     List<int> apartmentNumbers = ViewBag.apartmentList;
     TranslateBox tBox = ViewBag.tBox;
-    int year = ViewBag.year;
     Employee theEmployee = ViewBag.employee;
     string[] backgroundColors = { "aliceblue", "antiquewhite", "gainsboro", "lavender", "lightskyblue", "lemonchiffon" };
     int colorIndex = 0;
-    int currentMonth = FakeDateTime.DateNow.Month;
-    int currentYear = FakeDateTime.DateNow.Year;
+    DateTime fromDate = ViewBag.fromDate;
+    DateTime toDate = ViewBag.toDate;
+    //int fromMonth = ViewBag.fromMonth;
+    //int fromYear = ViewBag.fromYear;
+    //int toMonth = ViewBag.toMonth;
+    //int toYear = ViewBag.toYear;
 }
 
 
@@ -171,10 +174,16 @@
             <div class="form-box-wrap" style="width:920px;">
                 <div class="field-box select-box" style="padding-right:10px;">
                     <select name="fromMonth">
-                        <option selected>1</option>
-                        @for (int month = 2; month <= 12; month++)
+                        @for (int month = 1; month <= 12; month++)
                         {
-                            <option>@month</option>
+                            if (month == fromDate.Month)
+                            {
+                                <option selected>@month</option>
+                            }
+                            else
+                            {
+                                <option>@month</option>
+                            }
                         }
                     </select>
                     <label>
@@ -185,7 +194,7 @@
                     <select name="fromYear">
                         @for (int theYear = 2019; theYear <= 2021; theYear++)
                         {
-                            if (currentYear == theYear)
+                            if (theYear == fromDate.Year)
                             {
                                 <option selected>@theYear</option>
                             }
@@ -203,7 +212,8 @@
                     <select name="toMonth">
                         @for (int month = 1; month <= 12; month++)
                         {
-                            if (month == currentMonth)
+                            if (month == toDate.Month - 1)   //because the "toDate" contains the first 
+                                                             // moment of the next month
                             {
                                 <option selected>@month</option>
                             }
@@ -221,7 +231,7 @@
                     <select name="toYear">
                         @for (int theYear = 2019; theYear <= 2021; theYear++)
                         {
-                            if (currentYear == theYear)
+                            if (theYear == toDate.Year)
                             {
                                 <option selected>@theYear</option>
                             }
@@ -269,16 +279,16 @@
             <table style="table-layout:fixed; width:100%">
                 @*line 1 - date line*@
                 <tr>
-                    @for (int month = 1; month <= 12; month++)
+                    @for (DateTime aDate = fromDate; aDate < toDate; aDate = aDate.AddMonths(1))
                     {
-                        <th colspan="2" class="dash02th">@string.Format("{0,2}/{1}", month, year)</th>
+                        <th colspan="2" class="dash02th">@string.Format("{0:MM/yyyy}",aDate)</th>
                     }
                     <th colspan="2" class="dash02th">Total</th>
                 </tr>
 
                 @*line 2 - revenue and occupancy titles*@
                 <tr>
-                    @for (int month = 1; month <= 13; month++)
+                    @for (DateTime aDate = fromDate; aDate <= toDate; aDate = aDate.AddMonths(1))
                     {
                         <th class="dash02th">rev</th>
                         <th class="dash02th">occ%</th>
@@ -308,9 +318,13 @@
                             </td>
                         }
                         @*display total revenue and average occupancy*@
-                        <td class="dash02total">
+                    <td class="dash02total">
+                        @if (apartmentRevenue.Count() > 0)
+                        {
                             @apartmentRevenue.Sum(rev => rev.Value.revenue).toMoneyString()
-                        </td>
+                        }
+
+                    </td>
                         <td class="dash02total">
                             @apartmentRevenue.Average(rev => rev.Value.percentOccupancy() * 100)%
                         </td>
@@ -326,13 +340,22 @@
                     @for (int month = 1; month <= 12; month++)
                     {
                         var revenueForMonth = revenueMatrix.getByColumnsKey(month);
-                        var totalRevenueForMonth = revenueForMonth.Sum(rev => rev.Value.revenue);
+                        Money totalRevenueForMonth = new Money(0,"UAH");
+                        if (revenueForMonth.Count > 0)
+                        {
+                            totalRevenueForMonth = revenueForMonth.Sum(rev => rev.Value.revenue);
+                        }
+
                         grandTotalRevenue += totalRevenueForMonth;
                         revenuePerMonth.Add(month, totalRevenueForMonth);
                         <td class="dash02total">@totalRevenueForMonth.toMoneyString()</td>
 
-                        double percentOccupancy =
-                            revenueForMonth.Average(rev => rev.Value.percentOccupancy()) * 100;
+                        double percentOccupancy = 0;
+                        if (revenueForMonth.Count() > 0)
+                        {
+                            percentOccupancy = revenueForMonth.Average(rev => rev.Value.percentOccupancy()) * 100;
+                        }
+
                         averageOccupancy += percentOccupancy;
 
                         <td class="dash02total">@Math.Round(percentOccupancy)%</td>
