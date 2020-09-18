@@ -12,6 +12,7 @@
     int colorIndex = 0;
     DateTime fromDate = ViewBag.fromDate;
     DateTime toDate = ViewBag.toDate;
+    int totalMonths = 0;
     //int fromMonth = ViewBag.fromMonth;
     //int fromYear = ViewBag.fromYear;
     //int toMonth = ViewBag.toMonth;
@@ -63,7 +64,7 @@
         color: white;
         border: 1px solid #ddd;
         padding: 2px;
-        width: 50px;
+        width: 120px;
         height: 18px;
         overflow: hidden;
         text-align: center
@@ -72,7 +73,7 @@
     .dash02td {
         border: 1px solid #ddd;
         padding: 2px;
-        width: 50px;
+        width: 120px;
         height: 33px;
         overflow: hidden;
         text-align: center;
@@ -173,7 +174,7 @@
             @tBox.translate("Revenue Report")
             <div class="form-box-wrap" style="width:920px;">
                 <div class="field-box select-box" style="padding-right:10px;">
-                    <select name="fromMonth">
+                    <select name="_fromMonth">
                         @for (int month = 1; month <= 12; month++)
                         {
                             if (month == fromDate.Month)
@@ -191,7 +192,7 @@
                     </label>
                 </div>
                 <div class="field-box select-box" style="padding-right:10px;">
-                    <select name="fromYear">
+                    <select name="_fromYear">
                         @for (int theYear = 2019; theYear <= 2021; theYear++)
                         {
                             if (theYear == fromDate.Year)
@@ -209,10 +210,10 @@
                     </label>
                 </div>
                 <div class="field-box select-box" style="padding-right:10px;">
-                    <select name="toMonth">
+                    <select name="_toMonth">
                         @for (int month = 1; month <= 12; month++)
                         {
-                            if (month == toDate.Month - 1)   //because the "toDate" contains the first 
+                            if (month == toDate.Month - 1)   //because the "toDate" contains the first
                                                              // moment of the next month
                             {
                                 <option selected>@month</option>
@@ -228,7 +229,7 @@
                     </label>
                 </div>
                 <div class="field-box select-box" style="padding-right:10px;">
-                    <select name="toYear">
+                    <select name="_toYear">
                         @for (int theYear = 2019; theYear <= 2021; theYear++)
                         {
                             if (theYear == toDate.Year)
@@ -281,7 +282,8 @@
                 <tr>
                     @for (DateTime aDate = fromDate; aDate < toDate; aDate = aDate.AddMonths(1))
                     {
-                        <th colspan="2" class="dash02th">@string.Format("{0:MM/yyyy}",aDate)</th>
+                        totalMonths++;
+                        <th colspan="2" class="dash02th">@string.Format("{0:MM/yyyy}", aDate)</th>
                     }
                     <th colspan="2" class="dash02th">Total</th>
                 </tr>
@@ -305,28 +307,38 @@
                                                                      //is larger than the array of available colors
                             var apartmentRevenue = revenueMatrix.getByRowsKey(apartmentNumbers[apartmentI]);
                         }
-                        @*display the 12 revenue and occupancy columns*@
-                        @foreach (var aMonthRevenue in apartmentRevenue)
+                        @*display the revenue and occupancy columns*@
+                        @for (DateTime aDate = fromDate; aDate < toDate; aDate = aDate.AddMonths(1))
                         {
+                            int yearMonth = aDate.Year * 100 + aDate.Month;
+                            RevenueAndOccupancy aMonthRevenue = new RevenueAndOccupancy(30);
+                            if (apartmentRevenue.ContainsKey(yearMonth))
+                            {
+                                aMonthRevenue = apartmentRevenue[yearMonth];
+                            }
                             <td class="dash02td">
-                                @aMonthRevenue.Value.revenue.toMoneyString()
+                                @aMonthRevenue.revenue.toMoneyString()
                             </td>
                             int percentOccupancy =
-                                (int)(aMonthRevenue.Value.percentOccupancy() * 100);
+                                (int)(aMonthRevenue.percentOccupancy() * 100);
                             <td class="dash02td">
                                 @percentOccupancy%
                             </td>
                         }
                         @*display total revenue and average occupancy*@
-                    <td class="dash02total">
-                        @if (apartmentRevenue.Count() > 0)
-                        {
-                            @apartmentRevenue.Sum(rev => rev.Value.revenue).toMoneyString()
-                        }
-
-                    </td>
                         <td class="dash02total">
-                            @apartmentRevenue.Average(rev => rev.Value.percentOccupancy() * 100)%
+                            @if (apartmentRevenue.Count() > 0)
+                            {
+                                @apartmentRevenue.Sum(rev => rev.Value.revenue).toMoneyString()
+                            }
+
+                        </td>
+                        <td class="dash02total">
+                            @{
+                                int intAverageOccupancy =
+                                    (int)(apartmentRevenue.Average(rev => rev.Value.percentOccupancy() * 100));
+                            }
+                            @intAverageOccupancy%   @*average occupacy value followed by %*@
                         </td>
                     </tr>
                 }
@@ -337,23 +349,25 @@
                         double averageOccupancy = 0d;
                         Dictionary<int, Money> revenuePerMonth = new Dictionary<int, Money>();
                     }
-                    @for (int month = 1; month <= 12; month++)
+                    @for (DateTime aDate = fromDate; aDate < toDate; aDate = aDate.AddMonths(1))
                     {
-                        var revenueForMonth = revenueMatrix.getByColumnsKey(month);
-                        Money totalRevenueForMonth = new Money(0,"UAH");
+                        int yearMonth = aDate.Year * 100 + aDate.Month;
+                        var revenueForMonth = revenueMatrix.getByColumnsKey(yearMonth);
+                        Money totalRevenueForMonth = new Money(0, "UAH");
                         if (revenueForMonth.Count > 0)
                         {
                             totalRevenueForMonth = revenueForMonth.Sum(rev => rev.Value.revenue);
                         }
 
                         grandTotalRevenue += totalRevenueForMonth;
-                        revenuePerMonth.Add(month, totalRevenueForMonth);
+                        revenuePerMonth.Add(yearMonth, totalRevenueForMonth);
                         <td class="dash02total">@totalRevenueForMonth.toMoneyString()</td>
 
                         double percentOccupancy = 0;
                         if (revenueForMonth.Count() > 0)
                         {
-                            percentOccupancy = revenueForMonth.Average(rev => rev.Value.percentOccupancy()) * 100;
+                            percentOccupancy = revenueForMonth.Sum(rev => rev.Value.percentOccupancy()) / 
+                                totalMonths * 100;
                         }
 
                         averageOccupancy += percentOccupancy;
@@ -361,18 +375,19 @@
                         <td class="dash02total">@Math.Round(percentOccupancy)%</td>
                     }
                     @{
-                        averageOccupancy = averageOccupancy / 12;
+                        averageOccupancy = averageOccupancy / totalMonths;
                     }
                     <td class="dash02total">@grandTotalRevenue.toMoneyString()</td>
                     <td class="dash02total">@averageOccupancy%</td>
                 </tr>
                 @*expenses line*@
                 <tr>
-                    @for (int month = 1; month <= 12; month++)
+                    @for (DateTime aDate = fromDate; aDate < toDate; aDate = aDate.AddMonths(1))
                     {
-                        if (expensesPerMonth.ContainsKey(month))
+                        int yearMonth = aDate.Year * 100 + aDate.Month;
+                        if (expensesPerMonth.ContainsKey(yearMonth))
                         {
-                            <td class="dash02total">@expensesPerMonth[month].toMoneyString()</td>
+                            <td class="dash02total">@expensesPerMonth[yearMonth].toMoneyString()</td>
                         }
                         else
                         {
@@ -388,17 +403,18 @@
                 </tr>
                 @*net revenue - total revenue minus expenses*@
                 <tr>
-                    @for (int month = 1; month <= 12; month++)
+                    @for (DateTime aDate = fromDate; aDate < toDate; aDate = aDate.AddMonths(1))
                     {
                         Money expensesForMonth = new Money(0, "UAH");
                         Money revenueForMonth = new Money(0, "UAH");
-                        if (expensesPerMonth.ContainsKey(month))
+                        int yearMonth = aDate.Year * 100 + aDate.Month;
+                        if (expensesPerMonth.ContainsKey(yearMonth))
                         {
-                            expensesForMonth = expensesPerMonth[month];
+                            expensesForMonth = expensesPerMonth[yearMonth];
                         }
-                        if (revenuePerMonth.ContainsKey(month))
+                        if (revenuePerMonth.ContainsKey(yearMonth))
                         {
-                            revenueForMonth = revenuePerMonth[month];
+                            revenueForMonth = revenuePerMonth[yearMonth];
                         }
                         Money netRevenue = revenueForMonth - expensesForMonth;
                         <td class="dash02total">@netRevenue.toMoneyString()</td>

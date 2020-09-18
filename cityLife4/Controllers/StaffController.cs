@@ -1077,11 +1077,12 @@ namespace cityLife.Controllers
                 int apartmentNumber = anApartmentDays.Apartment.number;
                 int month = anApartmentDays.date.Month;
                 int year = anApartmentDays.date.Year;
-                if (revenueMatrix.containsKeys(apartmentNumber, month))
+                int yearMonth = year * 100 + month; //May 2020 will become: 202005. November 2019 will become 201911
+                if (revenueMatrix.containsKeys(apartmentNumber, yearMonth))
                 {
                     //revenue statistics for an appartment and month exist - add this days revenue to the 
                     //RevenueAndOccupancy object
-                    revenueMatrix[apartmentNumber, month].addDaysRevenue(anApartmentDays.revenueAsMoney());
+                    revenueMatrix[apartmentNumber, yearMonth].addDaysRevenue(anApartmentDays.revenueAsMoney());
                 }
                 else
                 {
@@ -1090,7 +1091,7 @@ namespace cityLife.Controllers
                     RevenueAndOccupancy revenueAppartmentMonth =
                         new RevenueAndOccupancy(DateTime.DaysInMonth(year, month));
                     revenueAppartmentMonth.addDaysRevenue(anApartmentDays.revenueAsMoney());
-                    revenueMatrix.Add(apartmentNumber, month, revenueAppartmentMonth);
+                    revenueMatrix.Add(apartmentNumber, yearMonth, revenueAppartmentMonth);
                 }
             }
 
@@ -1102,13 +1103,14 @@ namespace cityLife.Controllers
             foreach(var anExpense in expenses)
             {
                 int month = anExpense.date.Month;
-                if (expensesPerMonth.ContainsKey(month))
+                int yearMonth = anExpense.date.Year * 100 + month;
+                if (expensesPerMonth.ContainsKey(yearMonth))
                 {
-                    expensesPerMonth[month] += anExpense.expenseAsMoney();
+                    expensesPerMonth[yearMonth] += anExpense.expenseAsMoney();
                 }
                 else
                 {
-                    expensesPerMonth.Add(month, anExpense.expenseAsMoney());
+                    expensesPerMonth.Add(yearMonth, anExpense.expenseAsMoney());
                 }
             }
             ViewBag.revenueMatrix = revenueMatrix;
