@@ -1060,58 +1060,71 @@ namespace cityLife.Controllers
                 toYear = (int)_toYear;
             }
             DateTime fromDate = new DateTime(fromYear, fromMonth, 1);
-            DateTime toDate = new DateTime(toYear, toMonth, 1).AddMonths(1);  //if toMonth = 12 and toYear = 2020, then
-                                                                              //toYear will be 1/1/2021 00:00
+            DateTime toDate = new DateTime(toYear, toMonth, 1);  //if toMonth = 12 and toYear = 2020, then
+                                                                 //toYear will be 1/12/2020
+
+            //fromDate is after toDate - reverse the 2 dates
+            if (fromDate > toDate)
+            {
+                DateTime temp = fromDate;
+                fromDate = toDate;
+                toDate = temp;
+            }
 
             //The key of the dictionary is the apartment number. The value is the revenue and occupancy 
             //statistics for each month in the year for that apartment
             //See: https://docs.google.com/spreadsheets/d/1-xa-eSMR8yv7E8f9GBTBTVFPfG-ko9Ask8akpfHB-4Q/edit#gid=0
             //for an example of the report
+            //Note that for "toDate" we add 1 month - if "toDate" is 12/2020, then we need to read all revenue data 
+            //until 31/12/2020. So the condition is date < toDate.AddMonths(1), which is 1/1/2021 00:00:00
+            DateTime toDatePlus1 = toDate.AddMonths(1);
             var apartmentDays = from anApartmentDays in db.ApartmentDays
                                 where anApartmentDays.status != ApartOccuStatus.Free
-                                && anApartmentDays.date >= fromDate && anApartmentDays.date < toDate
+                                && anApartmentDays.date >= fromDate && anApartmentDays.date < toDatePlus1
                                 select anApartmentDays;
-            Dictionary2d<int, int, RevenueAndOccupancy> revenueMatrix = new Dictionary2d<int, int, RevenueAndOccupancy>();
+            Dictionary2d<int, DateTime, RevenueAndOccupancy> revenueMatrix = new Dictionary2d<int, DateTime, RevenueAndOccupancy>();
+
+            //Find all apartments which exist in the apartmentDays
+            var apartmentList = (from anApartmentDays in apartmentDays
+                                select anApartmentDays.Apartment.number).Distinct();
+            
+            //Populate all rows (apartments) and columns (months) of revenueMatrix
+            foreach(int apartmentNumber in apartmentList)
+            {
+                for (DateTime aDate = fromDate; aDate <= toDate; aDate = aDate.AddMonths(1))
+                {
+                    int daysInMonth = DateTime.DaysInMonth(aDate.Year, aDate.Month);
+                    revenueMatrix.Add(apartmentNumber, aDate, new RevenueAndOccupancy(daysInMonth));
+                }
+            }
+            //At this point the revenue matrix contains edmpty RevenuyeAndOccupancy objects for all apartments and 
+            //months.
+            //Populate the revenueMatrix with real revenue data
             foreach (var anApartmentDays in apartmentDays)
             {
                 int apartmentNumber = anApartmentDays.Apartment.number;
-                int month = anApartmentDays.date.Month;
-                int year = anApartmentDays.date.Year;
-                int yearMonth = year * 100 + month; //May 2020 will become: 202005. November 2019 will become 201911
-                if (revenueMatrix.containsKeys(apartmentNumber, yearMonth))
-                {
-                    //revenue statistics for an appartment and month exist - add this days revenue to the 
-                    //RevenueAndOccupancy object
-                    revenueMatrix[apartmentNumber, yearMonth].addDaysRevenue(anApartmentDays.revenueAsMoney());
-                }
-                else
-                {
-                    //This is the first time we have revenue for that appartment and that day. Create a new 
-                    //Re3venueAndOccupancy object and insert into the 2D dictionary
-                    RevenueAndOccupancy revenueAppartmentMonth =
-                        new RevenueAndOccupancy(DateTime.DaysInMonth(year, month));
-                    revenueAppartmentMonth.addDaysRevenue(anApartmentDays.revenueAsMoney());
-                    revenueMatrix.Add(apartmentNumber, yearMonth, revenueAppartmentMonth);
-                }
+                //convert the date to be the first day of the relevant month
+                DateTime yearMonth = new DateTime(anApartmentDays.date.Year, anApartmentDays.date.Month, 1);
+               
+                revenueMatrix[apartmentNumber, yearMonth].addDaysRevenue(anApartmentDays.revenueAsMoney());
             }
 
             //Calculate expenses
             var expenses = from anExpense in db.Expenses
-                           where anExpense.date >= fromDate && anExpense.date < toDate
+                           where anExpense.date >= fromDate && anExpense.date < toDatePlus1
                            select anExpense;
-            Dictionary<int, Money> expensesPerMonth = new Dictionary<int, Money>();
-            foreach(var anExpense in expenses)
+            Dictionary<DateTime, Money> expensesPerMonth = new Dictionary<DateTime, Money>();
+            //populate all months of expensesPerMonth with 0 values.
+            for (DateTime aDate = fromDate; aDate <= toDate; aDate = aDate.AddMonths(1))
             {
-                int month = anExpense.date.Month;
-                int yearMonth = anExpense.date.Year * 100 + month;
-                if (expensesPerMonth.ContainsKey(yearMonth))
-                {
-                    expensesPerMonth[yearMonth] += anExpense.expenseAsMoney();
-                }
-                else
-                {
-                    expensesPerMonth.Add(yearMonth, anExpense.expenseAsMoney());
-                }
+                DateTime yearMonth = new DateTime(aDate.Year, aDate.Month, 1);  //such as 1/12/2020
+                expensesPerMonth.Add(yearMonth, new Money(0m, "UAH"));
+            }
+            //At this point expensesPerMonth contain a Money record for each month in the report - with 0 value
+            foreach (var anExpense in expenses)
+            {
+                DateTime yearMonth = new DateTime(anExpense.date.Year, anExpense.date.Month, 1);
+                expensesPerMonth[yearMonth] += anExpense.expenseAsMoney();
             }
             ViewBag.revenueMatrix = revenueMatrix;
             ViewBag.expensesPerMonth = expensesPerMonth;
@@ -1120,10 +1133,6 @@ namespace cityLife.Controllers
             ViewBag.tBox = tBox;
             ViewBag.fromDate = fromDate;
             ViewBag.toDate = toDate;
-            //ViewBag.fromMonth = fromMonth;
-            //ViewBag.fromYear = fromYear;
-            //ViewBag.toMonth = toMonth;
-            //ViewBag.toYear = toYear;
             ViewBag.employee = theEmployee;
             return View("s33revenueReport");
         }
