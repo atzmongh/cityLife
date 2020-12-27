@@ -104,17 +104,17 @@ input:-ms-input-placeholder {
 @font-face {
   font-family: 'lato-medium';
   src: url("../fonts/lato-medium.eot");
-  src: url("../fonts/lato-medium.eot") format("embedded-opentype"), url("../fonts/lato-medium.woff2") format("woff2"), url("../fonts/lato-medium.woff") format("woff"), url("../fonts/lato-medium.ttf") format("truetype"), url("../fonts/lato-medium.svg#lato-medium") format("svg"); }
+  src: url("../fonts/lato-medium.eot") format("embedded-opentype"),   url("../fonts/lato-medium.ttf") format("truetype"), url("../fonts/lato-medium.svg#lato-medium") format("svg"); }
 
 @font-face {
   font-family: 'lato-semibold';
   src: url("../fonts/lato-semibold.eot");
-  src: url("../fonts/lato-semibold.eot") format("embedded-opentype"), url("../fonts/lato-semibold.woff2") format("woff2"), url("../fonts/lato-semibold.woff") format("woff"), url("../fonts/lato-semibold.ttf") format("truetype"), url("../fonts/lato-semibold.svg#lato-semibold") format("svg"); }
+  src: url("../fonts/lato-semibold.eot") format("embedded-opentype"),  url("../fonts/lato-semibold.woff") format("woff"), url("../fonts/lato-semibold.ttf") format("truetype"), url("../fonts/lato-semibold.svg#lato-semibold") format("svg"); }
 
 @font-face {
   font-family: 'lato-bold';
   src: url("../fonts/lato-bold.eot");
-  src: url("../fonts/lato-bold.eot") format("embedded-opentype"), url("../fonts/lato-bold.woff2") format("woff2"), url("../fonts/lato-bold.woff") format("woff"), url("../fonts/lato-bold.ttf") format("truetype"), url("../fonts/lato-bold.svg#lato-bold") format("svg"); }
+  src: url("../fonts/lato-bold.eot") format("embedded-opentype"),  url("../fonts/lato-bold.woff") format("woff"), url("../fonts/lato-bold.ttf") format("truetype"), url("../fonts/lato-bold.svg#lato-bold") format("svg"); }
 
 @font-face {
   font-family: 'lato-extrabold';
@@ -590,17 +590,17 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
 @font-face {
   font-family: 'lato-medium';
   src: url("../fonts/lato-medium.eot");
-  src: url("../fonts/lato-medium.eot") format("embedded-opentype"), url("../fonts/lato-medium.woff2") format("woff2"), url("../fonts/lato-medium.woff") format("woff"), url("../fonts/lato-medium.ttf") format("truetype"), url("../fonts/lato-medium.svg#lato-medium") format("svg"); }
+  src: url("../fonts/lato-medium.eot") format("embedded-opentype"),  url("../fonts/lato-medium.ttf") format("truetype"), url("../fonts/lato-medium.svg#lato-medium") format("svg"); }
 
 @font-face {
   font-family: 'lato-semibold';
   src: url("../fonts/lato-semibold.eot");
-  src: url("../fonts/lato-semibold.eot") format("embedded-opentype"), url("../fonts/lato-semibold.woff2") format("woff2"), url("../fonts/lato-semibold.woff") format("woff"), url("../fonts/lato-semibold.ttf") format("truetype"), url("../fonts/lato-semibold.svg#lato-semibold") format("svg"); }
+  src: url("../fonts/lato-semibold.eot") format("embedded-opentype"),  url("../fonts/lato-semibold.woff") format("woff"), url("../fonts/lato-semibold.ttf") format("truetype"), url("../fonts/lato-semibold.svg#lato-semibold") format("svg"); }
 
 @font-face {
   font-family: 'lato-bold';
   src: url("../fonts/lato-bold.eot");
-  src: url("../fonts/lato-bold.eot") format("embedded-opentype"), url("../fonts/lato-bold.woff2") format("woff2"), url("../fonts/lato-bold.woff") format("woff"), url("../fonts/lato-bold.ttf") format("truetype"), url("../fonts/lato-bold.svg#lato-bold") format("svg"); }
+  src: url("../fonts/lato-bold.eot") format("embedded-opentype"), url("../fonts/lato-bold.woff") format("woff"), url("../fonts/lato-bold.ttf") format("truetype"), url("../fonts/lato-bold.svg#lato-bold") format("svg"); }
 
 @font-face {
   font-family: 'lato-extrabold';

@@ -5,7 +5,7 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="413d876f0084455baeaf7d87ac2e25da" Name="Diagram1" ZoomLevel="100" >
-        <EntityTypeShape EntityType="cityLifeDB.Apartment" Width="1.5" PointX="4.125" PointY="0.75" />
+        <EntityTypeShape EntityType="cityLifeDB.Apartment" Width="1.5" PointX="4.375" PointY="0.625" />
         <EntityTypeShape EntityType="cityLifeDB.ApartmentPhoto" Width="1.75" PointX="4.625" PointY="4.5" />
         <AssociationConnector Association="cityLifeDB.ApartmentApartmentPhoto" />
         <EntityTypeShape EntityType="cityLifeDB.Pricing" Width="1.5" PointX="0.5" PointY="0.75" />
@@ -43,6 +43,10 @@
         <AssociationConnector Association="cityLifeDB.FK_CurrencyExpense" />
         <EntityTypeShape EntityType="cityLifeDB.ExpenseType" Width="1.5" PointX="12.625" PointY="9.875" />
         <AssociationConnector Association="cityLifeDB.FK_ExpenseTypeExpense" />
+        <EntityTypeShape EntityType="cityLifeDB.Hotel" Width="1.5" PointX="2.25" PointY="1.75" />
+        <EntityTypeShape EntityType="cityLifeDB.sysdiagram" Width="1.5" PointX="13.375" PointY="8.875" />
+        <AssociationConnector Association="cityLifeDB.FK_HotelApartment" />
+        <AssociationConnector Association="cityLifeDB.FK_HotelEmployeeWorkDays" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

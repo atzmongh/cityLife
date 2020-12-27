@@ -702,8 +702,11 @@ namespace cityLife.Controllers
             List<Money> revenuPerApartment = null;
             List<double> averageDaysPerApartment = null;
             List<int> occupanyPercentPerApartment = null;
+            List<Hotel> hotels = null;
+            List<int> hotelIds = new List<int> { 1, 2, 3 };
             var apartmentDayBlocks = theStaffController.s21dashboardPreparation(new DateTime(2018, 9, 20),
                 31,
+                hotelIds,
                 ref revenuePerDay,
                 ref expensePerDay,
                 ref expenseTypes,
@@ -711,7 +714,8 @@ namespace cityLife.Controllers
                 ref averageDaysPerApartment,
                 ref occupanyPercentPerApartment,
                 ref empWorkDaysArray,
-                ref maidList);
+                ref maidList,
+                ref hotels);
             int testNumber = 1;
             foreach (var anApartment in apartmentDayBlocks)
             {

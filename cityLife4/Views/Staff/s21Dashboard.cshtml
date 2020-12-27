@@ -19,6 +19,7 @@
     string wideDashboard = ViewBag.wideDashboard;   //contains either the word "checked" or empty
     int dashboardDays = ViewBag.dashboardDays;
     List<Employee> maidList = ViewBag.maidList;
+    List<Hotel> hotels = ViewBag.hotels;
     string wide = "";
     string high = "";
     if (wideDashboard == "checked")
@@ -182,6 +183,11 @@
 
             @tBox.translate("Dashboard")
             <span>(@fromDateSt)</span>
+            @foreach (Hotel aHotel in hotels)
+            {
+                string hotelId = "hotel" + aHotel.Id;
+                <input type="checkbox" name="@hotelId" onchange="$('#fromDateForm').submit()" data-hotel-id="@aHotel.Id" checked />@aHotel.nameKey 
+            }
             <input type="checkbox" name="wideDashboard" onchange="$('#fromDateForm').submit()" @wideDashboard />Wide
             <label for="datepickerBtn" class="datepicker-btn">
                 <input type="text" readonly="readonly" id="datepickerBtn" name="fromDate" class="call-datepicker"
