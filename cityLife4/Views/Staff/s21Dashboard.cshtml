@@ -8,6 +8,7 @@
     string fromDateSt = fromDate.ToString("dd/MM/yyyy");
     DateTime today = ViewBag.today;
     List<List<DayBlock>> apartmentDayBlocks = ViewBag.apartmentDayBlocks;
+    List<int> hotelIds = ViewBag.hotelIds;
     List<Money> revenuePerDay = ViewBag.revenuePerDay;
     List<Money> expensePerDay = ViewBag.expensePerDay;
     List<string> expenseTypes = ViewBag.expenseTypes;
@@ -186,7 +187,8 @@
             @foreach (Hotel aHotel in hotels)
             {
                 string hotelId = "hotel" + aHotel.Id;
-                <input type="checkbox" name="@hotelId" onchange="$('#fromDateForm').submit()" data-hotel-id="@aHotel.Id" checked />@aHotel.nameKey 
+                string check = hotelIds.Contains(aHotel.Id) ? "checked" : "";
+                <input type="checkbox" name="@hotelId" onchange="$('#fromDateForm').submit()" data-hotel-id="@aHotel.Id" @check />@aHotel.nameKey 
             }
             <input type="checkbox" name="wideDashboard" onchange="$('#fromDateForm').submit()" @wideDashboard />Wide
             <label for="datepickerBtn" class="datepicker-btn">

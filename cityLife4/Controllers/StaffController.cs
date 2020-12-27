@@ -164,6 +164,9 @@ namespace cityLife.Controllers
         /// or since today. (the default)
         /// </summary>
         /// <param name="fromDate">Date entered in the date picker, or null</param>
+        /// <param name="hotel1">Currently we assume that there are exactly 3 hotels with IDs 1,2,3
+        /// when "on" - this hotel should be displayed. When "off" or null - this hotel should not be 
+        /// displayed</param>
         /// <param name="wideDashboard">When "on" means that the user wants to get the wide version of the dashboard.
         /// In this mode, each column is wider (about 4 normal columns), we show only 3 days, and we put more data into\
         /// each order element.</param>
@@ -173,14 +176,17 @@ namespace cityLife.Controllers
             string hotel1, string hotel2, string hotel3,
             string wideDashboard = "off")
         {
-            //if this is an initial request for the dashboard - check if a cooky exists with the 
+            //if this is an initial request for the dashboard (or the user 
+            //unchecked all hotels - check if a cooky exists with the 
             //default value for hotel information
-            if (fromDate == null)
+            //if the cookie exists - insert its value to the variable. Otherwise - insert "off"
+            if (hotel1 == null && hotel2 == null && hotel3 == null)
             {
-                hotel1 = HttpContext.Request.Cookies["hotel1"]?.Value;
-                hotel2 = HttpContext.Request.Cookies["hotel2"]?.Value;
-                hotel3 = HttpContext.Request.Cookies["hotel3"]?.Value;
+                hotel1 = (HttpContext.Request.Cookies["hotel1"]?.Value) ?? "off";
+                hotel2 = (HttpContext.Request.Cookies["hotel2"]?.Value) ?? "off";
+                hotel3 = HttpContext.Request.Cookies["hotel3"]?.Value ?? "off";
             }
+            //At this point hotel1 will contain either "on" or "off". Same for hotel2 and hotel3
             DateTime startDate;
             if (fromDate == null && Session["fromDate"] == null)
             {
@@ -231,7 +237,14 @@ namespace cityLife.Controllers
                 List<double> aveargeDaysPerApartment = null;
                 List<int> percentOccupancyPerApartment = null;
                 List<Hotel> hotels = null;
-                List<int> hotelIds = new List<int>{ 1, 2, 3 };
+                List<int> hotelIds = new List<int>();
+                if (hotel1 == "on")
+                    hotelIds.Add(1);
+                if (hotel2 == "on")
+                    hotelIds.Add(2);
+                if (hotel3 == "on")
+                    hotelIds.Add(3);
+
                 var apartmentDayBlocks = s21dashboardPreparation(
                     startDate,
                     dashboardDays,
@@ -246,6 +259,7 @@ namespace cityLife.Controllers
                     ref maidList,
                     ref hotels);
                 ViewBag.apartmentDayBlocks = apartmentDayBlocks;
+                ViewBag.hotelIds = hotelIds;
                 ViewBag.revenuePerDay = revenuePerDay;
                 ViewBag.expensePerDay = expensePerDay;
                 ViewBag.expenseTypes = expenseTypes;
@@ -271,6 +285,15 @@ namespace cityLife.Controllers
                 {
                     ViewBag.highlightOrderId = 0;
                 }
+                HttpCookie hotel1Cookie = new HttpCookie("hotel1", hotel1);
+                hotel1Cookie.Expires = FakeDateTime.Now.AddDays(120);
+                Response.Cookies.Add(hotel1Cookie);
+                HttpCookie hotel2Cookie = new HttpCookie("hotel2", hotel2);
+                hotel2Cookie.Expires = FakeDateTime.Now.AddDays(120);
+                Response.Cookies.Add(hotel2Cookie);
+                HttpCookie hotel3Cookie = new HttpCookie("hotel3", hotel3);
+                hotel3Cookie.Expires = FakeDateTime.Now.AddDays(120);
+                Response.Cookies.Add(hotel3Cookie);
                 return View("s21Dashboard");
             }
 
