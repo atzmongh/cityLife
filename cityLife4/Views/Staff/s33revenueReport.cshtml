@@ -169,11 +169,11 @@
 </style>
 <div class="main-wrapper reset-indent">
     <form id="monthRangeForm" method="get" action="s33RevenueReport">
-        <div class="page-heading">
+        <div class="page-heading" style="padding: 25px 0;">
 
             @tBox.translate("Revenue Report")
-            <div class="form-box-wrap" style="width:920px;">
-                <div class="field-box select-box" style="padding-right:10px;">
+            <div class="form-box-wrap" style="justify-content: center; flex-wrap: wrap;">
+                <div class="field-box select-box" style="padding-right:5px; max-width: 170px;">
                     <select name="_fromMonth">
                         @for (int month = 1; month <= 12; month++)
                         {
@@ -191,7 +191,7 @@
                         <span class="field-name">@tBox.translate("from month")</span>
                     </label>
                 </div>
-                <div class="field-box select-box" style="padding-right:10px;">
+                <div class="field-box select-box" style="padding-right: 5px; max-width: 170px;">
                     <select name="_fromYear">
                         @for (int theYear = 2019; theYear <= 2021; theYear++)
                         {
@@ -209,7 +209,7 @@
                         <span class="field-name">@tBox.translate("from year")</span>
                     </label>
                 </div>
-                <div class="field-box select-box" style="padding-right:10px;">
+                <div class="field-box select-box" style="padding-right: 5px;max-width: 170px;">
                     <select name="_toMonth">
                         @for (int month = 1; month <= 12; month++)
                         {
@@ -227,7 +227,7 @@
                         <span class="field-name">@tBox.translate("to month")</span>
                     </label>
                 </div>
-                <div class="field-box select-box" style="padding-right:10px;">
+                <div class="field-box select-box" style="padding-right: 5px; max-width: 170px;">
                     <select name="_toYear">
                         @for (int theYear = 2019; theYear <= 2021; theYear++)
                         {
@@ -289,11 +289,13 @@
 
                 @*line 2 - revenue and occupancy titles*@
                 <tr>
-                    @for (DateTime aDate = fromDate; aDate <= toDate; aDate = aDate.AddMonths(1))
+                    @for (DateTime aDate = fromDate; aDate <= toDate; aDate = aDate.AddMonths(1)) 
                     {
                         <th class="dash02th">rev</th>
                         <th class="dash02th">occ%</th>
                     }
+                    <th class="dash02th">rev</th>
+                    <th class="dash02th">occ%</th>
                 </tr>
                 @*line 3 and above - revenue/occupancy lines (1 line for each apartment, 2 columns for each month)*@
 

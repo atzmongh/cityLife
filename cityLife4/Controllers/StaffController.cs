@@ -164,13 +164,29 @@ namespace cityLife.Controllers
         /// or since today. (the default)
         /// </summary>
         /// <param name="fromDate">Date entered in the date picker, or null</param>
+        /// <param name="hotel1">Currently we assume that there are exactly 3 hotels with IDs 1,2,3
+        /// when "on" - this hotel should be displayed. When "off" or null - this hotel should not be 
+        /// displayed</param>
         /// <param name="wideDashboard">When "on" means that the user wants to get the wide version of the dashboard.
         /// In this mode, each column is wider (about 4 normal columns), we show only 3 days, and we put more data into\
         /// each order element.</param>
         /// <returns></returns>
         [HttpGet]
-        public ActionResult s21Dashboard(DateTime? fromDate, string wideDashboard = "off")
+        public ActionResult s21Dashboard(DateTime? fromDate, 
+            string hotel1, string hotel2, string hotel3,
+            string wideDashboard = "off")
         {
+            //if this is an initial request for the dashboard (or the user 
+            //unchecked all hotels - check if a cooky exists with the 
+            //default value for hotel information
+            //if the cookie exists - insert its value to the variable. Otherwise - insert "off"
+            if (hotel1 == null && hotel2 == null && hotel3 == null)
+            {
+                hotel1 = (HttpContext.Request.Cookies["hotel1"]?.Value) ?? "off";
+                hotel2 = (HttpContext.Request.Cookies["hotel2"]?.Value) ?? "off";
+                hotel3 = HttpContext.Request.Cookies["hotel3"]?.Value ?? "off";
+            }
+            //At this point hotel1 will contain either "on" or "off". Same for hotel2 and hotel3
             DateTime startDate;
             if (fromDate == null && Session["fromDate"] == null)
             {
@@ -220,9 +236,19 @@ namespace cityLife.Controllers
                 List<Money> revenuePerApartment = null;
                 List<double> aveargeDaysPerApartment = null;
                 List<int> percentOccupancyPerApartment = null;
+                List<Hotel> hotels = null;
+                List<int> hotelIds = new List<int>();
+                if (hotel1 == "on")
+                    hotelIds.Add(1);
+                if (hotel2 == "on")
+                    hotelIds.Add(2);
+                if (hotel3 == "on")
+                    hotelIds.Add(3);
+
                 var apartmentDayBlocks = s21dashboardPreparation(
                     startDate,
                     dashboardDays,
+                    hotelIds,
                     ref revenuePerDay,
                     ref expensePerDay,
                     ref expenseTypes,
@@ -230,8 +256,10 @@ namespace cityLife.Controllers
                     ref aveargeDaysPerApartment,
                     ref percentOccupancyPerApartment,
                     ref empWorkDaysArray,
-                    ref maidList);
+                    ref maidList,
+                    ref hotels);
                 ViewBag.apartmentDayBlocks = apartmentDayBlocks;
+                ViewBag.hotelIds = hotelIds;
                 ViewBag.revenuePerDay = revenuePerDay;
                 ViewBag.expensePerDay = expensePerDay;
                 ViewBag.expenseTypes = expenseTypes;
@@ -246,6 +274,7 @@ namespace cityLife.Controllers
                 ViewBag.wideDashboard = wideDashboard == "on" ? "checked" : "";
                 ViewBag.dashboardDays = dashboardDays;
                 ViewBag.maidList = maidList;
+                ViewBag.hotels = hotels;
 
                 ViewBag.employee = theEmployee;
                 if (Session["lastOrderDetails"] != null)
@@ -256,6 +285,15 @@ namespace cityLife.Controllers
                 {
                     ViewBag.highlightOrderId = 0;
                 }
+                HttpCookie hotel1Cookie = new HttpCookie("hotel1", hotel1);
+                hotel1Cookie.Expires = FakeDateTime.Now.AddDays(120);
+                Response.Cookies.Add(hotel1Cookie);
+                HttpCookie hotel2Cookie = new HttpCookie("hotel2", hotel2);
+                hotel2Cookie.Expires = FakeDateTime.Now.AddDays(120);
+                Response.Cookies.Add(hotel2Cookie);
+                HttpCookie hotel3Cookie = new HttpCookie("hotel3", hotel3);
+                hotel3Cookie.Expires = FakeDateTime.Now.AddDays(120);
+                Response.Cookies.Add(hotel3Cookie);
                 return View("s21Dashboard");
             }
 
@@ -269,8 +307,11 @@ namespace cityLife.Controllers
         /// </summary>
         ///<param name="fromDate">starting date of the dashboard</param>
         ///<param name="days">the number of days we wish to display.(depends on the starting month)</param>
+        ///<param name="hotelIds">list of hotel IDs in the current filter. Either what the user has clicked
+        ///or what has been kept in the cookie.</param>
         ///<param name="revenuePerDay">An output parameter - will contain the list of revenues per day</param>
         ///<param name="expensePerDay">total expenses for each day</param>
+        ///<param name="expenseTypes">list of expense types</param>
         ///<param name="percentOccupancyPerApartment">Number of days the apartment is occupied divided by total number of days (rounded to 
         ///whole percent)</param>
         ///<param name="revenuePerApartment">Total revenue per apartment for that month</param>
@@ -281,6 +322,7 @@ namespace cityLife.Controllers
         ///Days for which no record found - will be null. Days for which more than one recrod found - will contain
         ///the last record. </param>
         ///<param name="maidList">A list of maids (employees of role="maid") - ouitput parameter</param>
+        ///<param name="hotels">list of all hotels in the system</param>
         /// <returns>List of apartment orders. For each apartment:
         /// list of DayBlocks.
         /// A dayBlock is either a single free day, or an order which can span 1 or more days. Note that a day block may not 
@@ -288,6 +330,7 @@ namespace cityLife.Controllers
         /// Note  that the list contains first all real apartments, then "waiting" apartments</returns>
         public List<List<DayBlock>> s21dashboardPreparation(DateTime fromDate,
             int days,
+            List<int> hotelIds,
             ref List<Money> revenuePerDay,
             ref List<Money> expensePerDay,
             ref List<string> expenseTypes,
@@ -295,7 +338,8 @@ namespace cityLife.Controllers
             ref List<double> averageDaysPerApartment,
             ref List<int> percentOccupancyPerApartment,
             ref EmployeeWorkDay[] empWorkDaysArray,
-            ref List<Employee> maidList)
+            ref List<Employee> maidList,
+            ref List<Hotel> hotels)
         {
             //for each apartment
             //for each day from from_date to from_date+3
@@ -345,6 +389,7 @@ namespace cityLife.Controllers
             //Sort apartments by type (first all "normal" apartments then the "waiting" apartments), then by their number
             var sortedApartments = from anApartment in db.Apartments
                                    orderby anApartment.type, anApartment.number
+                                   where hotelIds.Contains(anApartment.hotel_Id)
                                    select anApartment;
             Order anOrder = new Order()   //create a fictitious order with id = 0
             {
@@ -496,6 +541,7 @@ namespace cityLife.Controllers
 
             expenseTypes = (from expenseType in db.ExpenseTypes
                             select expenseType.nameKey).ToList();
+            hotels = db.Hotels.ToList();
 
 
 
@@ -941,7 +987,7 @@ namespace cityLife.Controllers
         /// <summary>
         /// Creates a list of expenses for the date selected by the user
         /// </summary>
-        /// <param name="expenseDate">the date in </param>
+        /// <param name="expenseDateSt">the date in </param>
         /// <returns></returns>
         [HttpGet]
         public PartialViewResult s30showExpensesForDate(string expenseDateSt)
@@ -1042,23 +1088,11 @@ namespace cityLife.Controllers
                 //No user is logged in - go to login screen
                 return s10login();
             }
-            int fromMonth, fromYear, toMonth, toYear;
-            if (_fromMonth == null)
-            {
-                //This is the initial request for this screen - no dates were entered by the user 
-                //set default dates
-                fromMonth = 1;
-                fromYear = 2019;// FakeDateTime.DateNow.Year;
-                toMonth = FakeDateTime.DateNow.Month;
-                toYear = fromYear;
-            }
-            else
-            {
-                fromMonth = (int)_fromMonth;
-                fromYear = (int)_fromYear;
-                toMonth = (int)_toMonth;
-                toYear = (int)_toYear;
-            }
+            
+            int fromMonth = _fromMonth ?? 1;
+            int fromYear = _fromYear?? FakeDateTime.DateNow.Year;
+            int toMonth = _toMonth?? FakeDateTime.DateNow.Month;
+            int toYear = _toYear ?? fromYear;
             DateTime fromDate = new DateTime(fromYear, fromMonth, 1);
             DateTime toDate = new DateTime(toYear, toMonth, 1);  //if toMonth = 12 and toYear = 2020, then
                                                                  //toYear will be 1/12/2020
@@ -1077,9 +1111,12 @@ namespace cityLife.Controllers
             //for an example of the report
             //Note that for "toDate" we add 1 month - if "toDate" is 12/2020, then we need to read all revenue data 
             //until 31/12/2020. So the condition is date < toDate.AddMonths(1), which is 1/1/2021 00:00:00
+            //We take only information about apartment with positive apartment numbers - apartments with 
+            //negative numbers are "waiting list" apartments (not real)
             DateTime toDatePlus1 = toDate.AddMonths(1);
             var apartmentDays = from anApartmentDays in db.ApartmentDays
-                                where anApartmentDays.status != ApartOccuStatus.Free
+                                where anApartmentDays.status != ApartOccuStatus.Free 
+                                && anApartmentDays.Apartment.number > 0
                                 && anApartmentDays.date >= fromDate && anApartmentDays.date < toDatePlus1
                                 select anApartmentDays;
             Dictionary2d<int, DateTime, RevenueAndOccupancy> revenueMatrix = new Dictionary2d<int, DateTime, RevenueAndOccupancy>();
@@ -1097,7 +1134,7 @@ namespace cityLife.Controllers
                     revenueMatrix.Add(apartmentNumber, aDate, new RevenueAndOccupancy(daysInMonth));
                 }
             }
-            //At this point the revenue matrix contains edmpty RevenuyeAndOccupancy objects for all apartments and 
+            //At this point the revenue matrix contains empty RevenuyeAndOccupancy objects for all apartments and 
             //months.
             //Populate the revenueMatrix with real revenue data
             foreach (var anApartmentDays in apartmentDays)
@@ -1140,7 +1177,7 @@ namespace cityLife.Controllers
         /// <summary>
         /// Calculate the  amount of expenses for that date (as money string)
         /// </summary>
-        /// <param name="aDate">the date for which we want to calcualte the expenses</param>
+        /// <param name="theExpenseDate">the date for which we want to calcualte the expenses</param>
         /// <returns>total expenses as string (without currency and cents in UAH)</returns>
         private string calculateExpensesForDate(DateTime theExpenseDate)
         {
@@ -1165,15 +1202,12 @@ namespace cityLife.Controllers
         /// <summary>
         /// This method is an auxiliary method to create the translation box and to insert it if needed to the Session variable
         /// It was copied from the public controller. A more elegant solution would be to create one method that will get the 
-        /// controller as a pararmeter.
+        /// controller as a parameter.
         /// </summary>
         /// <param name="language">language code, if set by the user</param>
         /// <returns>the translation box</returns>
         public TranslateBox setTbox(string language)
         {
-            cityLifeDBContainer1 db = new cityLifeDBContainer1();
-
-
             TranslateBox tBox;
             if (Session["tBox"] == null)
             {
