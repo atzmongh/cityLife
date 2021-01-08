@@ -184,13 +184,16 @@
 
             @tBox.translate("Dashboard")
             <span>(@fromDateSt)</span>
+            @*hotel filter (which hotels will be displayed)*@
             @foreach (Hotel aHotel in hotels)
             {
                 string hotelId = "hotel" + aHotel.Id;
                 string check = hotelIds.Contains(aHotel.Id) ? "checked" : "";
                 <input type="checkbox" name="@hotelId" onchange="$('#fromDateForm').submit()" data-hotel-id="@aHotel.Id" @check />@aHotel.nameKey 
             }
+            @*wide format - when checked shows each day as 4 columns*@
             <input type="checkbox" name="wideDashboard" onchange="$('#fromDateForm').submit()" @wideDashboard />Wide
+            @*calendar - the user can select the report starting date*@
             <label for="datepickerBtn" class="datepicker-btn">
                 <input type="text" readonly="readonly" id="datepickerBtn" name="fromDate" class="call-datepicker"
                        onchange="$('#fromDateForm').submit()">

@@ -177,7 +177,7 @@ namespace cityLife.Controllers
             string wideDashboard = "off")
         {
             //if this is an initial request for the dashboard (or the user 
-            //unchecked all hotels - check if a cooky exists with the 
+            //unchecked all hotels) - check if a cooky exists with the 
             //default value for hotel information
             //if the cookie exists - insert its value to the variable. Otherwise - insert "off"
             if (hotel1 == null && hotel2 == null && hotel3 == null)
@@ -207,7 +207,7 @@ namespace cityLife.Controllers
             }
             //At this point startDate contains a date (and also Session[fromDate"] - contains the same date
 
-            //Currntly for both normal mode and wide mode we dislay 31 days. The number of days can be set here.
+            //Currntly for both normal mode and wide mode we dislay a full month. The number of days can be set here.
             //We display one month. The calculation is: the number of days displayed are equal to the month length of the starting month. 
             //In most cases this will yield an end date which is one less that the starting date. The only exception is January 30 and 31, which will 
             //end at 1 or 2 of March.
@@ -238,6 +238,7 @@ namespace cityLife.Controllers
                 List<int> percentOccupancyPerApartment = null;
                 List<Hotel> hotels = null;
                 List<int> hotelIds = new List<int>();
+                //here again we assume 3 hotels, with IDs 1,2,3
                 if (hotel1 == "on")
                     hotelIds.Add(1);
                 if (hotel2 == "on")
@@ -386,9 +387,10 @@ namespace cityLife.Controllers
                 expensePerDay.Add(expensesForDate);
             }
 
-            //Sort apartments by type (first all "normal" apartments then the "waiting" apartments), then by their number
+            //Sort apartments by type (first all "normal" apartments then the "waiting" apartments), 
+            //then by hotel ID and then by their number
             var sortedApartments = from anApartment in db.Apartments
-                                   orderby anApartment.type, anApartment.number
+                                   orderby anApartment.type, anApartment.hotel_Id, anApartment.number
                                    where hotelIds.Contains(anApartment.hotel_Id)
                                    select anApartment;
             Order anOrder = new Order()   //create a fictitious order with id = 0
