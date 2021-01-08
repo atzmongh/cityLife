@@ -658,7 +658,7 @@
     <Compile Include="Expense.cs">
       <DependentUpon>cityLife.tt</DependentUpon>
     </Compile>
-    <Compile Include="expenseType.cs">
+    <Compile Include="ExpenseType.cs">
       <DependentUpon>cityLife.tt</DependentUpon>
     </Compile>
     <Compile Include="Global.asax.cs">

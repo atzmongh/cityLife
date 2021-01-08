@@ -933,7 +933,8 @@ namespace cityLife.Controllers
                     Currency = theCurrency,
                     hours = 0,
                     isSalaryDay = false,
-                    salaryCents = 0
+                    salaryCents = 0,
+                    hotel_Id = 1
                 };
                 db.EmployeeWorkDays.Add(empWorkDay);
             }
