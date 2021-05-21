@@ -17,6 +17,7 @@ namespace cityLife4
         Orange = 1,
         Green = 2,
         Blue = 3,
-        Gray = 4
+        Gray = 4,
+        DarkGreen = 5
     }
 }
