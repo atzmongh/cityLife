@@ -470,7 +470,12 @@ namespace cityLife.Controllers
                         }
                         //At this point anOrder contains the order pointed by the on-hand apartmentDay record
                         //Add the revenue of that day to the total revenu per day
-                        revenuePerDay[dayNumber] += anApartmentDay.revenueAsMoney();
+                        if (anApartmentDay.Apartment.number > 0)
+                        {
+                            //This is a real apartment (not a waiting list) - add its revenue to the day's revenue
+                            revenuePerDay[dayNumber] += anApartmentDay.revenueAsMoney();
+                        }
+                        
                         apartmentRevenue += anApartmentDay.revenueAsMoney();
                         apartmentOccupiedDays++;
                         if (aDayBlock == null)
