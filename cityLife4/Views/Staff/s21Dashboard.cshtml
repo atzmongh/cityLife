@@ -28,8 +28,9 @@
         wide = "wide";
         high = "high";
     }
-    string[] backgroundColors = { "aliceblue", "antiquewhite", "gainsboro", "lavender", "lightskyblue", "lemonchiffon" };
-    int colorIndex = 0;
+    //customer wants to have all lines with same color - this is now obsolete
+    //string[] backgroundColors = { "aliceblue", "antiquewhite", "gainsboro", "lavender", "lightskyblue", "lemonchiffon" };
+    //int colorIndex = 0;
 }
 
 
@@ -278,13 +279,18 @@
                 }
                 @foreach (var anApartment in apartmentDayBlocks)
                 {
-
-                    <tr style="background-color:@backgroundColors[colorIndex]; height:35px;">
-                        @{
-                            colorIndex++;
-                            colorIndex %= backgroundColors.Count();  //Advance the color index, and wrap around in case it is larger than the array
-                                                                     //of available colors
-                        }
+                    string backgroundColor;
+                    if (anApartment.First().apartmentNumber > 0)
+                    {
+                        //this is a real apartment - will have yello background
+                        backgroundColor = "lemonchiffon";
+                    }
+                    else
+                    {
+                        //this is a waiting list line
+                        backgroundColor = "aliceblue";
+                    }
+                    <tr style="background-color:@backgroundColor; height:35px;">
                         @foreach (var aDAyBlock in anApartment)
                         {
                             if (aDAyBlock.status == OrderStatus.Free)
