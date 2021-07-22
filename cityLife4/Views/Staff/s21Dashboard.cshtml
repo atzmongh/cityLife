@@ -240,10 +240,26 @@
             <table style="table-layout:fixed; width:100%">
                 @*line 1 - date line*@
                 <tr>
-                    @{ var lastDate = fromDate.AddDays(dashboardDays);}
+                    @{ var lastDate = fromDate.AddDays(dashboardDays);
+                        int pastDaysCount = 0;
+                    }
+                       
                     @for (DateTime aDate = fromDate; aDate < lastDate; aDate = aDate.AddDays(1))
                     {
-                        string todaysBackground = (aDate.Date == today.Date ? "today" : "");  //Check if the date is today - put a different color
+                        //Calcualte how many days in the past will be in this dashboard display
+                        if (aDate.Date <= today.Date)
+                        {
+                            pastDaysCount++;
+                        }
+                       
+                        //Check if the date is today - put a different color
+                        string todaysBackground = "";
+                        if (aDate.Date == today.Date)
+                        {
+                            todaysBackground = "today";
+                        }
+
+
                         string weekendBackground = "";
                         if (aDate.Date.DayOfWeek == DayOfWeek.Sunday || aDate.Date.DayOfWeek == DayOfWeek.Saturday)
                         {
@@ -343,9 +359,22 @@
                 }
                 @*Revenu total line*@
                 <tr>
-                    @{ var totalRevenue = new Money(0m, "UAH");}
+                    @{ var totalRevenue = new Money(0m, "UAH");
+                        var totalActualRevenue = new Money(0m, "UAH");
+                        var totalExpectedRevenue = new Money(0m, "UAH");
+                     }
                     @foreach (var aRevenue in revenuePerDay)
                     {
+                        totalRevenue += aRevenue;
+                        if (pastDaysCount > 0)
+                        {
+                            totalActualRevenue += aRevenue;
+                            pastDaysCount--;
+                        }
+                        else
+                        {
+                            totalExpectedRevenue += aRevenue;
+                        }
                         if (aRevenue.isZero())
                         {
                             <td class="dash02td"></td>
@@ -353,9 +382,7 @@
                         else
                         {
                             <td class="dash02td">@aRevenue.toMoneyString(showCents: false)</td>
-                            totalRevenue += aRevenue;
-
-
+                           
                         }
                     }
                     @{
@@ -430,8 +457,20 @@
             </table>
         </div>
     </div>
-    <div style="padding:2px;">@tBox.translate("Total revenue"):@totalRevenue.toMoneyString(showCents: false)</div>
-
+    @*<div style="padding:2px;">@tBox.translate("Revenue: actual"):@totalActualRevenue.toMoneyString(showCents: false)
+    @tBox.translate("Expected"):@totalExpectedRevenue.toMoneyString(showCents:false)
+    </div>*@
+    <table>
+        <tr>
+            <td>actual revenue</td>
+            <td>@totalActualRevenue.toMoneyString(showCents: false)</td>
+        </tr>
+        <tr>
+            
+            <td>Expected revenue</td>
+            <td>@totalExpectedRevenue.toMoneyString(showCents: false)</td>
+        </tr>
+    </table>
     <!--This part contgains all forms which are displayed under the main grid. Contains 6 forms, where each time only
         one is displayed and the rest are hidden-->
     <div id="s20underTheGrid">

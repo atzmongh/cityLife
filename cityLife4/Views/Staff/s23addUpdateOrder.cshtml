@@ -45,6 +45,7 @@
             <li id="liPersonal" class="active" onclick="activate('Personal')">@tBox.translate("Personal")</li>
             <li id="liBooking" class="nonActive" onclick="activate('Booking')">@tBox.translate("Booking")</li>
             <li id="liStatus" class="nonActive" onclick="activate('Status')">@tBox.translate("Status")</li>
+            <li id="liServices" class="nonActive" onclick="activate('Services')">@tBox.translate("Services")</li>
         </ul>
     </header>
     <form method="post" action="/staff/s25addUpdateOrder">
@@ -59,6 +60,9 @@
             @Html.Partial("s26orderStatus")
         </div>
     </form>
+    <div id="divServices" style="display:none">
+        @Html.Partial("s34OrderServices");
+    </div>
 </div>
 <script>
     var a = 0;

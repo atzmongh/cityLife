@@ -538,6 +538,7 @@
     <Content Include="Scripts\Db migrations\dbo.migration2_4.sql" />
     <Content Include="Scripts\Db migrations\dbo.migration2_5.sql" />
     <Content Include="Scripts\Db migrations\dbo.migration2_6.sql" />
+    <Content Include="Scripts\Db migrations\dbo.migration2_7.sql" />
     <Content Include="styles2.css" />
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="cityLifeDB.csv" />
@@ -753,6 +754,7 @@
     <Content Include="Views\Staff\s30showExpenses.cshtml" />
     <Content Include="Views\Staff\s31updateExpense.cshtml" />
     <Content Include="Views\Staff\s33revenueReport.cshtml" />
+    <Content Include="Views\Staff\s34OrderServices.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
       <SubType>Designer</SubType>
